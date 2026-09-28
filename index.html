@@ -297,6 +297,30 @@
             padding:40px 20px; text-align:center;
             color:rgba(255,255,255,0.25); font-size:0.85rem; letter-spacing:0.05em;
         }
+
+        /* ── INVENTORY TOP BAR (stays fixed while the grid scrolls) ─── */
+        .inv-topbar { flex-shrink:0; padding:10px 20px 12px; background:rgba(14,30,20,0.98); border-bottom:1px solid rgba(255,255,255,0.08); text-align:center; }
+        #inv-count { color:rgba(180,230,195,0.9); font-size:0.78rem; letter-spacing:0.04em; }
+        #inv-count b { font-size:1.15rem; color:rgba(220,250,225,1); }
+        #inv-count span { opacity:0.8; }
+        .inv-progress { height:4px; margin-top:8px; border-radius:2px; background:rgba(255,255,255,0.1); overflow:hidden; }
+        #inv-progress-fill { height:100%; width:0%; background:rgba(120,220,140,0.85); border-radius:2px; transition:width 0.3s; }
+
+        /* ── ENLARGED VOCABULARY CARD ───────────────────────────────── */
+        #card-zoom { position:fixed; inset:0; z-index:60; display:none; align-items:center; justify-content:center; padding:16px; background:rgba(2,4,10,0.82); backdrop-filter:blur(5px); pointer-events:all; }
+        #card-zoom.open { display:flex; }
+        .zoom-card { position:relative; width:min(320px,88vw); box-sizing:border-box; padding:28px 20px 20px; border-radius:22px; text-align:center; color:#fff;
+            border:1px solid rgba(180,230,195,0.35); background:linear-gradient(160deg,rgba(20,45,30,0.98),rgba(8,18,12,0.98));
+            box-shadow:0 20px 70px rgba(0,0,0,0.7); animation:zoomIn 0.18s ease-out; }
+        @keyframes zoomIn { from { transform:scale(0.85); opacity:0; } to { transform:scale(1); opacity:1; } }
+        .zoom-close { position:absolute; top:8px; right:10px; background:none; border:none; color:rgba(255,255,255,0.55); font-size:1.1rem; cursor:pointer; padding:6px 10px; }
+        .zoom-close:hover { color:#fff; }
+        .zoom-en { font-size:1.25rem; font-weight:700; color:rgba(180,230,195,0.98); margin-bottom:6px; }
+        .zoom-emoji { font-size:clamp(5rem,26vw,7.5rem); line-height:1.15; margin:6px 0 10px; }
+        .zoom-es { font-size:1.7rem; font-weight:800; color:rgba(230,250,235,1); letter-spacing:0.02em; }
+        .zoom-qty { margin-top:8px; font-size:0.8rem; color:rgba(180,230,195,0.8); min-height:1em; }
+        .zoom-hint { margin-top:16px; font-size:0.62rem; letter-spacing:0.06em; color:rgba(255,255,255,0.3); }
+
     </style>
 </head>
 <body>
@@ -466,8 +490,11 @@
             <span class="panel-title">Inventory</span>
             <button class="panel-back" data-goto="panel-main">‹ Back</button>
         </div>
+        <div class="inv-topbar">
+            <div id="inv-count"></div>
+            <div class="inv-progress"><div id="inv-progress-fill"></div></div>
+        </div>
         <div class="panel-body inventory-body">
-            <div id="inv-count" style="text-align:center;margin:2px 0 14px;color:rgba(180,230,195,0.9);font-size:0.95rem;letter-spacing:0.04em"></div>
             <div class="inv-grid" id="inv-grid"></div>
         </div>
     </div>
@@ -517,6 +544,18 @@
                 </label>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Enlarged vocabulary card -->
+<div id="card-zoom" role="dialog" aria-modal="true" aria-label="Vocabulary card">
+    <div class="zoom-card">
+        <button class="zoom-close" id="zoom-close" type="button" aria-label="Close">✕</button>
+        <div class="zoom-en" id="zoom-en"></div>
+        <div class="zoom-emoji" id="zoom-emoji"></div>
+        <div class="zoom-es" id="zoom-es"></div>
+        <div class="zoom-qty" id="zoom-qty"></div>
+        <div class="zoom-hint">Toca fuera para cerrar / Tap outside to close</div>
     </div>
 </div>
 
@@ -1421,6 +1460,7 @@ let soundEnabled = true;
 let soundVolume = Number(localStorage.getItem('vocabSoundVolume') ?? '5');
 if(!Number.isFinite(soundVolume)) soundVolume = 5;
 soundVolume = Math.max(0, Math.min(10, Math.round(soundVolume)));
+
 const volumeSlider = document.getElementById('volume-slider');
 const volumeValue = document.getElementById('volume-value');
 if(volumeSlider) volumeSlider.value = String(soundVolume);
@@ -3295,7 +3335,9 @@ function renderInventory(){
     if(!grid) return;
     grid.innerHTML = '';
     const countEl = document.getElementById('inv-count');
-    if(countEl) countEl.textContent = `${inventoryMap.size} / ${VOCAB.length} palabras diferentes recogidas`;
+    if(countEl) countEl.innerHTML = `<b>${inventoryMap.size}</b> / ${VOCAB.length} <span>palabras diferentes recogidas</span>`;
+    const fillEl = document.getElementById('inv-progress-fill');
+    if(fillEl) fillEl.style.width = (VOCAB.length ? (inventoryMap.size / VOCAB.length * 100) : 0) + '%';
     if(inventoryMap.size === 0){
         grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,0.25);font-size:0.8rem;padding:24px 0">Explore to find items</div>';
         return;
@@ -3305,6 +3347,9 @@ function renderInventory(){
         slot.className = 'inv-slot';
         slot.innerHTML = `<div class="inv-en">${entry.vocab.en}</div><div class="inv-emoji">${entry.vocab.emoji}</div><div class="inv-es">${es}${entry.qty>1?` <span class="inv-qty">×${entry.qty}</span>`:''}</div>`;
         slot.title = `${entry.vocab.en} — ${es}${entry.qty>1?' (×'+entry.qty+')':''}`;
+        slot.dataset.es = es;
+        slot.setAttribute('role','button');
+        slot.tabIndex = 0;
         grid.appendChild(slot);
     }
     // Fill remaining visual slots to keep grid tidy
@@ -3325,6 +3370,7 @@ function renderLog(){
 }
 
 function showPanel(id){
+    if(typeof closeCardZoom === 'function') closeCardZoom();
     panels.forEach(p=>{ p.style.display = p.id===id ? 'flex' : 'none'; });
     if(id==='panel-inventory') renderInventory();
     if(id==='panel-log') renderLog();
@@ -3336,8 +3382,16 @@ function openMenu(){
     showPanel('panel-main');
 }
 
+// Opening the menu never triggers an ad, so the menu (and its content) is
+// always shown immediately.
+function requestMenuOpen(){
+    if(menuOpen) return;
+    openMenu();
+}
+
 function closeMenu(){
     menuOpen = false;
+    if(typeof closeCardZoom === 'function') closeCardZoom();
     overlay.classList.remove('open');
     jL.active=false; joyLB.style.display='none'; jL.dx=jL.dy=0;
     jR.active=false; joyRB.style.display='none'; jR.dx=jR.dy=0;
@@ -3355,7 +3409,7 @@ document.getElementById('completion-continue')?.addEventListener('click', ()=>co
 document.getElementById('completion-continue')?.addEventListener('touchend', e=>{e.preventDefault();e.stopPropagation();completionScreen?.classList.remove('open');},{passive:false});
 
 layoutHUD();
-wireBtn('btn-menu', openMenu);
+wireBtn('btn-menu', requestMenuOpen);
 wireBtn('close-menu', closeMenu);
 wireBtn('save-game', saveGame);
 wireBtn('btn-action', ()=>{
@@ -3399,8 +3453,9 @@ document.getElementById('toggle-icebolt')?.addEventListener('change', function()
 
 window.addEventListener('keydown', e=>{
     if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
+    if(e.code==='Escape' && cardZoomEl && cardZoomEl.classList.contains('open')){ closeCardZoom(); return; }
     if(e.code==='Escape' && menuOpen){ closeMenu(); return; }
-    if(e.code==='KeyM' && !menuOpen){ openMenu(); return; }
+    if(e.code==='KeyM' && !menuOpen){ requestMenuOpen(); return; }
     if(e.code==='Space'){ e.preventDefault(); document.getElementById('btn-action').click(); }
     if(e.code==='KeyF'){
         e.preventDefault();
@@ -3524,6 +3579,34 @@ function stopLoungeMusic(){
     if(musicTimer){ clearTimeout(musicTimer); musicTimer=null; }
     if(musicCtx){ try{ musicCtx.suspend(); }catch(e){} }
 }
+
+// Enlarged vocabulary card: click/tap any collected card in the inventory.
+const cardZoomEl = document.getElementById('card-zoom');
+function closeCardZoom(){ if(cardZoomEl) cardZoomEl.classList.remove('open'); }
+function openCardZoom(es){
+    const entry = inventoryMap.get(es);
+    if(!entry || !cardZoomEl) return;
+    document.getElementById('zoom-en').textContent = entry.vocab.en;
+    document.getElementById('zoom-emoji').textContent = entry.vocab.emoji;
+    document.getElementById('zoom-es').textContent = es;
+    document.getElementById('zoom-qty').textContent = entry.qty > 1 ? `×${entry.qty} recogidos / collected` : '';
+    cardZoomEl.classList.add('open');
+}
+(function(){
+    const grid = document.getElementById('inv-grid');
+    grid.addEventListener('click', e=>{
+        const slot = e.target.closest('.inv-slot[data-es]');
+        if(slot) openCardZoom(slot.dataset.es);
+    });
+    grid.addEventListener('keydown', e=>{
+        if(e.code==='Enter' || e.code==='Space'){
+            const slot = e.target.closest('.inv-slot[data-es]');
+            if(slot){ e.preventDefault(); e.stopPropagation(); openCardZoom(slot.dataset.es); }
+        }
+    });
+    cardZoomEl.addEventListener('click', e=>{ if(e.target===cardZoomEl) closeCardZoom(); });
+    document.getElementById('zoom-close').addEventListener('click', closeCardZoom);
+})();
 
 // Start screen: generate the world only after the player presses PLAY.
 let gameStarted = false;
