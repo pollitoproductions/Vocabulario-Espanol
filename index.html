@@ -524,7 +524,7 @@
                     </div>
                 </div>
                 <label class="toggle">
-                    <input type="checkbox" id="toggle-firebolt" checked>
+                    <input type="checkbox" id="toggle-firebolt" autocomplete="off">
                     <div class="toggle-track"></div>
                     <div class="toggle-thumb"></div>
                 </label>
@@ -538,7 +538,7 @@
                     </div>
                 </div>
                 <label class="toggle">
-                    <input type="checkbox" id="toggle-icebolt">
+                    <input type="checkbox" id="toggle-icebolt" autocomplete="off">
                     <div class="toggle-track"></div>
                     <div class="toggle-thumb"></div>
                 </label>
@@ -1359,15 +1359,15 @@ function updateLevStaminaUI(){
     const levFrac = Math.max(0, Math.min(1, levStamina / LEV_MAX));
     levArc.setAttribute('stroke-dashoffset', ARC_LEN * (1 - levFrac));
     levArc.setAttribute('stroke', levActive
-        ? `rgba(80,140+Math.floor(levFrac*115),255,{0.6+levFrac*0.4})`
-        : `rgba(60,160+Math.floor(levFrac*95),255,{0.4+levFrac*0.5})`);
+        ? `rgba(80,${140+Math.floor(levFrac*115)},255,${0.6+levFrac*0.4})`
+        : `rgba(60,${160+Math.floor(levFrac*95)},255,${0.4+levFrac*0.5})`);
     if(sprintArc){
         const sprintFrac = Math.max(0, Math.min(1, sprintStamina / SPRINT_MAX));
         const sprintLen = 2 * Math.PI * 31;
         sprintArc.setAttribute('stroke-dashoffset', sprintLen * (1 - sprintFrac));
         sprintArc.setAttribute('stroke', sprintHeld
-            ? `rgba(120+Math.floor(sprintFrac*100),{220+Math.floor(sprintFrac*35)},120+Math.floor(sprintFrac*80),{0.65+sprintFrac*0.35})`
-            : `rgba(80,170+Math.floor(sprintFrac*55),110,{0.4+sprintFrac*0.5})`);
+            ? `rgba(${120+Math.floor(sprintFrac*100)},${220+Math.floor(sprintFrac*35)},${120+Math.floor(sprintFrac*80)},${0.65+sprintFrac*0.35})`
+            : `rgba(80,${170+Math.floor(sprintFrac*55)},110,${0.4+sprintFrac*0.5})`);
     }
 }
 
@@ -1738,7 +1738,7 @@ function makeFireballTexture(t) {
         const er = 18+Math.sin(t*Math.PI*7+e*1.7)*10;
         const ex = cx+Math.cos(ea)*er, ey = cy+Math.sin(ea)*er;
         ctx.beginPath(); ctx.arc(ex,ey,1+Math.random()*1.5,0,Math.PI*2);
-        ctx.fillStyle=`rgba(255,180+Math.floor(Math.random()*75),0,{0.5+Math.random()*0.5})`;
+        ctx.fillStyle=`rgba(255,${180+Math.floor(Math.random()*75)},0,${0.5+Math.random()*0.5})`;
         ctx.fill();
     }
 
@@ -3001,10 +3001,10 @@ function makeItemSprite(vocab){
     const col=vocab.color, r=(col>>16)&0xff, gv=(col>>8)&0xff, b=col&0xff;
 
     const g=ctx.createRadialGradient(cx,cx,0,cx,cx,cx);
-    g.addColorStop(0,   `rgba(r,{gv},${b},0.9)`);
-    g.addColorStop(0.35,`rgba(r,{gv},${b},0.65)`);
-    g.addColorStop(0.65,`rgba(r,{gv},${b},0.25)`);
-    g.addColorStop(1,   `rgba(r,{gv},${b},0)`);
+    g.addColorStop(0,   `rgba(${r},${gv},${b},0.9)`);
+    g.addColorStop(0.35,`rgba(${r},${gv},${b},0.65)`);
+    g.addColorStop(0.65,`rgba(${r},${gv},${b},0.25)`);
+    g.addColorStop(1,   `rgba(${r},${gv},${b},0)`);
     ctx.fillStyle=g;
     ctx.fillRect(0,0,S,S);
 
@@ -3297,7 +3297,7 @@ function updateCollectibles(dt){
     nearestItem=closest;
     if(closest){
         promptEl.style.display='block';
-        promptEl.textContent=`recoger (collect/pick up) · closest.vocab.es({closest.vocab.en})`;
+        promptEl.textContent=`recoger (collect/pick up) · ${closest.vocab.es} (${closest.vocab.en})`;
     } else {
         promptEl.style.display='none';
     }
@@ -3316,7 +3316,7 @@ function tryCollect(){
     scene.remove(nearestItem.label);
     promptEl.style.display='none';
     const entry = inventoryMap.get(vocab.es);
-    addLog(`✅ Recogiste "${vocab.es}" — vocab.en{entry.qty>1?' (×'+entry.qty+')':''}`);
+    addLog(`✅ Recogiste "${vocab.es}" — ${vocab.en}${entry.qty>1?' (×'+entry.qty+')':''}`);
     nearestItem=null;
     if(navigator.vibrate && document.getElementById('toggle-vibration')?.checked) navigator.vibrate(25);
     if(inventoryMap.size===VOCAB.length) showCompletionScreen();
@@ -3345,8 +3345,8 @@ function renderInventory(){
     for(const [es, entry] of inventoryMap){
         const slot = document.createElement('div');
         slot.className = 'inv-slot';
-        slot.innerHTML = `<div class="inv-en">entry.vocab.en</div><divclass="inv-emoji">{entry.vocab.emoji}</div><div class="inv-es">es{entry.qty>1?` <span class="inv-qty">×${entry.qty}</span>`:''}</div>`;
-        slot.title = `${entry.vocab.en} — es{entry.qty>1?' (×'+entry.qty+')':''}`;
+        slot.innerHTML = `<div class="inv-en">${entry.vocab.en}</div><div class="inv-emoji">${entry.vocab.emoji}</div><div class="inv-es">${es}${entry.qty>1?` <span class="inv-qty">×${entry.qty}</span>`:''}</div>`;
+        slot.title = `${entry.vocab.en} — ${es}${entry.qty>1?' (×'+entry.qty+')':''}`;
         slot.dataset.es = es;
         slot.setAttribute('role','button');
         slot.tabIndex = 0;
@@ -3365,7 +3365,7 @@ function renderLog(){
     const body = document.getElementById('log-body');
     if(!body) return;
     body.innerHTML = logEntries.length
-        ? logEntries.map(e=>`<div class="log-entry"><div class="log-time">e.time</div>{e.msg}</div>`).join('')
+        ? logEntries.map(e=>`<div class="log-entry"><div class="log-time">${e.time}</div>${e.msg}</div>`).join('')
         : '<div class="empty-state">No entries yet.</div>';
 }
 
@@ -3669,5 +3669,3 @@ continuePlay?.addEventListener('keydown', e=>{
 </script>
 </body>
 </html>
-
-
