@@ -64,6 +64,7 @@ ul.links span{display:block;font-size:.88rem;color:#5b6b62}
 <h1>Practice the words</h1>
 <p class="lead">Flashcards, a quiz and an el/la trainer built from the same 1,000 words as the game. Free, no sign-up.</p>
 <div class="tabs" role="tablist"><button data-m="flash" aria-selected="true">Flashcards</button><button data-m="quiz" aria-selected="false">Quiz</button><button data-m="el" aria-selected="false">El or la?</button></div>
+<div class="opt" style="margin:6px 0 2px"><label><input type="checkbox" id="pron" checked> 🔊 Pronunciación — hear each word read aloud</label></div>
 <div id="app"></div>
 <h2>Why practice this way</h2>
 <p>Seeing a word once in the game is a good start, but memory grows through repeated, active recall. That means trying to produce the meaning before you look at it. The flashcards, the quiz and the el/la trainer on this page all work that way. They use the same 1,000 words from Vocabulario Español, so anything you collected in the game can be tested here, and anything you miss here is a good reason to go back and find it again in the world.</p>
@@ -80,6 +81,22 @@ const $=s=>document.querySelector(s);
 const KEY='vocabPracticeKnown';
 let known={};try{known=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(known))}catch(e){}}
+
+/* pronunciation: read Spanish words aloud (Web Speech API) */
+let pronEnabled=true;try{pronEnabled=localStorage.getItem('vocabPronunciation')!=='0'}catch(e){}
+let esVoice=null;
+function pickSpanishVoice(){if(!('speechSynthesis' in window))return;try{const vs=speechSynthesis.getVoices().filter(v=>/^es([-_]|$)/i.test(v.lang||''));esVoice=vs.find(v=>/es[-_]MX/i.test(v.lang))||vs.find(v=>/es[-_]US/i.test(v.lang))||vs[0]||null}catch(e){esVoice=null}}
+if('speechSynthesis' in window){pickSpanishVoice();if(typeof speechSynthesis.addEventListener==='function')speechSynthesis.addEventListener('voiceschanged',pickSpanishVoice);else speechSynthesis.onvoiceschanged=pickSpanishVoice}
+function speakWord(text){
+  if(!pronEnabled||!text)return;const synth=window.speechSynthesis;if(!synth)return;
+  try{
+    if(synth.speaking||synth.pending)synth.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    if(esVoice){u.voice=esVoice;u.lang=esVoice.lang}else{u.lang='es-MX'}
+    u.rate=0.85;
+    synth.speak(u);
+  }catch(e){}
+}
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const isNoun=w=>/^(el|la|los|las) /.test(w.es);
 const art=w=>w.es.split(' ')[0];
@@ -103,6 +120,7 @@ function opts(extra){
 function setMode(m){mode=m;document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.m===m));
   if(m==='flash')flashSetup();else if(m==='quiz')quizSetup();else elSetup();}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+const pronChk=$('#pron');if(pronChk){pronChk.checked=pronEnabled;pronChk.addEventListener('change',e=>{pronEnabled=e.target.checked;try{localStorage.setItem('vocabPronunciation',pronEnabled?'1':'0')}catch(_){}})}
 
 /* flashcards */
 let deck=[],ix=0,flipped=false,seen=0,got=0;
@@ -126,7 +144,8 @@ function flashShow(){
   el.innerHTML='<p class="stat">Card '+(ix+1)+' of '+deck.length+'</p><div class="bar"><i style="width:'+(ix/deck.length*100)+'%"></i></div><div class="card" id="c" tabindex="0" role="button" aria-label="Flip card"></div><div class="act" id="ac"></div>';
   const draw=()=>{const front=dirv==='es'?w.es:w.en,back=dirv==='es'?w.en:w.es;
     $('#c').innerHTML=(flipped?'':'<div class="em">'+w.em+'</div>')+(flipped?'<div class="em">'+w.em+'</div>':'')+'<div class="big">'+(flipped?back:front)+'</div><div class="hint">'+(flipped?(dirv==='es'?'English':'Español'):'Tap to flip')+'</div>';
-    $('#ac').innerHTML=flipped?'<button id="k">I knew it</button><button class="alt" id="m">Not yet</button>':'<button class="alt" id="f">Flip</button>';
+    $('#ac').innerHTML=flipped?'<button id="k">I knew it</button><button class="alt" id="m">Not yet</button>'+(pronEnabled?'<button class="alt" id="spk">🔊 Escuchar</button>':''):'<button class="alt" id="f">Flip</button>'+(pronEnabled?'<button class="alt" id="spk">🔊 Escuchar</button>':'');
+    const sp=$('#spk');if(sp)sp.onclick=()=>speakWord(w.es);
     if(flipped){$('#k').onclick=()=>{known[w.es]=1;save();got++;seen++;ix++;flashShow()};$('#m').onclick=()=>{delete known[w.es];save();w.miss=true;seen++;ix++;flashShow()}}
     else $('#f').onclick=flip};
   const flip=()=>{flipped=!flipped;draw()};
@@ -150,9 +169,11 @@ function quizShow(){
       if(qdir==='en'&&isNoun(w)!==isNoun(x))continue;wrong.push(x);if(wrong.length===3)break}}
   const ch=shuffle([w].concat(wrong));
   el.innerHTML='<p class="stat">Question '+(qi+1)+' of '+qs.length+' · Score '+score+'</p><div class="bar"><i style="width:'+(qi/qs.length*100)+'%"></i></div><div class="card" style="cursor:default"><div class="em">'+w.em+'</div><div class="big">'+(qdir==='es'?w.es:w.en)+'</div></div><div class="choices" id="ch"></div><div class="act" id="nx"></div>';
+  if(qdir==='es'&&pronEnabled){$('#nx').innerHTML='<button class="alt" id="spkq">🔊 Escuchar</button>';$('#spkq').onclick=()=>speakWord(w.es)}
   ch.forEach(x=>{const b=document.createElement('button');b.textContent=x[key];b.onclick=()=>{
     [...$('#ch').children].forEach(c=>{c.disabled=true;if(c.textContent===ans)c.classList.add('good')});
     if(x===w){score++}else{b.classList.add('bad')}
+    speakWord(w.es);
     $('#nx').innerHTML='<button id="next">'+(qi+1>=qs.length?'See score':'Next')+'</button>';$('#next').focus();$('#next').onclick=()=>{qi++;quizShow()}};$('#ch').appendChild(b)});
 }
 
@@ -171,6 +192,7 @@ function elShow(){
   ['el','la'].forEach(a=>{const b=document.createElement('button');b.textContent=a;b.onclick=()=>{
     [...$('#ch').children].forEach(c=>{c.disabled=true;if(c.textContent===art(w))c.classList.add('good')});
     if(a===art(w))esc++;else b.classList.add('bad');
+    speakWord(w.es);
     $('#nx').innerHTML='<button id="next">'+(ei+1>=es.length?'See score':'Next')+'</button>';$('#next').focus();$('#next').onclick=()=>{ei++;elShow()}};$('#ch').appendChild(b)});
 }
 setMode('flash');
