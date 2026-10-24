@@ -69,7 +69,7 @@ body.no-emoji .card .em{display:none}
 <h1>Practice the words</h1>
 <p class="lead">Flashcards, a quiz and an el/la trainer built from the same 1,000 words as the games. Free, no sign-up.</p>
 <div class="tabs" role="tablist"><button data-m="quiz" aria-selected="true">Quiz</button><button data-m="flash" aria-selected="false">Flashcards</button><button data-m="el" aria-selected="false">El or la?</button><button data-m="known" aria-selected="false">Known words</button></div>
-<div class="opt"><div class="opt-row"><span class="opt-head">Hear &amp; hints</span><label><input type="checkbox" id="pron" checked> 🔊 Pronunciación — hear each word read aloud</label><label><input type="checkbox" id="emoj" checked> 🙂 Emoji — show the picture hint</label></div><div class="opt-row"><span class="opt-head">Speaking</span><label><input type="checkbox" id="sayadv"> 🎤 Say it to advance — pronounce the word to move on</label><span id="saystrictwrap" style="display:none">How correct: <label><input type="radio" name="saystrict" value="standard"> Standard</label><label><input type="radio" name="saystrict" value="strict"> Strict</label></span></div></div>
+<div class="opt"><div class="opt-row"><span class="opt-head">Hear &amp; hints</span><label><input type="checkbox" id="pron" checked> 🔊 Pronunciación</label><label><input type="checkbox" id="emoj" checked> 🙂 Emoji</label></div><div class="opt-row"><span class="opt-head">Speaking</span><label><input type="checkbox" id="sayadv"> 🎤 Say it to advance</label><span id="saystrictwrap" style="display:none">How correct: <label><input type="radio" name="saystrict" value="standard"> Standard</label><label><input type="radio" name="saystrict" value="strict"> Strict</label></span></div></div>
 <div id="saynote" class="stat" style="display:none;margin-top:0">🎤 Your voice is sent to your browser's speech service to check it — it isn't stored.</div>
 <div id="app"></div>
 <h2>Why practice this way</h2>
@@ -128,10 +128,9 @@ function pool(){
   if(s&&s[0]==='r'){return shuffle(W.filter(w=>!f||bare(w).charAt(0).toUpperCase()===f)).slice(0,+s.slice(1))}
   return W.filter(w=>(!f||bare(w).charAt(0).toUpperCase()===f)&&(!s||SETS[+s].words.has(w)));
 }
-el.addEventListener('change',e=>{if(e.target.id==='set'&&e.target.value[0]==='r'){const n=$('#n');if(n)n.value='9999'}});
-function opts(extra,head,hideCount){
-  return '<div class="opt"><div class="opt-row"><span class="opt-head">Words</span><label>Word set <select id="set"><option value="">All 1,000 words</option><optgroup label="Random mix (new words every round)">'+[900,800,700,600,500,400,300,200,100].map(n=>'<option value="r'+n+'">Random '+n+'</option>').join('')+'</optgroup><optgroup label="Fixed sets (alphabetical)">'+SETS.map((s,i)=>'<option value="'+i+'">'+s.label+'</option>').join('')+'</optgroup></select></label>'+
-  (hideCount?'':'<label>Cards per round <select id="n"><option>10</option><option selected>20</option><option>30</option><option>50</option><option>75</option><option>100</option><option>150</option><option>200</option><option>300</option><option>500</option><option value="9999">All in the set / mix</option></select></label>')+'</div>'+
+function opts(extra,head,countLabel){
+  return '<div class="opt"><div class="opt-row"><span class="opt-head">Words</span><label>Word set <select id="set"><option value="">All 1,000 words</option><optgroup label="Fixed sets (alphabetical)">'+SETS.map((s,i)=>'<option value="'+i+'">'+s.label+'</option>').join('')+'</optgroup></select></label>'+
+  (countLabel?'<label>'+countLabel+' <select id="n"><option>10</option><option selected>20</option><option>30</option><option>40</option><option>50</option><option>60</option><option>70</option><option>80</option><option>90</option><option>100</option></select></label>':'')+'</div>'+
   (extra?'<div class="opt-row">'+(head?'<span class="opt-head">'+head+'</span>':'')+extra+'</div>':'')+'</div>';
 }
 function setMode(m){mode=m;document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.m===m));
@@ -153,7 +152,7 @@ saySyncUI();
 /* flashcards */
 let deck=[],ix=0,flipped=false,seen=0,got=0;
 function flashSetup(){
-  el.innerHTML=opts('<label>Show <select id="dir"><option value="es">Spanish first</option><option value="en">English first</option></select></label><label><input type="checkbox" id="unk"> Only cards I have not marked known</label>','Flashcards')+
+  el.innerHTML=opts('<label>Show <select id="dir"><option value="es">Spanish first</option><option value="en">English first</option></select></label><label><input type="checkbox" id="unk"> Only cards I have not marked known</label>','Flashcards','Cards per round')+
   '<div class="act"><button id="go">Start</button></div><p class="stat">Marked known so far: <b>'+Object.keys(known).length+'</b> of '+W.length+'. <a href="#" id="rst">Reset</a></p>';
   $('#go').onclick=flashStart;
   $('#rst').onclick=e=>{e.preventDefault();known={};save();flashSetup()};
@@ -263,11 +262,11 @@ function sayGate(w,eligible){
 /* quiz */
 let qs=[],qi=0,score=0,qdir='es';
 function quizSetup(){
-  el.innerHTML=opts('<label>Question <select id="dir"><option value="es">Spanish → English</option><option value="en">English → Spanish</option></select></label>','Quiz',true)+'<div class="act"><button id="go">Start quiz</button></div>';
+  el.innerHTML=opts('<label>Question <select id="dir"><option value="es">Spanish → English</option><option value="en">English → Spanish</option></select></label>','Quiz','Questions per round')+'<div class="act"><button id="go">Start quiz</button></div>';
   $('#go').onclick=()=>{qdir=$('#dir').value;let p=pool();
     if(qdir==='en'){const c={};W.forEach(w=>c[w.en]=(c[w.en]||0)+1);p=p.filter(w=>c[w.en]===1)}
     if(p.length<4){el.insertAdjacentHTML('beforeend','<div class="result">Not enough words in this set. Try another set.</div>');return}
-    qs=shuffle(p).slice(0,20);qi=0;score=0;quizShow()};
+    qs=shuffle(p).slice(0,+$('#n').value);qi=0;score=0;quizShow()};
 }
 function quizShow(){
   if(qi>=qs.length){const pct=Math.round(score/qs.length*100);
@@ -291,7 +290,7 @@ function quizShow(){
 /* el / la */
 let es=[],ei=0,esc=0;
 function elSetup(){
-  el.innerHTML=opts('','')+'<p class="stat">Singular nouns only (el or la). Pick the right article.</p><div class="act"><button id="go">Start</button></div>';
+  el.innerHTML=opts('','','Cards per round')+'<p class="stat">Singular nouns only (el or la). Pick the right article.</p><div class="act"><button id="go">Start</button></div>';
   $('#go').onclick=()=>{const p=pool().filter(w=>/^(el|la) /.test(w.es)&&!AMBIG_GENDER.has(bare(w)));
     if(!p.length){el.insertAdjacentHTML('beforeend','<div class="result">No nouns in this set. Try another set.</div>');return}
     es=shuffle(p).slice(0,+$('#n').value);ei=0;esc=0;elShow()};
