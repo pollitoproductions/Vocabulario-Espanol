@@ -47,7 +47,7 @@ ul.links span{display:block;font-size:.88rem;color:#5b6b62}
 #cogtool ul.cog-list li{break-inside:avoid;font-size:.95rem;padding:2px 0}
 #cogtool ul.cog-list b.es{color:#1f5c3f}
 #cogtool button.cog-hear{background:none;border:0;cursor:pointer;font-size:1rem;padding:0 2px;line-height:1}
-#cogtool #cogsay{font-size:.95rem;margin:6px 0 10px;min-height:1.4em}
+#cogtool .cog-say{font-size:.95rem;margin-left:6px}
 #cogtool button.cog-hear.listening{color:#c0392b;animation:cogpulse 1s infinite}
 @keyframes cogpulse{50%{opacity:.35}}
 #cogtool .cog-privacy{font-size:.85rem;color:#5b6b62}
@@ -70,11 +70,10 @@ ul.links span{display:block;font-size:.88rem;color:#5b6b62}
 <div class="cog-prompt" id="cogprompt"></div>
 <div class="cog-target" id="cogtarget" style="display:none"></div>
 <div class="cog-hint" id="coghint">Tap the card to flip</div>
-<div class="cog-card-btns"><button type="button" class="cog-hear" onclick="event.stopPropagation();cogCardHearEs()" aria-label="Hear in Spanish">🔊 ES</button> <button type="button" class="cog-hear" onclick="event.stopPropagation();cogCardHearEn()" aria-label="Hear in English">🔊 EN</button> <button type="button" class="cog-hear" id="cogcardsay" onclick="event.stopPropagation();sayCog(this,cogDeck[cogPos])" aria-label="Say it">🎤</button></div>
+<div class="cog-card-btns"><button type="button" class="cog-hear" onclick="event.stopPropagation();cogCardHearEs()" aria-label="Hear in Spanish">🔊 ES</button> <button type="button" class="cog-hear" onclick="event.stopPropagation();cogCardHearEn()" aria-label="Hear in English">🔊 EN</button> <button type="button" class="cog-hear" id="cogcardsay" onclick="event.stopPropagation();sayCog(this,cogDeck[cogPos])" aria-label="Say it">🎤</button> <span class="cog-say" id="cogcardsayfb"></span></div>
 </div>
 <div class="cog-filters"><button type="button" class="cog-btn" onclick="cogFlip()">Flip</button> <button type="button" class="cog-btn on" onclick="cogNext()">Next card</button> <button type="button" class="cog-btn" onclick="cogShuffle()">Shuffle</button></div>
 </div>
-<p id="cogsay"></p>
 <p class="cog-privacy">Your voice is sent to your browser's speech service to check it — it isn't stored.</p>
 <div id="coglistview" style="display:none">
 <input id="cogsearch" type="search" placeholder="Search in English or Spanish…" aria-label="Search cognates">
@@ -87,28 +86,33 @@ function cogNorm(s){var r=s.toLowerCase();r=r.replace(/[áàäâ]/g,"a").replace
 function speakCog(w){if(!("speechSynthesis" in window)){return;}try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(w);u.rate=0.85;var vs=window.speechSynthesis.getVoices()||[];var v=null;for(var i=0;i<vs.length;i++){if(vs[i].lang==="es-MX"){v=vs[i];break;}}if(!v){for(var j=0;j<vs.length;j++){if(vs[j].lang==="es-US"){v=vs[j];break;}}}if(!v){for(var k=0;k<vs.length;k++){if(vs[k].lang&&vs[k].lang.indexOf("es")===0){v=vs[k];break;}}}if(v){u.voice=v;}u.lang="es-MX";window.speechSynthesis.speak(u);}catch(err){}}
 function speakCogEn(w){if(!("speechSynthesis" in window)){return;}try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(w);u.rate=0.85;var vs=window.speechSynthesis.getVoices()||[];var v=null;for(var i=0;i<vs.length;i++){if(vs[i].lang==="en-US"){v=vs[i];break;}}if(!v){for(var j=0;j<vs.length;j++){if(vs[j].lang==="en-GB"){v=vs[j];break;}}}if(!v){for(var k=0;k<vs.length;k++){if(vs[k].lang&&vs[k].lang.indexOf("en")===0){v=vs[k];break;}}}if(v){u.voice=v;}u.lang="en-US";window.speechSynthesis.speak(u);}catch(err){}}
 var cogFilter="all";
-function renderCog(){var q=cogNorm(document.getElementById("cogsearch").value||"");var out=[];for(var i=0;i<COG.length;i++){var e=COG[i];if(cogFilter!=="all"&&e[2]!==cogFilter){continue;}if(q&&cogNorm(e[0]).indexOf(q)<0&&cogNorm(e[1]).indexOf(q)<0){continue;}out.push("<li><b>"+e[0]+"</b> → <b class=\"es\">"+e[1]+"</b> <button type=\"button\" class=\"cog-hear\" onclick=\"speakCog('"+e[1].replace(/'/g,"\'")+"')\" aria-label=\"Hear in Spanish: "+e[1]+"\">🔊 ES</button> <button type=\"button\" class=\"cog-hear\" onclick=\"speakCogEn('"+e[0].replace(/'/g,"\'")+"')\" aria-label=\"Hear in English: "+e[0]+"\">🔊 EN</button> <button type=\"button\" class=\"cog-hear\" onclick=\"sayCog(this,"+i+")\" aria-label=\"Say it\">🎤</button></li>");}document.getElementById("coglist").innerHTML=out.join("");document.getElementById("cogcount").textContent="Showing "+out.length+" of "+COG.length+" cognates";}
+function renderCog(){var q=cogNorm(document.getElementById("cogsearch").value||"");var out=[];for(var i=0;i<COG.length;i++){var e=COG[i];if(cogFilter!=="all"&&e[2]!==cogFilter){continue;}if(q&&cogNorm(e[0]).indexOf(q)<0&&cogNorm(e[1]).indexOf(q)<0){continue;}out.push("<li><b>"+e[0]+"</b> → <b class=\"es\">"+e[1]+"</b> <button type=\"button\" class=\"cog-hear\" onclick=\"speakCog('"+e[1].replace(/'/g,"\'")+"')\" aria-label=\"Hear in Spanish: "+e[1]+"\">🔊 ES</button> <button type=\"button\" class=\"cog-hear\" onclick=\"speakCogEn('"+e[0].replace(/'/g,"\'")+"')\" aria-label=\"Hear in English: "+e[0]+"\">🔊 EN</button> <button type=\"button\" class=\"cog-hear\" onclick=\"sayCog(this,"+i+")\" aria-label=\"Say it\">🎤</button> <span class=\"cog-say\"></span></li>");}document.getElementById("coglist").innerHTML=out.join("");document.getElementById("cogcount").textContent="Showing "+out.length+" of "+COG.length+" cognates";}
 function setCogFilter(f,btn){cogFilter=f;var bs=document.querySelectorAll("#cogfilters .cog-btn");for(var i=0;i<bs.length;i++){bs[i].classList.remove("on");}btn.classList.add("on");cogSayStop();cogDeckBuild();renderCard();renderCog();}
 var cogDir="en-es";
 var cogRec=null;var cogRecBtn=null;var cogRecTimer=null;
-function setCogDir(d,btn){cogDir=d;var bs=document.querySelectorAll("#cogdirs .cog-btn");for(var i=0;i<bs.length;i++){bs[i].classList.remove("on");}btn.classList.add("on");cogSayStop();cogFlipped=false;renderCard();}
+function setCogDir(d,btn){cogDir=d;var bs=document.querySelectorAll("#cogdirs .cog-btn");for(var i=0;i<bs.length;i++){bs[i].classList.remove("on");}btn.classList.add("on");cogSayStop();cogCardFbClear();cogFlipped=false;renderCard();}
 var cogView="flash";
 var cogDeck=[];
 var cogPos=0;
 var cogFlipped=false;
 function cogShuffleDeck(){for(var i=cogDeck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=cogDeck[i];cogDeck[i]=cogDeck[j];cogDeck[j]=tmp;}}
-function cogDeckBuild(){cogDeck=[];for(var i=0;i<COG.length;i++){if(cogFilter!=="all"&&COG[i][2]!==cogFilter){continue;}cogDeck.push(i);}cogShuffleDeck();cogPos=0;cogFlipped=false;}
+function cogDeckBuild(){cogCardFbClear();cogDeck=[];for(var i=0;i<COG.length;i++){if(cogFilter!=="all"&&COG[i][2]!==cogFilter){continue;}cogDeck.push(i);}cogShuffleDeck();cogPos=0;cogFlipped=false;}
 function cogCardSides(){var e=COG[cogDeck[cogPos]];if(cogDir==="en-es"){return {prompt:e[0],target:e[1]};}return {prompt:e[1],target:e[0]};}
 function renderCard(){var pr=document.getElementById("cogprompt");var tg=document.getElementById("cogtarget");var hn=document.getElementById("coghint");if(cogDeck.length===0){pr.textContent="No cards in this filter.";tg.style.display="none";hn.textContent="";return;}var s=cogCardSides();pr.textContent=s.prompt;tg.textContent=s.target;tg.style.display=cogFlipped?"block":"none";hn.textContent=cogFlipped?"Tap the card to flip back":"Tap the card to flip";}
 function cogFlip(){if(cogDeck.length===0){return;}cogFlipped=!cogFlipped;renderCard();}
-function cogNext(){if(cogDeck.length===0){return;}cogPos++;if(cogPos>=cogDeck.length){cogShuffleDeck();cogPos=0;}cogFlipped=false;renderCard();}
-function cogShuffle(){cogShuffleDeck();cogPos=0;cogFlipped=false;renderCard();}
+function cogNext(){if(cogDeck.length===0){return;}cogSayStop();cogCardFbClear();cogPos++;if(cogPos>=cogDeck.length){cogShuffleDeck();cogPos=0;}cogFlipped=false;renderCard();}
+function cogShuffle(){cogSayStop();cogCardFbClear();cogShuffleDeck();cogPos=0;cogFlipped=false;renderCard();}
 function cogCardHearEs(){if(cogDeck.length===0){return;}speakCog(COG[cogDeck[cogPos]][1]);}
 function cogCardHearEn(){if(cogDeck.length===0){return;}speakCogEn(COG[cogDeck[cogPos]][0]);}
 function setCogView(v,btn){cogView=v;var bs=document.querySelectorAll("#cogviews .cog-btn");for(var i=0;i<bs.length;i++){bs[i].classList.remove("on");}if(btn){btn.classList.add("on");}cogSayStop();document.getElementById("cogflash").style.display=(v==="flash")?"block":"none";document.getElementById("coglistview").style.display=(v==="list")?"block":"none";if(v==="flash"){renderCard();}else{renderCog();}}
 function cogSayNorm(s){s=s.toLowerCase().trim();s=s.replace(/[.,!?;:'"()¡¿]/g,"");s=s.replace(/^to\s+/,"");return cogNorm(s);}
-function cogSayStop(){if(cogRec){try{cogRec.abort();}catch(err){}}if(cogRecTimer){clearTimeout(cogRecTimer);cogRecTimer=null;}if(cogRecBtn){cogRecBtn.classList.remove("listening");cogRecBtn=null;}cogRec=null;var f=document.getElementById("cogsay");if(f&&f.textContent.indexOf("Listening")>=0){f.textContent="";}}
-function sayCog(btn,idx){var SR=window.SpeechRecognition||window.webkitSpeechRecognition;var fb=document.getElementById("cogsay");if(!SR){if(fb){fb.textContent="Speech check isn't available in this browser.";}return;}if(cogRec){var wasBtn=(btn===cogRecBtn);cogSayStop();if(wasBtn){return;}}
+function cogCardFbClear(){var cf=document.getElementById("cogcardsayfb");if(cf){cf.textContent="";}}
+var cogAudio=null;
+function cogAudioEnsure(){try{if(!cogAudio){var AC=window.AudioContext||window.webkitAudioContext;if(!AC){return null;}cogAudio=new AC();}if(cogAudio.state==="suspended"){cogAudio.resume();}return cogAudio;}catch(err){return null;}}
+function cogDing(){var ac=cogAudioEnsure();if(!ac){return;}try{var tm=ac.currentTime;var g=ac.createGain();g.gain.setValueAtTime(0.0001,tm);g.gain.exponentialRampToValueAtTime(0.15,tm+0.02);g.gain.exponentialRampToValueAtTime(0.0001,tm+0.45);g.connect(ac.destination);var o1=ac.createOscillator();o1.type="sine";o1.frequency.setValueAtTime(880,tm);var o2=ac.createOscillator();o2.type="sine";o2.frequency.setValueAtTime(1318.5,tm+0.12);o1.connect(g);o2.connect(g);o1.start(tm);o2.start(tm+0.12);o1.stop(tm+0.25);o2.stop(tm+0.45);}catch(err){}}
+var cogRecFb=null;
+function cogSayStop(){if(cogRec){try{cogRec.abort();}catch(err){}}if(cogRecTimer){clearTimeout(cogRecTimer);cogRecTimer=null;}if(cogRecBtn){cogRecBtn.classList.remove("listening");cogRecBtn=null;}cogRec=null;if(cogRecFb&&cogRecFb.textContent.indexOf("Listening")>=0){cogRecFb.textContent="";}cogRecFb=null;}
+function sayCog(btn,idx){var SR=window.SpeechRecognition||window.webkitSpeechRecognition;var fb=(btn.parentElement&&btn.parentElement.querySelector)?btn.parentElement.querySelector(".cog-say"):null;if(!SR){if(fb){fb.textContent="Speech check isn't available in this browser.";}return;}if(cogRec){var wasBtn=(btn===cogRecBtn);cogSayStop();if(wasBtn){return;}}cogAudioEnsure();
 var e=COG[idx];var target,lang1,lang2,okWord;
 if(cogDir==="en-es"){target=e[1];lang1="es-MX";lang2="es-US";okWord="¡Correcto!";}
 else{target=e[0];lang1="en-US";lang2="en-GB";okWord="Correct!";}
@@ -116,10 +120,10 @@ try{if(window.speechSynthesis){window.speechSynthesis.cancel();}}catch(err){}
 var langs=[lang1,lang2];var li=0;
 function startRec(){var r;try{r=new SR();}catch(err){if(fb){fb.textContent="Speech check isn't available in this browser.";}return;}
 r.lang=langs[li];r.interimResults=false;r.continuous=false;r.maxAlternatives=1;
-r.onresult=function(ev){var tr="";try{tr=ev.results[0][0].transcript||"";}catch(err){}cogSayStop();if(fb){if(cogSayNorm(tr)===cogSayNorm(target)){fb.textContent="✓ "+okWord;}else{fb.textContent="Heard: “"+tr+"” — not quite, try again.";}}};
+r.onresult=function(ev){var tr="";try{tr=ev.results[0][0].transcript||"";}catch(err){}cogSayStop();if(fb){if(cogSayNorm(tr)===cogSayNorm(target)){fb.textContent="✓ "+okWord;cogDing();}else{fb.textContent="Heard: “"+tr+"” — not quite, try again.";}}};
 r.onerror=function(ev){var code=ev&&ev.error;if(code==="language-not-supported"&&li+1<langs.length){li++;try{r.abort();}catch(err){}startRec();return;}cogSayStop();if(fb){if(code==="not-allowed"||code==="service-not-allowed"){fb.textContent="Microphone blocked — allow the microphone to try again.";}else{fb.textContent="Couldn't hear that — try again.";}}};
 r.onend=function(){if(cogRec===r){cogSayStop();}};
-cogRec=r;cogRecBtn=btn;btn.classList.add("listening");
+cogRec=r;cogRecBtn=btn;cogRecFb=fb;btn.classList.add("listening");
 if(fb){fb.textContent="Listening… — tap to stop";}
 try{r.start();}catch(err){cogSayStop();}
 if(cogRecTimer){clearTimeout(cogRecTimer);}
