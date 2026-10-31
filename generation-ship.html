@@ -77,6 +77,7 @@
   button.ctl .lbl { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; line-height: 1.2; }
   #btn-mode { height: 54px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
   #btn-mine { height: 54px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
+  #btn-looksteer { height: 54px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
   #btn-center { height: 54px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
   /* Mini menu button: small, rounded, cyber-blue synthetic look. */
   #btn-menu {
@@ -310,8 +311,8 @@
   <div class="controls">Progress counts spoken Spanish only \u2014 flipping, tapping, and listening don\u2019t count; English practice doesn\u2019t count either.</div>
   </div><button class="subHead" data-sub="manual" data-label="CREW MANUAL // CONTROLS" type="button">▸ CREW MANUAL // CONTROLS</button><div class="subBody" id="sub-manual">
   <div class="controls">
-    Desktop: Click to look &middot; WASD walk &middot; Shift run &middot; Q auto-walk &middot; Space jump &middot; F depart (docking is automatic) &middot; nav readout always on while flying &middot; H ship menu &middot; W/S thrust/retro &middot; A/D turn &middot; &uarr;/&darr; pitch &middot; Space brake (in flight) &middot; M mine near an aura asteroid &middot; R retry after crash &middot; in flight the mouse looks around the shuttle (steering stays A/D + &uarr;/&darr;; CENTER button or C re-centers the view, which also eases back on its own when idle) &middot; fly within 250 m of a floating word to pronounce it and collect +5 WATER / +5 METAL<br>
-    Touch: Touch left half for floating stick (push to its edge to run) &middot; Drag right side to look around the shuttle (steering is the left stick; the view eases back on its own when idle; CENTER button re-centers it) &middot; Button: DEPART (docking is automatic within 100 m of any port) &middot; nav readout always on while flying &middot; JUMP (docked only) &middot; MINE (near an aura asteroid) &middot; &#9776; ship menu<br>Cells: walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to enter; EXIT door, EXIT button, or E to leave. Stations: walk up to a glowing-ring tool station and tap Open (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). HOME in this menu saves your journey and returns to the title screen
+    Desktop: Click to look &middot; WASD walk &middot; Shift run &middot; Q auto-walk &middot; Space jump &middot; F depart (docking is automatic) &middot; nav readout always on while flying &middot; H ship menu &middot; W/S thrust/retro &middot; A/D turn &middot; &uarr;/&darr; pitch &middot; Space brake (in flight) &middot; M mine near an aura asteroid &middot; R retry after crash &middot; in flight the mouse looks around the shuttle in LOOK mode or steers it in STEER mode (LOOK/STEER button switches; steering stays A/D + &uarr;/&darr; in both modes; CENTER button or C re-centers the view, which also eases back on its own when idle) &middot; fly within 250 m of a floating word to pronounce it and collect +5 WATER / +5 METAL<br>
+    Touch: Touch left half for floating stick (push to its edge to run) &middot; Drag right side: LOOK mode looks around, STEER mode steers the ship (drag up to climb; LOOK/STEER button switches; the left stick steers in both modes; the view eases back on its own when idle; CENTER button re-centers it) &middot; Button: DEPART (docking is automatic within 100 m of any port) &middot; nav readout always on while flying &middot; JUMP (docked only) &middot; MINE (near an aura asteroid) &middot; &#9776; ship menu<br>Cells: walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to enter; EXIT door, EXIT button, or E to leave. Stations: walk up to a glowing-ring tool station and tap Open (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). HOME in this menu saves your journey and returns to the title screen
   </div>
   </div><button class="subHead" data-sub="note" data-label="NOTE" type="button">▸ NOTE</button><div class="subBody" id="sub-note">
   <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; aura asteroids can be mined (hold M) for water from comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. (Jump arcs feel Mars-like by movement tuning; the ship&rsquo;s spin gravity itself is unchanged.) After departing, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, and a MEDICAL BAY room. Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 25 km from the ship, grows urgent past 40 km, and past 50 km you are LOST and the run ends (retry returns you aboard, haul kept, free). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, the belt stretches to about 20 km, and all 1,000 Spanish vocabulary words float among the rocks, plus exercise questions starting closer in, from 1.5 km out — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold arrow under the port readout points to the nearest uncollected item — word or exercise question — with a tag saying which, and distant items show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, you return to your last save.</div>
@@ -415,6 +416,7 @@
   <button class="ctl" id="btn-jump" type="button">&#8679;<span class="lbl">JUMP</span></button>
   <button class="ctl" id="btn-mine" type="button" style="display:none">MINE</button>
   <button class="ctl" id="btn-center" type="button" style="display:none">CENTER</button>
+  <button class="ctl" id="btn-looksteer" type="button" style="display:none">LOOK</button>
   <button class="ctl" id="btn-exit" type="button" style="display:none">EXIT</button>
   <button class="ctl" id="btn-station" type="button" style="display:none">OPEN</button>
   <button class="ctl" id="btn-terminal" type="button" style="display:none">OPEN REVIEW TERMINAL</button>
@@ -446,13 +448,15 @@ const METAL_YIELD = 15;       // metal per mined metal rock
 const SHUTTLE_THRUST = 12;    // m/s^2
 const SHUTTLE_YAW_RATE = 0.9; // rad/s
 const SHUTTLE_PITCH_RATE = 0.7; // rad/s
-// Decoupled flight camera (round 30 shuttle pass): mouse drag / touch
-// drag in flight looks around the shuttle instead of steering it —
-// steering is A/D + arrows + joystick only. camYaw/camPitch are the look
-// offsets relative to the shuttle frame; any look input sets them and
-// resets the idle timer, cancelling the auto-ease instantly. There is NO
-// recenter button and NO recenter key by design: recentering is idle
-// auto-ease only (see the flight camera block in updateFlight).
+// Decoupled flight camera (round 30 shuttle pass + LOOK/STEER toggle):
+// in LOOK mode (default) mouse drag / touch drag in flight looks around
+// the shuttle instead of steering it; in STEER mode the same drag steers
+// the ship (horizontal yaws, vertical pitches) and the camera does not
+// move. Steering is otherwise A/D + arrows + joystick. camYaw/camPitch
+// are the look offsets relative to the shuttle frame; any look input
+// sets them and resets the idle timer, cancelling the auto-ease
+// instantly. Recentering is the CENTER button (or C) plus idle auto-ease
+// (see the flight camera block in updateFlight).
 let camYaw = 0, camPitch = 0, lastCamInput = 0, lastFlightInput = 0;
 const CAM_IDLE_SECS = 3; // no look input AND no flight input this long -> ease back
 const CAM_EASE_RATE = 0.6; // gentle lerp rate (time constant ~1.7 s, never a snap)
@@ -462,6 +466,29 @@ const CAM_EASE_RATE = 0.6; // gentle lerp rate (time constant ~1.7 s, never a sn
 const CAM_CENTER_RATE = 3;
 let centerEase = false, centerEaseStarted = 0;
 function centerCamera() { centerEase = true; centerEaseStarted = performance.now(); }
+// Round 30 LOOK/STEER toggle (Brant playtest: on touch the left stick
+// gives yaw + thrust and right-side drag only moves the camera, so
+// there is NO ship-pitch input at all and flight is flat — the top of
+// the tile cloud is unreachable). Default LOOK = today's behavior (drag
+// looks, ship steers on keys/joystick only). STEER = right-side drag
+// steers the SHIP instead of the camera: horizontal drag yaws, vertical
+// drag pitches, through the same rotateShuttle path. Drag deltas
+// accumulate in steerDragYaw/Pitch (pixels since last updateFlight) and
+// convert at STEER_DRAG_PER_PX = 0.05 per pixel — full key-rate
+// deflection at ~20 px/frame (~1200 px/s swipe); typical drags give
+// partial deflection, so drag speed maps to turn rate, capped at the key
+// rates. Consumed and cleared every updateFlight, so a drag never
+// repeats. Drag-steering counts as flight input (the idle ease never
+// fights steering) but never touches lastCamInput, so a running CENTER
+// ease keeps easing the camera home while steering.
+let lookSteerMode = 'look';
+let steerDragYaw = 0, steerDragPitch = 0;
+const STEER_DRAG_PER_PX = 0.05;
+function updateLookSteerButton() {
+  const b = document.getElementById('btn-looksteer');
+  b.textContent = lookSteerMode === 'steer' ? 'STEER' : 'LOOK';
+  b.classList.toggle('on', lookSteerMode === 'steer');
+}
 const MAX_DT = 0.05;          // seconds; clamps hitches / tab-switches
 // Docking ports: nine total. The top end-cap hub port (on the spin axis, so
 // it never whirls) plus 8 body ports — 2 per quadrant × 4 quadrants around
@@ -2804,6 +2831,7 @@ const menuWater = document.getElementById('menuWater');
 const menuMetal = document.getElementById('menuMetal');
 const btnMine = document.getElementById('btn-mine');
 const btnCenter = document.getElementById('btn-center');
+const btnLookSteer = document.getElementById('btn-looksteer');
 // Round 25: Backrooms-style auto-walk (ship walk mode only). Toggle with
 // Q; stops on tool/collect open, cell entry,
 // dock/undock, menu/title open, or crash (see stopAutoWalk call sites
@@ -2840,6 +2868,7 @@ function hideNav() {
   beaconWarn.style.display = 'none';
   beaconBeam.visible = false;
   btnCenter.style.display = 'none';
+  btnLookSteer.style.display = 'none';
 }
 // Docked jump: one clean ballistic hop with a Mars arc (JUMP_G).
 // Ship spin gravity (TARGET_G, 1/3 g) is unchanged — only the jump arc feels Mars-like.
@@ -3095,13 +3124,21 @@ document.addEventListener('mousemove', function (e) {
     yaw -= e.movementX * 0.0022;
     pitch = Math.max(-1.45, Math.min(1.45, pitch - e.movementY * 0.0022));
   } else {
-    // Flight look (round 30 shuttle pass, decoupled camera): dragging the
-    // mouse looks around the shuttle; it NEVER turns the ship. Steering
-    // is A/D + arrows + joystick. Any look input resets the idle timer,
-    // cancelling the auto-ease instantly.
-    camYaw -= e.movementX * 0.0022;
-    camPitch = Math.max(-1.45, Math.min(1.45, camPitch - e.movementY * 0.0022));
-    lastCamInput = performance.now();
+    // Flight look / steer (round 30 shuttle pass + LOOK/STEER toggle):
+    // LOOK (default): dragging the mouse looks around the shuttle; it
+    // NEVER turns the ship. STEER: dragging steers the SHIP instead —
+    // horizontal drag yaws, vertical drag pitches — accumulated as pixel
+    // deltas for updateFlight; the camera does not move at all.
+    // Steering is A/D + arrows + joystick in both modes. Any look input
+    // resets the idle timer, cancelling the auto-ease instantly.
+    if (lookSteerMode === 'steer') {
+      steerDragYaw += e.movementX; steerDragPitch += e.movementY;
+      lastFlightInput = performance.now();
+    } else {
+      camYaw -= e.movementX * 0.0022;
+      camPitch = Math.max(-1.45, Math.min(1.45, camPitch - e.movementY * 0.0022));
+      lastCamInput = performance.now();
+    }
   }
 });
 document.addEventListener('keydown', function (e) {
@@ -3152,6 +3189,14 @@ window.addEventListener('pointermove', function (e) {
     } else if (mode === 'walk') {
       yaw -= dx * 0.005;
       pitch = Math.max(-1.45, Math.min(1.45, pitch - dy * 0.005));
+    } else if (lookSteerMode === 'steer') {
+      // Flight STEER (LOOK/STEER toggle): dragging steers the SHIP
+      // instead of the camera — horizontal drag yaws, vertical drag
+      // pitches. Pixel deltas accumulate for updateFlight; the camera
+      // does not move at all. Counts as flight input, so the idle ease
+      // never fights steering.
+      steerDragYaw += dx; steerDragPitch += dy;
+      lastFlightInput = performance.now();
     } else {
       // Flight look (round 30 shuttle pass, decoupled camera): dragging
       // looks around the shuttle; it NEVER turns the ship. Steering is
@@ -3362,17 +3407,30 @@ function updateWalk(dt) {
 function updateFlight(dt) {
   let yawIn = 0, pitchIn = 0, thrust = 0;
   // Shuttle forward is +Z with up +Y, so left is a positive Y rotation, right negative.
-  // Steering comes from keys or the floating joystick only (the on-screen
-  // THRUST/RETRO/TURN buttons were removed as redundant).
+  // Steering comes from keys, the floating joystick, or drag in STEER
+  // mode (the on-screen THRUST/RETRO/TURN buttons were removed as redundant).
   if (keys.KeyA) yawIn += 1;
   if (keys.KeyD) yawIn -= 1;
   yawIn -= joyX;
   if (keys.ArrowUp) pitchIn -= 1;
   if (keys.ArrowDown) pitchIn += 1;
+  // LOOK/STEER toggle: drag-steering from the last frame, converted at
+  // STEER_DRAG_PER_PX (0.05/px — full key-rate deflection at ~20 px/frame).
+  // Drag speed maps to turn rate, capped at the key rates by the clamps
+  // below. Consumed and cleared every frame so a drag never repeats.
+  // Signs mirror the joystick: drag right (dx > 0) yaws right (yawIn
+  // negative, like joyX > 0); drag up (dy < 0) pitches up (pitchIn
+  // negative, like ArrowUp).
+  if (lookSteerMode === 'steer') {
+    yawIn -= Math.max(-1, Math.min(1, steerDragYaw * STEER_DRAG_PER_PX));
+    pitchIn += Math.max(-1, Math.min(1, steerDragPitch * STEER_DRAG_PER_PX));
+  }
+  steerDragYaw = 0; steerDragPitch = 0;
   if (keys.KeyW) thrust += 1;
   if (keys.KeyS) thrust -= 1;
   thrust += joyY;
   yawIn = Math.max(-1, Math.min(1, yawIn));
+  pitchIn = Math.max(-1, Math.min(1, pitchIn)); // keys alone are already ±1; this only bounds keys+drag combined
   thrust = Math.max(-1, Math.min(1, thrust));
   lastThrust = thrust; // burn sound reads this in animate()
   if (yawIn !== 0 || pitchIn !== 0 || thrust !== 0 || keys.Space) lastFlightInput = performance.now();
@@ -3586,6 +3644,8 @@ function updateFlight(dt) {
     // CENTER button: flight only — hidden docked / crashed / while any
     // prompt or panel is open (collect, station, review, menu).
     btnCenter.style.display = (mode === 'flight' && !crashed && !collectOpen && !toolOpen && !reviewOpen && !menuOn) ? '' : 'none';
+    // LOOK/STEER toggle: same flight-only visibility as CENTER.
+    btnLookSteer.style.display = (mode === 'flight' && !crashed && !collectOpen && !toolOpen && !reviewOpen && !menuOn) ? '' : 'none';
     // Word guidance (guidance round, round 30 correction): gold arrow +
     // distance to the nearest uncollected, unsuppressed item of ANY type
     // (word tiles + all five question-tile types), reusing the collect
@@ -4026,6 +4086,13 @@ document.getElementById('btn-collect-leave').addEventListener('pointerdown', fun
 // Round 30 CENTER button: plain click (iOS-safe, same as station Hear).
 // Re-centers the flight camera with the fast ease; look input cancels.
 document.getElementById('btn-center').addEventListener('click', function () { centerCamera(); });
+// Round 30 LOOK/STEER toggle: plain click (iOS-safe). Switches drag
+// between looking (camera) and steering (ship) in flight; the label and
+// .on state show the current mode. No key binding.
+document.getElementById('btn-looksteer').addEventListener('click', function () {
+  lookSteerMode = lookSteerMode === 'steer' ? 'look' : 'steer';
+  updateLookSteerButton();
+});
 // Any tap or keypress counts as the gesture that unlocks WebAudio.
 document.addEventListener('pointerdown', ensureAudio);
 document.addEventListener('keydown', ensureAudio);
