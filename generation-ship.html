@@ -183,7 +183,7 @@
     border: 1px solid rgba(89, 214, 255, 0.65); border-radius: 20px; padding: 22px;
     text-align: center; font-family: monospace;
   }
-  #toolCard h2 { margin: 0; font-size: 22px; letter-spacing: 0.1em; color: #7fe3ff; }
+  #toolCard h2 { margin: 0 0 4px; padding-bottom: 10px; border-bottom: 1px solid rgba(89, 214, 255, 0.35); font-size: 22px; letter-spacing: 0.1em; color: #7fe3ff; }
   #toolLogic { margin-top: 6px; font-size: 13px; color: #9fd8ef; line-height: 1.5; }
   #toolBody { margin-top: 16px; font-size: 17px; line-height: 1.5; }
   #toolBody .big { font-size: 30px; font-weight: 700; }
@@ -191,7 +191,7 @@
   #toolCard button.ctl2, #toolBody button.ctl2 {
     padding: 12px 18px; font-size: 16px; font-family: monospace; cursor: pointer;
     background: rgba(8, 24, 44, 0.8); color: #7fe3ff; border: 1px solid rgba(89, 214, 255, 0.65);
-    border-radius: 14px; touch-action: manipulation; margin: 4px;
+    border-radius: 14px; touch-action: manipulation; margin: 6px;
   }
   #toolBody button.ctl2.right { background: #1d5c2e; color: #d8ffd8; border-color: #7dff9b; }
   #toolBody button.ctl2.wrong { background: #5c1d1d; color: #ffd9d9; border-color: #ff6b6b; }
@@ -199,12 +199,22 @@
   #toolFeedback { min-height: 22px; margin-top: 12px; font-size: 15px; color: #ffd166; }
   #toolFeedback.ok { color: #7dff9b; }
   /* Round 18: uniform audio row in the tool panel (Hear ES/EN + Say-it). */
-  #toolAudio { display: none; margin-top: 14px; }
+  #toolAudio { display: none; margin-top: 14px; border-top: 1px solid rgba(89, 214, 255, 0.25); padding-top: 12px; }
   #toolCard button.ctl2.listening { background: #c81e1e; color: #fff; border-color: #ff6b6b; animation: collectPulse 1s infinite; }
   #toolSayFeedback { min-height: 22px; margin-top: 10px; font-size: 15px; color: #ffd166; }
   #toolSayFeedback.ok { color: #7dff9b; }
   #toolNoMic { display: none; margin-top: 10px; font-size: 13px; color: #ffb347; }
   #toolPrivacy { margin-top: 10px; font-size: 11px; color: #8fa8c8; line-height: 1.5; }
+  /* Round 25 panel cleanup: the Close control is the panel's primary exit
+     action, so it reads as one; the AUTO-WALK button shows its on-state;
+     small screens get tighter card padding. No content or behavior change. */
+  #toolCard #btn-tool-close { background: #59d6ff; color: #06101e; border-color: #aee9ff; font-weight: 700; }
+  #buttons .ctl.on { background: #59d6ff; color: #06101e; border-color: #aee9ff; }
+  @media (max-width: 480px) {
+    #toolCard { padding: 16px; }
+    #toolCard h2 { font-size: 19px; }
+    #toolBody { font-size: 16px; }
+  }
   /* Home / title screen: full overlay on load, cyber-blue house style. */
   #titlePanel {
     position: fixed; inset: 0; z-index: 50; display: none; align-items: center; justify-content: center;
@@ -252,6 +262,8 @@
 <button id="btn-menu" type="button" aria-label="Ship menu">&#9776;</button>
 <div id="menuPanel">
   <h2>SHIP STATUS // GENERATION SHIP</h2>
+  <button class="closeBtn" id="btn-menu-save" type="button">SAVE JOURNEY</button>
+  <div id="menuSaveMsg"></div>
   <button class="subHead" data-sub="status" data-label="SHIP STATUS" type="button">▾ SHIP STATUS</button><div class="subBody open" id="sub-status">
   <div class="row"><span>TRANSPONDER</span><b>ARK-7 // BEACON BROADCASTING</b></div>
   <div class="row"><span>DRIVE</span><b id="menuDrive">DOCKED</b></div>
@@ -262,8 +274,6 @@
   <div class="row"><span>WATER</span><b id="menuWater">0</b></div>
   <div class="row"><span>METAL</span><b id="menuMetal">0</b></div>
   </div><button class="subHead" data-sub="journey" data-label="JOURNEY // SAVE" type="button">▸ JOURNEY // SAVE</button><div class="subBody" id="sub-journey">
-  <button class="closeBtn" id="btn-menu-save" type="button">SAVE JOURNEY</button>
-  <div id="menuSaveMsg"></div>
   <button class="closeBtn" id="btn-menu-home" type="button">HOME &mdash; SAVE &amp; TITLE SCREEN</button>
   </div><button class="subHead" data-sub="progress" data-label="PROGRESS" type="button">▸ PROGRESS</button><div class="subBody" id="sub-progress">
   <div class="row"><span>WORDS COLLECTED</span><b id="progWords">0 / 1000</b></div>
@@ -276,11 +286,11 @@
   <div class="controls">Progress counts spoken Spanish only \u2014 flipping, tapping, and listening don\u2019t count; English practice doesn\u2019t count either.</div>
   </div><button class="subHead" data-sub="manual" data-label="CREW MANUAL // CONTROLS" type="button">▸ CREW MANUAL // CONTROLS</button><div class="subBody" id="sub-manual">
   <div class="controls">
-    Desktop: Click to look &middot; WASD walk &middot; Space jump &middot; F undock (docking is automatic) &middot; nav readout always on while flying &middot; H ship menu &middot; W/S thrust/retro &middot; A/D turn &middot; &uarr;/&darr; pitch &middot; Space brake (undocked) &middot; M mine near an aura asteroid &middot; R retry after crash &middot; fly within 250 m of a floating word to pronounce it and collect +5 WATER / +5 METAL<br>
-    Touch: Touch left half for floating stick &middot; Drag right side to look/steer &middot; Button: UNDOCK (docking is automatic within 100 m of any port) &middot; nav readout always on while flying &middot; JUMP (docked only) &middot; MINE (near an aura asteroid) &middot; &#9776; ship menu<br>Cells: walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to enter; EXIT door, EXIT button, or E to leave. Stations: walk up to a glowing-ring tool station and tap Open (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). HOME in this menu saves your journey and returns to the title screen
+    Desktop: Click to look &middot; WASD walk &middot; Shift run &middot; Q auto-walk &middot; Space jump &middot; F undock (docking is automatic) &middot; nav readout always on while flying &middot; H ship menu &middot; W/S thrust/retro &middot; A/D turn &middot; &uarr;/&darr; pitch &middot; Space brake (undocked) &middot; M mine near an aura asteroid &middot; R retry after crash &middot; fly within 250 m of a floating word to pronounce it and collect +5 WATER / +5 METAL<br>
+    Touch: Touch left half for floating stick (push to its edge to run) &middot; AUTO-WALK button &middot; Drag right side to look/steer &middot; Button: UNDOCK (docking is automatic within 100 m of any port) &middot; nav readout always on while flying &middot; JUMP (docked only) &middot; MINE (near an aura asteroid) &middot; &#9776; ship menu<br>Cells: walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to enter; EXIT door, EXIT button, or E to leave. Stations: walk up to a glowing-ring tool station and tap Open (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). HOME in this menu saves your journey and returns to the title screen
   </div>
   </div><button class="subHead" data-sub="note" data-label="NOTE" type="button">▸ NOTE</button><div class="subBody" id="sub-note">
-  <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; aura asteroids can be mined (hold M) for water from comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. After undocking, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, and a MEDICAL BAY room (Dictation). Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 20 km from the ship; past 30 km you are LOST and the run ends (retry returns you aboard, haul kept). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, the belt stretches to about 20 km, and all 1,000 Spanish vocabulary words float among the rocks — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold word arrow under the port readout points to the nearest uncollected word, and distant words show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, the journey ends.</div>
+  <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; aura asteroids can be mined (hold M) for water from comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. (Jump arcs float Moon-like by movement tuning; the ship&rsquo;s spin gravity itself is unchanged.) After undocking, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, and a MEDICAL BAY room (Dictation). Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 20 km from the ship; past 30 km you are LOST and the run ends (retry returns you aboard, haul kept). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, the belt stretches to about 20 km, and all 1,000 Spanish vocabulary words float among the rocks — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold word arrow under the port readout points to the nearest uncollected word, and distant words show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, the journey ends.</div>
   </div>
   <button class="closeBtn" id="btn-menu-close" type="button">CLOSE</button>
 </div>
@@ -357,6 +367,7 @@
 <div id="buttons">
   <button class="ctl" id="btn-mode" type="button">UNDOCK</button>
   <button class="ctl" id="btn-jump" type="button">&#8679;<span class="lbl">JUMP</span></button>
+  <button class="ctl" id="btn-autowalk" type="button" style="display:none">AUTO-WALK</button>
   <button class="ctl" id="btn-mine" type="button" style="display:none">MINE</button>
   <button class="ctl" id="btn-exit" type="button" style="display:none">EXIT</button>
   <button class="ctl" id="btn-station" type="button" style="display:none">OPEN</button>
@@ -370,10 +381,12 @@ const RADIUS = 160;           // metres, inner surface of the habitat (doubled f
 const LENGTH = 640;           // metres, cylinder length (doubled from 320)
 const EYE = 1.7;              // eye height above the deck
 const G_EARTH = 9.81;
-const TARGET_G = G_EARTH / 3; // m/s^2 — the station spins for one-third g
+const TARGET_G = G_EARTH / 3; // m/s^2 — the station spins for one-third g (spin gravity, readouts, Coriolis: UNCHANGED)
 const OMEGA = Math.sqrt(TARGET_G / RADIUS); // rad/s; yields 1/3 g at RADIUS
-const WALK_SPEED = 12;        // m/s — brisk walk (was 6)
-const JUMP_VEL = 6.0;         // m/s — at 1/3 g this arcs ~5.5 m high, ~3.7 s hang, high and floaty
+const JUMP_G = 1.62;          // m/s^2 — Moon-float jump arc ONLY; ship spin gravity stays TARGET_G
+const WALK_SPEED = 18;        // m/s — base walk (was 12; the ship is 640 m long, so 12 felt slow)
+const RUN_MULT = 2;           // run speed = base x 2 (36 m/s)
+const JUMP_VEL = 6.0;         // m/s — with the Moon-float arc this jumps ~11.1 m high, ~7.4 s hang, high and floaty
 const DOCK_RANGE = 100;       // metres from any docking port; flying inside this range docks automatically
 const BEACON_WARN_DIST = 20000; // metres from the ship centre; past this, the beacon-range warning shows (round 15: action ends ~20 km, warning starts there)
 const BEACON_LOST_DIST = 30000; // metres from the ship centre; past this, the run ends LOST (round 15: 10 km of grace past the warning)
@@ -851,8 +864,16 @@ function makeStationConsole(labelText, colorCss, beaconH) {
   ped.position.set(0, 1.3, 0); grp.add(ped);
   const scrTex = fitTextTexture(labelText, colorCss);
   const scrMat = new THREE.MeshBasicMaterial({ map: scrTex, transparent: true, side: THREE.DoubleSide });
-  const scr = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.5), scrMat);
-  scr.position.set(0, 2.3, 0); grp.add(scr);
+  // Round 25 fix: the old single screen sat at local z 0, buried INSIDE
+  // the pedestal box (depth 1.1, faces at z +/-0.55), so the console read
+  // as a plain dark block from every angle. Now the screen sits proud of
+  // BOTH axial faces (z +/-0.57), the back one rotated so its text reads
+  // correctly from the far side — the console reads as an activity from
+  // either axial approach, matching the double-sided sign system.
+  const scrF = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.5), scrMat);
+  scrF.position.set(0, 2.3, 0.57); grp.add(scrF);
+  const scrB = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.5), scrMat);
+  scrB.position.set(0, 2.3, -0.57); scrB.rotation.y = Math.PI; grp.add(scrB);
   const strip = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.15, 1.15),
     new THREE.MeshBasicMaterial({ color: 0x59d6ff }));
   strip.position.set(0, 2.65, 0); grp.add(strip);
@@ -1389,14 +1410,15 @@ for (const eb of ENTERABLES) {
     ship.add(pl);
   }
 }
-// ---------- Round 17: open-area tool stations + entrance arches ----------
+// ---------- Round 17: open-area tool stations ----------
 // The mess (IDIOMS) and gallery (SER VS. ESTAR) are open areas, not
 // cells, so their stations stand in the open: the mess console between
 // the table columns at angle 2.05, z 110; the gallery console on the
 // upper deck at angle 4.7, z 90 (clear of the upper-deck tables at z 80 /
-// 100 / 120). Each open area also gets an entrance arch — two posts only
-// (round 24 sign dedup: the arch tool signs are removed, so the console
-// sign above each console is the one tool-name sign for that station).
+// 100 / 120). Round 25 removed the entrance arches entirely: after the
+// round 24 sign dedup their signs were gone, leaving purposeless bare
+// posts, so the console sign above each console is now the station's
+// only marker. The arches carried no collision or trigger logic.
 {
   const messRad = new THREE.Vector3(Math.cos(2.05), Math.sin(2.05), 0);
   const messCon = makeStationConsole('IDIOMS', '#ffc27a', 14);
@@ -1415,22 +1437,9 @@ for (const eb of ENTERABLES) {
   galLight.position.copy(galRad).multiplyScalar(147);
   galLight.position.z = 90;
   ship.add(galLight);
-  // Round 24 sign dedup: arches are posts only, no tool text — the
-  // console sign above each console is that station's one tool-name sign.
-  function makeEntranceArch(angle, z) {
-    const radial = new THREE.Vector3(Math.cos(angle), Math.sin(angle), 0);
-    const tang = new THREE.Vector3(-Math.sin(angle), Math.cos(angle), 0);
-    const postMat = new THREE.MeshStandardMaterial({ color: 0x4a5560, roughness: 0.85 });
-    for (const s of [-1, 1]) {
-      const post = new THREE.Mesh(new THREE.BoxGeometry(0.5, 8, 0.5), postMat);
-      post.position.copy(radial).multiplyScalar(156).add(tang.clone().multiplyScalar(s * 2.8));
-      post.position.z = z;
-      post.quaternion.copy(basisQuat(radial));
-      ship.add(post);
-    }
-  }
-  makeEntranceArch(2.05, 84);
-  makeEntranceArch(4.7, 38);
+  // Round 25: entrance arches deleted outright (see above) — no posts,
+  // no calls. The mess and gallery approaches are now clean open walk
+  // space marked only by the console sign, pillar, and aura.
 }
 // ---------- Round 23: cell stations move OUTSIDE ----------
 // Brant: the activity belongs out in the open, not in the corner of a
@@ -1618,6 +1627,7 @@ const btnExit = document.getElementById('btn-exit');
 function enterCell(zone) {
   if (inCell || transitioning || mode !== 'walk') return;
   transitioning = true;
+  stopAutoWalk();
   savedExterior = { angle: playerAngle, z: playerZ, yaw, pitch };
   cellZone = zone;
   cellGroup = zone === 'agri' ? agriCell : zone === 'tech' ? techCell : zone === 'med' ? medCell : eduCell;
@@ -1683,15 +1693,25 @@ function updateCellWalk(dt) {
   if (keys.KeyD) s += 1;
   if (keys.KeyA) s -= 1;
   f += joyY; s += joyX;
+  // Round 25 auto-walk: when on, forward pressure stays applied; the
+  // normalize below keeps it at base/run speed, and holding back (S or
+  // stick-down) cancels forward motion. Stops via stopAutoWalk().
+  if (autoWalk) f += 1;
   const len = Math.hypot(f, s);
   if (len > 1) { f /= len; s /= len; }
+  // Round 25 run: Shift held, or the touch joystick pushed to its edge
+  // (magnitude > 0.9). Keyboard-only input has joyMag 0, so Shift is the
+  // only keyboard run; joystick edge is the touch run.
+  const joyMag = Math.hypot(joyX, joyY);
+  const running = (keys.ShiftLeft || keys.ShiftRight || joyMag > 0.9);
+  const spd = WALK_SPEED * (running ? RUN_MULT : 1);
   // Cell forward is -z at cellYaw 0; right = cross(fwd, up).
   const fwd = new THREE.Vector3(Math.sin(cellYaw), 0, -Math.cos(cellYaw));
   const right = new THREE.Vector3(-fwd.z, 0, fwd.x);
-  cellX = Math.max(-15.5, Math.min(15.5, cellX + (fwd.x * f + right.x * s) * WALK_SPEED * dt));
-  cellZ = Math.max(-9.5, Math.min(9.5, cellZ + (fwd.z * f + right.z * s) * WALK_SPEED * dt));
+  cellX = Math.max(-15.5, Math.min(15.5, cellX + (fwd.x * f + right.x * s) * spd * dt));
+  cellZ = Math.max(-9.5, Math.min(9.5, cellZ + (fwd.z * f + right.z * s) * spd * dt));
   if (jumpH > 0 || jumpV > 0) {
-    jumpV -= TARGET_G * dt;
+    jumpV -= JUMP_G * dt;
     jumpH += jumpV * dt;
     if (jumpH <= 0) { jumpH = 0; jumpV = 0; }
   }
@@ -2078,6 +2098,18 @@ const failOverlay = document.getElementById('failOverlay');
 const menuWater = document.getElementById('menuWater');
 const menuMetal = document.getElementById('menuMetal');
 const btnMine = document.getElementById('btn-mine');
+const btnAutoWalk = document.getElementById('btn-autowalk');
+// Round 25: Backrooms-style auto-walk (ship walk mode only). Toggle with
+// Q or the AUTO-WALK button; stops on tool/collect open, cell entry,
+// dock/undock, menu/title open, or crash (see stopAutoWalk call sites
+// plus the animate-loop backstop). Never engages in flight or cells.
+let autoWalk = false;
+function stopAutoWalk() { autoWalk = false; if (btnAutoWalk) btnAutoWalk.classList.remove('on'); }
+function toggleAutoWalk() {
+  if (menuOn || mode !== 'walk' || inCell || crashed || titleOpen || toolOpen || collectOpen) return;
+  autoWalk = !autoWalk;
+  if (btnAutoWalk) btnAutoWalk.classList.toggle('on', autoWalk);
+}
 const failText = document.getElementById('failText');
 const failTitle = document.getElementById('failTitle');
 const failWarn = document.getElementById('failWarn');
@@ -2093,6 +2125,7 @@ const btnFailTitle = document.getElementById('btn-fail-title');
 function toggleMenu() {
   if (crashed) return; // fail screen owns the menu while open
   menuOn = !menuOn;
+  if (menuOn) stopAutoWalk();
   menuPanel.style.display = menuOn ? 'block' : 'none';
   btnMenu.classList.toggle('on', menuOn);
   if (menuOn) { menuSaveMsg.textContent = ''; updateMenu(); }
@@ -2103,7 +2136,8 @@ function hideNav() {
   beaconWarn.style.display = 'none';
   beaconBeam.visible = false;
 }
-// Docked jump: one clean ballistic hop under the station's 1/3 g.
+// Docked jump: one clean ballistic hop with a Moon-float arc (JUMP_G).
+// Ship spin gravity (TARGET_G, 1/3 g) is unchanged — only the jump arc floats like the Moon.
 function doJump() {
   if (mode !== 'walk' || jumpH > 0) return;
   jumpV = JUMP_VEL;
@@ -2125,6 +2159,7 @@ function crashMission(cause) {
   if (menuOn) toggleMenu();
   try { if (document.exitPointerLock) document.exitPointerLock(); } catch (e) {}
   crashed = true;
+  stopAutoWalk();
   hideNav();
   btnMine.style.display = 'none';
   const isCrash = cause === 'asteroid' || cause === 'hull';
@@ -2300,6 +2335,7 @@ function autoDock(portWorld) {
 // Button / F key: undock-only. While undocked they do nothing, because
 // docking is automatic on proximity to any port.
 function toggleMode() {
+  stopAutoWalk();
   if (mode === 'walk') undock();
 }
 
@@ -2338,6 +2374,7 @@ document.addEventListener('keydown', function (e) {
   if (e.code === 'Space' && !e.repeat && mode === 'walk') doJump();
   if (e.code === 'KeyF' && !e.repeat) toggleMode();
   if (e.code === 'KeyH' && !e.repeat) toggleMenu();
+  if (e.code === 'KeyQ' && !e.repeat) toggleAutoWalk();
   if (e.code === 'KeyR' && !e.repeat) retryMission();
   if (e.code === 'KeyE' && !e.repeat && inCell) exitCell();
   keys[e.code] = true;
@@ -2444,6 +2481,9 @@ document.getElementById('btn-fail-title').addEventListener('pointerdown', functi
 document.getElementById('btn-jump').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur(); doJump();
 });
+document.getElementById('btn-autowalk').addEventListener('pointerdown', function (e) {
+  e.preventDefault(); e.target.blur(); toggleAutoWalk();
+});
 document.getElementById('btn-mine').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur(); mineHeld = true;
 });
@@ -2474,8 +2514,18 @@ function updateWalk(dt) {
   if (keys.KeyD) s += 1;
   if (keys.KeyA) s -= 1;
   f += joyY; s += joyX;
+  // Round 25 auto-walk: when on, forward pressure stays applied; the
+  // normalize below keeps it at base/run speed, and holding back (S or
+  // stick-down) cancels forward motion. Stops via stopAutoWalk().
+  if (autoWalk) f += 1;
   const len = Math.hypot(f, s);
   if (len > 1) { f /= len; s /= len; }
+  // Round 25 run: Shift held, or the touch joystick pushed to its edge
+  // (magnitude > 0.9). Keyboard-only input has joyMag 0, so Shift is the
+  // only keyboard run; joystick edge is the touch run.
+  const joyMag = Math.hypot(joyX, joyY);
+  const running = (keys.ShiftLeft || keys.ShiftRight || joyMag > 0.9);
+  const spd = WALK_SPEED * (running ? RUN_MULT : 1);
 
   // Eye radius for this frame's movement (recomputed after moving, below).
   playerEyeR = (RADIUS - EYE) - 10 * galleryFactor(playerAngle, playerZ);
@@ -2489,13 +2539,13 @@ function updateWalk(dt) {
   const right = new THREE.Vector3().crossVectors(fwdH, up);
   const move = fwdH.multiplyScalar(f).add(right.multiplyScalar(s));
 
-  playerZ = Math.max(-(LENGTH / 2 - 20), Math.min(LENGTH / 2 - 20, playerZ + move.z * WALK_SPEED * dt));
+  playerZ = Math.max(-(LENGTH / 2 - 20), Math.min(LENGTH / 2 - 20, playerZ + move.z * spd * dt));
   // Gallery side walls are solid: inside the gallery/stair footprint
   // (z 40 ... 160), a tangential move that would cross either gallery
   // edge is cancelled, so the walker slides along the wall instead of
   // stepping off the upper deck or through the podium. Checked on the
   // unwrapped angle delta (no wrap false-positives near angle 0).
-  const tangDisp = move.dot(tangent) * WALK_SPEED * dt / playerEyeR;
+  const tangDisp = move.dot(tangent) * spd * dt / playerEyeR;
   const anNow = ((playerAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
   const anNext = anNow + tangDisp;
   const crossesGalleryEdge = playerZ >= 40 && playerZ <= 160 &&
@@ -2513,9 +2563,9 @@ function updateWalk(dt) {
     else if (playerZ < 0) playerZ = Math.min(-1.0, playerZ);
   }
 
-  // Jump: 1/3-g ballistic arc, landing back on the inner surface.
+  // Jump: Moon-float ballistic arc (JUMP_G = 1.62), landing back on the inner surface.
   if (jumpH > 0 || jumpV > 0) {
-    jumpV -= TARGET_G * dt;
+    jumpV -= JUMP_G * dt;
     jumpH += jumpV * dt;
     if (jumpH <= 0) { jumpH = 0; jumpV = 0; }
   }
@@ -3008,6 +3058,7 @@ function startListening() {
 }
 function openCollect(w) {
   collectTile = w; collectOpen = true;
+  stopAutoWalk();
   try { if (document.exitPointerLock) document.exitPointerLock(); } catch (e) {}
   try { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch (e) {}
   updateBurnSound(0); // burn stops the instant the prompt opens
@@ -3354,6 +3405,7 @@ function openTool(id) {
   const st = STATIONS.find(function (s) { return s.id === id; });
   if (!st) return;
   toolOpen = true; toolId = id;
+  stopAutoWalk();
   try { if (document.exitPointerLock) document.exitPointerLock(); } catch (e) {}
   try { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch (e) {}
   btnStation.style.display = 'none';
@@ -3576,6 +3628,12 @@ function animate() {
     }
     if (!crashed && mode === 'walk') checkStations();
   }
+  // Round 25: auto-walk backstop + button visibility. Any dock/undock
+  // transition or cell entry clears auto-walk even if a dedicated call
+  // site is missed, and the button only shows in ship walk mode with no
+  // panel, prompt, menu, title, or fail screen open.
+  if (mode !== 'walk' || inCell) stopAutoWalk();
+  btnAutoWalk.style.display = (mode === 'walk' && !inCell && !collectOpen && !toolOpen && !titleOpen && !menuOn && !crashed) ? '' : 'none';
   // Thruster burn sound: thrusting flight only — silent docked, crashed,
   // or while the collect prompt is open.
   updateBurnSound(!collectOpen && !toolOpen && !titleOpen && !crashed && mode === 'flight' ? lastThrust : 0);
@@ -3720,6 +3778,7 @@ const titleResumeSummary = document.getElementById('title-resume-summary');
 const titleMainBtns = document.getElementById('title-main-btns');
 const titleConfirm = document.getElementById('title-confirm');
 function showTitle(journeyEnded) {
+  stopAutoWalk();
   try { if (document.exitPointerLock) document.exitPointerLock(); } catch (e) {}
   if (menuOn) toggleMenu();
   const s = readSave();
