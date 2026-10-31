@@ -79,6 +79,7 @@
   #btn-mine { height: 54px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
   #btn-looksteer { height: 54px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
   #btn-center { height: 54px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
+  #btn-brake { height: 54px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
   /* Mini menu button: small, rounded, cyber-blue synthetic look. */
   #btn-menu {
     position: fixed; top: 12px; right: 12px; z-index: 9;
@@ -311,8 +312,8 @@
   <div class="controls">Progress counts spoken Spanish only \u2014 flipping, tapping, and listening don\u2019t count; English practice doesn\u2019t count either.</div>
   </div><button class="subHead" data-sub="manual" data-label="CREW MANUAL // CONTROLS" type="button">▸ CREW MANUAL // CONTROLS</button><div class="subBody" id="sub-manual">
   <div class="controls">
-    Desktop: Click to look &middot; WASD walk &middot; Shift run &middot; Q auto-walk &middot; Space jump &middot; F depart (docking is automatic) &middot; nav readout always on while flying &middot; H ship menu &middot; W/S thrust/retro &middot; A/D turn &middot; &uarr;/&darr; pitch &middot; Space brake (in flight) &middot; M mine near an aura asteroid &middot; R retry after crash &middot; in flight the mouse looks around the shuttle in LOOK mode or steers it in STEER mode (LOOK/STEER button switches; steering stays A/D + &uarr;/&darr; in both modes; CENTER button or C re-centers the view, which also eases back on its own when idle) &middot; fly within 250 m of a floating word to pronounce it and collect +5 WATER / +5 METAL<br>
-    Touch: Touch left half for floating stick (push to its edge to run) &middot; Drag right side: LOOK mode looks around, STEER mode steers the ship (drag up to climb; LOOK/STEER button switches; the left stick steers in both modes; the view eases back on its own when idle; CENTER button re-centers it) &middot; Button: DEPART (docking is automatic within 100 m of any port) &middot; nav readout always on while flying &middot; JUMP (docked only) &middot; MINE (near an aura asteroid) &middot; &#9776; ship menu<br>Cells: walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to enter; EXIT door, EXIT button, or E to leave. Stations: walk up to a glowing-ring tool station and tap Open (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). HOME in this menu saves your journey and returns to the title screen
+    Desktop: Click to look &middot; WASD walk &middot; Shift run &middot; Q auto-walk &middot; Space jump &middot; F depart (docking is automatic) &middot; nav readout always on while flying &middot; H ship menu &middot; W/S thrust/retro &middot; A/D turn &middot; &uarr;/&darr; pitch &middot; Space or BRAKE button to brake (in flight) &middot; M mine near an aura asteroid &middot; R retry after crash &middot; in flight the mouse looks around the shuttle in LOOK mode or steers it in STEER mode (LOOK/STEER button switches; steering stays A/D + &uarr;/&darr; in both modes; CENTER button or C puts the camera directly behind the spacecraft, which also eases back there on its own when idle) &middot; fly within 250 m of a floating word to pronounce it and collect +5 WATER / +5 METAL<br>
+    Touch: Touch left half for floating stick (push to its edge to run) &middot; Drag right side: LOOK mode looks around, STEER mode steers the ship (drag up to climb; LOOK/STEER button switches; the left stick steers in both modes; the view eases back on its own when idle; CENTER button puts the camera directly behind the spacecraft) &middot; Button: DEPART (docking is automatic within 100 m of any port) &middot; nav readout always on while flying &middot; JUMP (docked only) &middot; MINE (near an aura asteroid) &middot; BRAKE (hold to stop in flight) &middot; &#9776; ship menu<br>Cells: walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to enter; EXIT door, EXIT button, or E to leave. Stations: walk up to a glowing-ring tool station and tap Open (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). HOME in this menu saves your journey and returns to the title screen
   </div>
   </div><button class="subHead" data-sub="note" data-label="NOTE" type="button">▸ NOTE</button><div class="subBody" id="sub-note">
   <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; aura asteroids can be mined (hold M) for water from comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. (Jump arcs feel Mars-like by movement tuning; the ship&rsquo;s spin gravity itself is unchanged.) After departing, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, and a MEDICAL BAY room. Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 25 km from the ship, grows urgent past 40 km, and past 50 km you are LOST and the run ends (retry returns you aboard, haul kept, free). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, the belt stretches to about 20 km, and all 1,000 Spanish vocabulary words float among the rocks, plus exercise questions starting closer in, from 1.5 km out — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold arrow under the port readout points to the nearest uncollected item — word or exercise question — with a tag saying which, and distant items show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, you return to your last save.</div>
@@ -417,6 +418,7 @@
   <button class="ctl" id="btn-mine" type="button" style="display:none">MINE</button>
   <button class="ctl" id="btn-center" type="button" style="display:none">CENTER</button>
   <button class="ctl" id="btn-looksteer" type="button" style="display:none">LOOK</button>
+  <button class="ctl" id="btn-brake" type="button" style="display:none">BRAKE</button>
   <button class="ctl" id="btn-exit" type="button" style="display:none">EXIT</button>
   <button class="ctl" id="btn-station" type="button" style="display:none">OPEN</button>
   <button class="ctl" id="btn-terminal" type="button" style="display:none">OPEN REVIEW TERMINAL</button>
@@ -2832,6 +2834,8 @@ const menuMetal = document.getElementById('menuMetal');
 const btnMine = document.getElementById('btn-mine');
 const btnCenter = document.getElementById('btn-center');
 const btnLookSteer = document.getElementById('btn-looksteer');
+const btnBrake = document.getElementById('btn-brake');
+let brakeHeld = false; // hold-to-brake (BRAKE button; same decay as Space)
 // Round 25: Backrooms-style auto-walk (ship walk mode only). Toggle with
 // Q; stops on tool/collect open, cell entry,
 // dock/undock, menu/title open, or crash (see stopAutoWalk call sites
@@ -2869,6 +2873,7 @@ function hideNav() {
   beaconBeam.visible = false;
   btnCenter.style.display = 'none';
   btnLookSteer.style.display = 'none';
+  btnBrake.style.display = 'none';
 }
 // Docked jump: one clean ballistic hop with a Mars arc (JUMP_G).
 // Ship spin gravity (TARGET_G, 1/3 g) is unchanged — only the jump arc feels Mars-like.
@@ -3283,6 +3288,17 @@ document.getElementById('btn-mine').addEventListener('pointerdown', function (e)
 });
 window.addEventListener('pointerup', function () { mineHeld = false; });
 window.addEventListener('pointercancel', function () { mineHeld = false; });
+// Round 30 BRAKE button: HOLD to brake (touch + desktop) — exactly the
+// Space brake decay, no new physics constant. pointerup/leave/cancel
+// all release, so a slide-off the button can never stick the brake on.
+document.getElementById('btn-brake').addEventListener('pointerdown', function (e) {
+  e.preventDefault(); e.target.blur(); brakeHeld = true;
+});
+document.getElementById('btn-brake').addEventListener('pointerup', function () { brakeHeld = false; });
+document.getElementById('btn-brake').addEventListener('pointerleave', function () { brakeHeld = false; });
+document.getElementById('btn-brake').addEventListener('pointercancel', function () { brakeHeld = false; });
+window.addEventListener('pointerup', function () { brakeHeld = false; });
+window.addEventListener('pointercancel', function () { brakeHeld = false; });
 
 // Gallery walk level: smooth factor 0 (main deck) ... 1 (upper deck).
 // Stair ramps run z 40...60 and 140...160; the side edges are a HARD
@@ -3433,12 +3449,12 @@ function updateFlight(dt) {
   pitchIn = Math.max(-1, Math.min(1, pitchIn)); // keys alone are already ±1; this only bounds keys+drag combined
   thrust = Math.max(-1, Math.min(1, thrust));
   lastThrust = thrust; // burn sound reads this in animate()
-  if (yawIn !== 0 || pitchIn !== 0 || thrust !== 0 || keys.Space) lastFlightInput = performance.now();
+  if (yawIn !== 0 || pitchIn !== 0 || thrust !== 0 || keys.Space || brakeHeld) lastFlightInput = performance.now();
 
   rotateShuttle(yawIn * SHUTTLE_YAW_RATE * dt, pitchIn * SHUTTLE_PITCH_RATE * dt);
   const fwd = new THREE.Vector3(0, 0, 1).applyQuaternion(shuttle.quaternion);
   shuttleVel.addScaledVector(fwd, thrust * SHUTTLE_THRUST * dt);
-  if (keys.Space) shuttleVel.multiplyScalar(Math.max(0, 1 - 2.5 * dt)); // brake assist only; no ambient drag
+  if (keys.Space || brakeHeld) shuttleVel.multiplyScalar(Math.max(0, 1 - 2.5 * dt)); // brake assist only (Space or BRAKE button); no ambient drag
   shuttle.position.addScaledVector(shuttleVel, dt);
   flame.visible = thrust > 0.05;
   retroL.visible = retroR.visible = thrust < -0.05; // reverse thrust only, never the Space brake
@@ -3448,7 +3464,7 @@ function updateFlight(dt) {
   // Drive state for the ship-status menu (real thrust state, never faked).
   if (thrust > 0.05) driveState = 'BURNING — MAIN DRIVE';
   else if (thrust < -0.05) driveState = 'RETRO BURN';
-  else if (keys.Space) driveState = 'BRAKING';
+  else if (keys.Space || brakeHeld) driveState = 'BRAKING';
   else driveState = 'COAST';
 
   // Beacon range (round 14, thresholds round 32): distance is measured from the ship centre
@@ -3554,10 +3570,9 @@ function updateFlight(dt) {
   // Decoupled flight camera (round 30 shuttle pass): the camera orbits
   // the shuttle on look offsets the player controls separately from ship
   // heading — mouse drag / touch drag looks around, A/D + arrows +
-  // joystick steer. Neutral (offsets zero) trails the shuttle: behind the
-  // direction of TRAVEL when moving fast, behind the NOSE when
-  // near-stationary (neutral forward blends nose toward velocity with
-  // speed). Idle auto-ease ONLY: with no look input AND no flight input
+  // joystick steer. Neutral (offsets zero) trails the shuttle directly
+  // behind its NOSE (never the velocity — the old velocity blend swung
+  // the view 180° on thrust reversal). Idle auto-ease ONLY: with no look input AND no flight input
   // for CAM_IDLE_SECS, the offsets ease gently toward zero (slow lerp,
   // never a snap); any look input cancels instantly by resetting the
   // timer and setting fresh offsets. CENTER button (or C) fast-eases the offsets to zero; look input cancels that ease instantly.
@@ -3576,11 +3591,16 @@ function updateFlight(dt) {
       if (Math.abs(camYaw) < 0.005 && Math.abs(camPitch) < 0.005) { camYaw = 0; camPitch = 0; centerEase = false; }
     }
   }
-  const speedNow = shuttleVel.length();
-  const velDir = speedNow > 0.01 ? shuttleVel.clone().divideScalar(speedNow) : fwd;
-  const neutralFwd = fwd.clone().lerp(velDir, Math.min(1, speedNow / 100));
-  if (neutralFwd.lengthSq() < 0.000001) neutralFwd.copy(fwd); // nose/travel opposed: never normalize a near-zero vector
-  neutralFwd.normalize();
+  // Neutral trailing is NOSE-ONLY (round 30 fix): the camera base trails
+  // the spacecraft's nose direction, never the velocity. The old blend
+  // toward velocity swung the neutral 180° when velocity passed through
+  // zero during a thrust reversal — that was the view-flip Brant saw.
+  // Nose-trailing moves only with ship yaw (0.9 rad/s), so it can never
+  // flip on reversal. CENTER / C / idle ease all resolve here, so all
+  // three now mean 'directly behind the spacecraft.' No look computation
+  // here is origin-relative: the camera sits on shuttle.position plus
+  // nose-derived offsets, never on the map centre.
+  const neutralFwd = fwd.clone();
   const upS = new THREE.Vector3(0, 1, 0).applyQuaternion(shuttle.quaternion);
   const camFwd = neutralFwd.clone().applyAxisAngle(upS, camYaw);
   const camRight = new THREE.Vector3().crossVectors(upS, camFwd).normalize();
@@ -3646,6 +3666,8 @@ function updateFlight(dt) {
     btnCenter.style.display = (mode === 'flight' && !crashed && !collectOpen && !toolOpen && !reviewOpen && !menuOn) ? '' : 'none';
     // LOOK/STEER toggle: same flight-only visibility as CENTER.
     btnLookSteer.style.display = (mode === 'flight' && !crashed && !collectOpen && !toolOpen && !reviewOpen && !menuOn) ? '' : 'none';
+    // BRAKE button: same flight-only visibility as CENTER.
+    btnBrake.style.display = (mode === 'flight' && !crashed && !collectOpen && !toolOpen && !reviewOpen && !menuOn) ? '' : 'none';
     // Word guidance (guidance round, round 30 correction): gold arrow +
     // distance to the nearest uncollected, unsuppressed item of ANY type
     // (word tiles + all five question-tile types), reusing the collect
@@ -4084,7 +4106,8 @@ document.getElementById('btn-collect-leave').addEventListener('pointerdown', fun
   e.preventDefault(); e.target.blur(); closeCollect(false);
 });
 // Round 30 CENTER button: plain click (iOS-safe, same as station Hear).
-// Re-centers the flight camera with the fast ease; look input cancels.
+// Puts the flight camera directly behind the spacecraft (nose-trailing)
+// with the fast ease; look input cancels.
 document.getElementById('btn-center').addEventListener('click', function () { centerCamera(); });
 // Round 30 LOOK/STEER toggle: plain click (iOS-safe). Switches drag
 // between looking (camera) and steering (ship) in flight; the label and
