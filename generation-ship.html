@@ -13,14 +13,14 @@
   }
   #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
   #hud {
-    position: fixed; top: 12px; left: 12px; z-index: 5;
+    position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: calc(12px + env(safe-area-inset-left, 0px)); z-index: 5;
     color: #eaf2ff;
     background: linear-gradient(160deg, rgba(10, 17, 30, 0.78), rgba(10, 17, 30, 0.58));
     border: 1px solid rgba(89, 214, 255, 0.5);
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.38), 0 0 14px rgba(89, 214, 255, 0.25);
     -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
     padding: 12px 14px; border-radius: 18px;
-    max-width: min(92vw, 440px);
+    max-width: min(92vw, 440px, calc(100vw - 84px));
     font-size: clamp(12px, 2.6vw, 15px); line-height: 1.5;
     pointer-events: none;
   }
@@ -28,7 +28,7 @@
   #hud .flavor { color: #b9c9e2; font-style: italic; margin-bottom: 6px; }
   #hud .controls { margin-top: 6px; color: #c7d6ee; font-size: clamp(11px, 2.4vw, 13px); }
   #hint {
-    position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 5;
+    position: fixed; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); z-index: 5;
     color: #d6e4fa;
     background: linear-gradient(160deg, rgba(10, 17, 30, 0.78), rgba(10, 17, 30, 0.58));
     border: 1px solid rgba(160, 190, 230, 0.22);
@@ -62,11 +62,11 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   }
   #buttons {
-    position: fixed; right: 14px; bottom: 14px; z-index: 6;
+    position: fixed; right: calc(14px + env(safe-area-inset-right, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 6;
     display: flex; flex-direction: column; gap: 8px; width: 208px;
   }
   button.ctl {
-    width: 100%; height: 64px; border-radius: 18px;
+    width: 100%; height: 44px; border-radius: 18px;
     background: linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.07));
     color: #fff; border: 1px solid rgba(255, 255, 255, 0.28);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.30);
@@ -75,14 +75,14 @@
   }
   button.ctl:active, button.ctl.on { background: linear-gradient(160deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.20)); }
   button.ctl .lbl { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; line-height: 1.2; }
-  #btn-mode { height: 54px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
-  #btn-mine { height: 54px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
-  #btn-looksteer { height: 54px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
-  #btn-center { height: 54px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
-  #btn-brake { height: 54px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
+  #btn-mode { height: 44px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
+  #btn-mine { height: 44px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
+  #btn-looksteer { height: 44px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
+  #btn-center { height: 44px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
+  #btn-brake { height: 44px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
   /* Mini menu button: small, rounded, cyber-blue synthetic look. */
   #btn-menu {
-    position: fixed; top: 12px; right: 12px; z-index: 9;
+    position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); z-index: 9;
     width: 44px; height: 40px; padding: 0;
     background: rgba(8, 24, 44, 0.75); color: #7fe3ff;
     border: 1px solid rgba(89, 214, 255, 0.65); border-radius: 14px;
@@ -93,7 +93,7 @@
   #btn-menu.on { background: #59d6ff; color: #06101e; border-color: #aee9ff; }
   /* Ship-status menu: dark synthetic panel, cyber-blue accents, rounded. */
   #menuPanel {
-    position: fixed; top: 60px; right: 12px; z-index: 8; display: none;
+    position: fixed; top: calc(60px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); z-index: 8; display: none;
     width: min(92vw, 430px); max-height: 82vh; overflow-y: auto;
     color: #d7e3f4; background: rgba(6, 10, 16, 0.92);
     border: 1px solid rgba(89, 214, 255, 0.5);
@@ -102,10 +102,12 @@
     font-family: "Courier New", ui-monospace, monospace; font-size: 13px; line-height: 1.55;
   }
   #menuPanel h2 { margin: 0 0 8px; font-size: 15px; letter-spacing: 0.12em; color: #7fe3ff; }
-  #menuPanel .row { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 4px 0; }
+  #menuPanel .row { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 4px 0; }
   #menuPanel .row b { color: #59d6ff; text-align: right; }
   #menuPanel .sect { margin-top: 10px; color: #7fe3ff; letter-spacing: 0.1em; font-size: 12px; }
   #menuPanel .controls { color: #c7d6ee; font-size: 12px; line-height: 1.6; }
+  #menuPanel .mHead { margin-top: 12px; color: #7fe3ff; letter-spacing: 0.12em; font-size: 12px; font-weight: 700; }
+  #menuPanel .mBody { color: #c7d6ee; font-size: 13px; line-height: 1.75; margin-top: 4px; }
   #menuPanel .closeBtn {
     margin-top: 12px; width: 100%; padding: 10px;
     background: rgba(8, 24, 44, 0.8); color: #7fe3ff; border: 1px solid rgba(89, 214, 255, 0.65);
@@ -113,9 +115,9 @@
   }
   #menuSaveMsg { color: #7fe3ff; font-size: 12px; min-height: 16px; text-align: center; }
   #menuPanel .subHead {
-    margin-top: 10px; width: 100%; padding: 9px 10px; text-align: left;
+    margin-top: 10px; width: 100%; padding: 10px 12px; text-align: left;
     background: rgba(8, 24, 44, 0.8); color: #7fe3ff; border: 1px solid rgba(89, 214, 255, 0.5);
-    border-radius: 12px; font-family: monospace; font-size: 12px; letter-spacing: 0.1em; cursor: pointer;
+    border-radius: 12px; font-family: monospace; font-size: 13px; letter-spacing: 0.1em; cursor: pointer;
   }
   #menuPanel .subBody { display: none; }
   #menuPanel .subBody.open { display: block; }
@@ -135,7 +137,7 @@
      can never overlap the thumb controls or the bottom-right buttons. */
   #navLine {
     display: none; align-items: center; gap: 8px;
-    margin-top: 2px; color: #eaf2ff; font-size: 14px; white-space: nowrap;
+    margin-top: 2px; color: #eaf2ff; font-size: clamp(12px, 3.2vw, 14px); flex-wrap: wrap;
   }
   #guideArrow { display: inline-block; font-size: 22px; line-height: 1; color: #7fe3ff; text-shadow: 0 0 10px rgba(89, 214, 255, 0.8); }
   #guideElev { color: #7fe3ff; }
@@ -143,12 +145,14 @@
      cyan port readout above it. Same cluster, same visibility rules. */
   #wordLine {
     display: none; align-items: center; gap: 8px;
-    margin-top: 2px; color: #eaf2ff; font-size: 14px; white-space: nowrap;
+    margin-top: 2px; color: #eaf2ff; font-size: clamp(12px, 3.2vw, 14px); flex-wrap: wrap;
   }
   #wordArrow { display: inline-block; font-size: 22px; line-height: 1; color: #ffd166; text-shadow: 0 0 10px rgba(255, 209, 102, 0.8); }
   #beaconWarn {
-    display: none; margin-top: 2px; color: #ffb347; font-size: 13px; font-weight: 700;
-    letter-spacing: 0.04em; text-shadow: 0 0 8px rgba(255, 179, 71, 0.7); white-space: nowrap;
+    display: none; margin-top: 2px; color: #ffb347;
+    font-size: clamp(11px, 3vw, 13px); font-weight: 700; line-height: 1.45;
+    letter-spacing: 0.04em; text-shadow: 0 0 8px rgba(255, 179, 71, 0.7);
+    white-space: normal; overflow-wrap: normal; max-width: 100%;
   }
   /* Pronounce-to-collect prompt: same cyber-blue menu house style. */
   #collectPanel {
@@ -156,7 +160,8 @@
     background: rgba(2, 10, 20, 0.72); padding: 20px;
   }
   #collectCard {
-    width: min(420px, 92vw); background: rgba(8, 24, 44, 0.96); color: #eaf2ff;
+    width: min(420px, 92vw); max-height: 88vh; overflow-y: auto;
+    background: rgba(8, 24, 44, 0.96); color: #eaf2ff;
     border: 1px solid rgba(89, 214, 255, 0.65); border-radius: 20px; padding: 22px;
     text-align: center; font-family: monospace;
   }
@@ -257,6 +262,7 @@
   #titleCard h1 { margin: 0; font-size: clamp(24px, 6vw, 34px); letter-spacing: 0.12em; color: #7fe3ff; }
   #titleStory { margin-top: 16px; font-size: 16px; line-height: 1.7; color: #d7e3f4; text-align: left; }
   #titleResumeSummary { margin-top: 10px; font-size: 13px; color: #9fd8ef; }
+  #titleCopy { margin-top: 18px; font-size: 11px; letter-spacing: 0.08em; color: rgba(159, 216, 239, 0.75); }
   #titleCard button.ctl2 {
     padding: 14px 22px; font-size: 17px; font-family: monospace; cursor: pointer;
     background: rgba(8, 24, 44, 0.8); color: #7fe3ff; border: 1px solid rgba(89, 214, 255, 0.65);
@@ -264,12 +270,17 @@
   }
   #titleCard button.ctl2.primary { background: #59d6ff; color: #06101e; border-color: #aee9ff; font-weight: 700; }
   #titleConfirmText { margin-top: 12px; font-size: 15px; color: #ffb347; line-height: 1.5; }
+  @media (max-height: 500px) {
+    #hud { padding: 10px 12px; }
+    #hint { max-width: calc(100vw - 460px); }
+    #buttons { gap: 6px; }
+  }
   @media (max-width: 520px) {
     #buttons { width: 176px; }
-    button.ctl { height: 56px; }
-    #btn-mode, #btn-mine { height: 52px; }
+    button.ctl { height: 44px; }
+    #btn-mode, #btn-mine { height: 44px; }
     #joy { width: 104px; height: 104px; }
-    #hint { bottom: auto; top: 148px; }
+    #hint { bottom: auto; top: calc(208px + env(safe-area-inset-top, 0px)); }
   }
 </style>
 <script type="importmap">
@@ -292,7 +303,16 @@
   <h2>SHIP STATUS // GENERATION SHIP</h2>
   <button class="closeBtn" id="btn-menu-save" type="button">SAVE JOURNEY</button>
   <div id="menuSaveMsg"></div>
-  <button class="subHead" data-sub="status" data-label="SHIP STATUS" type="button">▾ SHIP STATUS</button><div class="subBody open" id="sub-status">
+  <button class="subHead" data-sub="progress" data-label="PROGRESS" type="button">▾ PROGRESS</button><div class="subBody open" id="sub-progress">
+  <div class="row"><span>WORDS COLLECTED</span><b id="progWords">0 / 1000</b></div>
+  <div class="row"><span>COGNATES SPOKEN</span><b id="progCog">0 / 487</b></div>
+  <div class="row"><span>IDIOMS SPOKEN</span><b id="progIdioms">0 / 135</b></div>
+  <div class="row"><span>PRACTICE SPOKEN</span><b id="progPractice">0 / 1000</b></div>
+  <div class="row"><span>CONJUGATION SPOKEN</span><b id="progConj">0 / 1695</b></div>
+  <div class="row"><span>DICTATION SPOKEN</span><b id="progDict">0 / 2830</b></div>
+  <div class="row"><span>SER VS. ESTAR SPOKEN</span><b id="progSer">0 / 100</b></div>
+  <div class="controls">Progress counts spoken Spanish only \u2014 flipping, tapping, and listening don\u2019t count; English practice doesn\u2019t count either.</div>
+  </div><button class="subHead" data-sub="status" data-label="SHIP STATUS" type="button">▸ SHIP STATUS</button><div class="subBody" id="sub-status">
   <div class="row"><span>TRANSPONDER</span><b>ARK-7 // BEACON BROADCASTING</b></div>
   <div class="row"><span>DRIVE</span><b id="menuDrive">DOCKED</b></div>
   <div class="row"><span>SPIN GRAVITY</span><b id="menuGrav"></b></div>
@@ -301,22 +321,25 @@
   <div class="row"><span>DIST TO NEAREST PORT</span><b id="menuPort">DOCKED</b></div>
   <div class="row"><span>WATER</span><b id="menuWater">0</b></div>
   <div class="row"><span>METAL</span><b id="menuMetal">0</b></div>
-  </div><button class="subHead" data-sub="progress" data-label="PROGRESS" type="button">▸ PROGRESS</button><div class="subBody" id="sub-progress">
-  <div class="row"><span>WORDS COLLECTED</span><b id="progWords">0 / 1000</b></div>
-  <div class="row"><span>COGNATES SPOKEN</span><b id="progCog">0 / 487</b></div>
-  <div class="row"><span>IDIOMS SPOKEN</span><b id="progIdioms">0 / 135</b></div>
-  <div class="row"><span>PRACTICE SPOKEN</span><b id="progPractice">0 / 1000</b></div>
-  <div class="row"><span>CONJUGATION SPOKEN</span><b id="progConj">0 / 1695</b></div>
-  <div class="row"><span>DICTATION SPOKEN</span><b id="progDict">0 / 1000</b></div>
-  <div class="row"><span>SER VS. ESTAR SPOKEN</span><b id="progSer">0 / 100</b></div>
-  <div class="controls">Progress counts spoken Spanish only \u2014 flipping, tapping, and listening don\u2019t count; English practice doesn\u2019t count either.</div>
   </div><button class="subHead" data-sub="manual" data-label="CREW MANUAL // CONTROLS" type="button">▸ CREW MANUAL // CONTROLS</button><div class="subBody" id="sub-manual">
   <div class="controls">
-    Desktop: Click to look &middot; WASD walk &middot; Shift run &middot; Q auto-walk &middot; Space jump &middot; F depart (docking is automatic) &middot; nav readout always on while flying &middot; H ship menu &middot; W/S thrust/retro &middot; A/D turn &middot; &uarr;/&darr; pitch &middot; Space or BRAKE button to brake (in flight) &middot; M mine near an aura asteroid &middot; R retry after crash &middot; in flight the mouse looks around the shuttle in LOOK mode or steers it in STEER mode (LOOK/STEER button switches; steering stays A/D + &uarr;/&darr; in both modes; CENTER button or C puts the camera directly behind the spacecraft, which also eases back there on its own when idle) &middot; fly within 250 m of a floating word to pronounce it and collect +5 WATER / +5 METAL<br>
-    Touch: Touch left half for floating stick (push to its edge to run) &middot; Drag right side: LOOK mode looks around, STEER mode steers the ship (drag up to climb; LOOK/STEER button switches; the left stick steers in both modes; the view eases back on its own when idle; CENTER button puts the camera directly behind the spacecraft) &middot; Button: DEPART (docking is automatic within 100 m of any port) &middot; nav readout always on while flying &middot; JUMP (docked only) &middot; MINE (near an aura asteroid) &middot; BRAKE (hold to stop in flight) &middot; &#9776; ship menu<br>Cells: walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to enter; EXIT door, EXIT button, or E to leave. Stations: walk up to a glowing-ring tool station and tap Open (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). HOME in this menu saves your journey and returns to the title screen
+<div class="mHead">DESKTOP</div>
+    <div class="mBody">Click to look &middot; WASD walk &middot; Shift run &middot; Q auto-walk &middot; Space jump &middot; F depart (docking is automatic) &middot; H ship menu &middot; W/S thrust / retro &middot; A/D turn &middot; &uarr;/&darr; pitch &middot; Space or the BRAKE button to brake in flight &middot; hold M within 100 m of an aura asteroid to mine (about 3 seconds) &middot; R takes the fail screen&rsquo;s action after a crash &middot; in flight, the mouse looks around in LOOK mode or steers the ship in STEER mode (the LOOK/STEER button switches; A/D + &uarr;/&darr; steer in both modes; CENTER or C puts the camera directly behind the spacecraft, and it eases back there on its own when idle) &middot; the nav readout is always on while flying</div>
+    <div class="mHead">TOUCH</div>
+    <div class="mBody">Left half: floating stick (push to its edge to run) &middot; drag the right side: LOOK mode looks around, STEER mode steers the ship (drag up to climb; the LOOK/STEER button switches; the left stick steers in both modes; the view eases back on its own when idle; CENTER puts the camera directly behind the spacecraft) &middot; DEPART (docking is automatic within 100 m of any port) &middot; JUMP while walking aboard &middot; hold MINE within 100 m of an aura asteroid (about 3 seconds) &middot; hold BRAKE to stop in flight &middot; &#9776; ship menu &middot; the nav readout is always on while flying</div>
+    <div class="mHead">LEARNING STATIONS</div>
+    <div class="mBody">The six tool stations are walk-up consoles in the agriculture ring: walk up to a glowing ring and tap Open (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). A station never blocks you &mdash; speaking is feedback only, except that spoken Spanish earns progress. On Practice, Conjugation, and Ser vs. estar, the audio row stays hidden until you answer &mdash; answer first, then listen.</div>
+    <div class="mHead">CELLS</div>
+    <div class="mBody">The Greenhouse, Workshop, Classroom, and Medical bay are rooms you can walk into through their glowing doorways and explore; leave by the EXIT door, the EXIT button, or E. Nothing a station needs is inside a cell &mdash; the stations stand outside, in the open.</div>
+    <div class="mHead">COLLECTING IN SPACE</div>
+    <div class="mBody">Fly within 250 m of a floating word or exercise question to pause and pronounce it: words ask for the Spanish word; questions ask you to speak the answer (tap Show answer to peek &mdash; peeking never counts, only speaking does). Say it right to collect it for +5 WATER and +5 METAL; Leave (or Escape) flies on, and the item waits until you are 400 m clear. A gold arrow points to the nearest uncollected item &mdash; word or question &mdash; with a tag saying which; distant items show as small glow dots until their plates stream in.</div>
+    <div class="mHead">REVIEW TERMINALS</div>
+    <div class="mBody">Eight gold review terminals stand around the industrial side &mdash; three on the mezzanine, five on the main deck. Walk up and tap Open (or press Enter) to review everything you have already spoken, by tool, with Hear in both languages. Reviewing never changes progress.</div>
+    <div class="mHead">SAVING</div>
+    <div class="mBody">SAVE JOURNEY in this menu saves at once; the game also saves after every collect, every mining yield, and every docking. GO TO HOME SCREEN saves, then returns to the title screen. Resuming restores your haul, your collected items, and your position &mdash; aboard, inside a cell, or in flight.</div>
   </div>
   </div><button class="subHead" data-sub="note" data-label="NOTE" type="button">▸ NOTE</button><div class="subBody" id="sub-note">
-  <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; aura asteroids can be mined (hold M) for water from comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. (Jump arcs feel Mars-like by movement tuning; the ship&rsquo;s spin gravity itself is unchanged.) After departing, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, and a MEDICAL BAY room. Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 25 km from the ship, grows urgent past 40 km, and past 50 km you are LOST and the run ends (retry returns you aboard, haul kept, free). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, the belt stretches to about 20 km, and all 1,000 Spanish vocabulary words float among the rocks, plus exercise questions starting closer in, from 1.5 km out — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold arrow under the port readout points to the nearest uncollected item — word or exercise question — with a tag saying which, and distant items show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, you return to your last save.</div>
+  <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; aura asteroids can be mined (hold M, or the MINE button, for about 3 seconds within 100 m) for water from icy comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. (Jump arcs feel Mars-like by movement tuning; the ship&rsquo;s spin gravity itself is unchanged.) After departing, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, with a MEDICAL BAY room in the technology half. Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 25 km from the ship, grows urgent past 40 km, and past 50 km you are LOST and the run ends (retry returns you aboard, haul kept, free). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, all 1,000 Spanish vocabulary words float from about 3 km to 20 km out, plus exercise questions between 1.5 km and 15 km out — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold arrow under the port readout points to the nearest uncollected item — word or exercise question — with a tag saying which, and distant items show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, you return to your last save.</div>
   </div>
   <button class="closeBtn" id="btn-menu-home" type="button">GO TO HOME SCREEN</button>
   <button class="closeBtn" id="btn-menu-close" type="button">CLOSE</button>
@@ -398,6 +421,7 @@
         <button class="ctl2" id="btn-title-cancel" type="button">CANCEL</button>
       </div>
     </div>
+    <div id="titleCopy">© 2026 Brant Fuller</div>
   </div>
 </div>
 <div id="failOverlay">
@@ -476,8 +500,8 @@ function centerCamera() { centerEase = true; centerEaseStarted = performance.now
 // steers the SHIP instead of the camera: horizontal drag yaws, vertical
 // drag pitches, through the same rotateShuttle path. Drag deltas
 // accumulate in steerDragYaw/Pitch (pixels since last updateFlight) and
-// convert at STEER_DRAG_PER_PX = 0.05 per pixel — full key-rate
-// deflection at ~20 px/frame (~1200 px/s swipe); typical drags give
+// convert at STEER_DRAG_PER_PX = 0.15 per pixel — full key-rate
+// deflection at ~7 px/frame (~420 px/s swipe); typical drags give
 // partial deflection, so drag speed maps to turn rate, capped at the key
 // rates. Consumed and cleared every updateFlight, so a drag never
 // repeats. Drag-steering counts as flight input (the idle ease never
@@ -485,7 +509,7 @@ function centerCamera() { centerEase = true; centerEaseStarted = performance.now
 // ease keeps easing the camera home while steering.
 let lookSteerMode = 'look';
 let steerDragYaw = 0, steerDragPitch = 0;
-const STEER_DRAG_PER_PX = 0.05;
+const STEER_DRAG_PER_PX = 0.15;
 function updateLookSteerButton() {
   const b = document.getElementById('btn-looksteer');
   b.textContent = lookSteerMode === 'steer' ? 'STEER' : 'LOOK';
@@ -2909,7 +2933,7 @@ function crashMission(cause) {
   failTitle.textContent = failKind === 'over' ? 'GAME OVER' : 'MISSION FAILED';
   failText.textContent = cause === 'asteroid' ? 'You crashed into an asteroid.' : cause === 'lost' ? 'LOST — you flew past the 50 km beacon limit. The ARK-7\'s beacon cannot reach you here.' : 'You crashed into the mothership.';
   if (failKind === 'free') {
-    failWarn.textContent = 'FIRST CRASH — FREE REPAIR. From now on, repairing your ship costs 10 WATER + 10 METAL. If you can\'t pay, you return to your last save. Mine asteroids and collect words to stay stocked.';
+    failWarn.textContent = 'FIRST CRASH — FREE REPAIR. From now on, repairing your ship costs 10 WATER + 10 METAL. If you can\'t pay but have a save, you return to your last save; with no save, the journey ends. Mine asteroids and collect words to stay stocked.';
     failWarn.style.display = '';
     failHint.textContent = 'Press R or tap RETRY to return aboard, free this time.';
     btnRetry.textContent = 'RETRY — FREE REPAIR';
@@ -3258,8 +3282,8 @@ document.getElementById('btn-menu-close').addEventListener('pointerdown', functi
   e.preventDefault(); e.target.blur(); toggleMenu();
 });
 // Round 24: menu submenus. One open at a time (phone panel stays usable).
-// The open section persists across menu opens; SHIP STATUS is the default.
-let menuSub = 'status';
+// The open section persists across menu opens; PROGRESS is the default.
+let menuSub = 'progress';
 function setSub(name) {
   menuSub = name;
   ['status', 'progress', 'manual', 'note'].forEach(function (n) {
@@ -3431,7 +3455,7 @@ function updateFlight(dt) {
   if (keys.ArrowUp) pitchIn -= 1;
   if (keys.ArrowDown) pitchIn += 1;
   // LOOK/STEER toggle: drag-steering from the last frame, converted at
-  // STEER_DRAG_PER_PX (0.05/px — full key-rate deflection at ~20 px/frame).
+  // STEER_DRAG_PER_PX (0.15/px — full key-rate deflection at ~7 px/frame).
   // Drag speed maps to turn rate, capped at the key rates by the clamps
   // below. Consumed and cleared every frame so a drag never repeats.
   // Signs mirror the joystick: drag right (dx > 0) yaws right (yawIn
