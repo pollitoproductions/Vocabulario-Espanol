@@ -198,6 +198,32 @@
   #toolBody button.ctl2:disabled { opacity: 0.55; cursor: default; }
   #toolFeedback { min-height: 22px; margin-top: 12px; font-size: 15px; color: #ffd166; }
   #toolFeedback.ok { color: #7dff9b; }
+  /* Review terminal (round 30): same house style, gold instead of cyan. */
+  #reviewPanel {
+    position: fixed; inset: 0; z-index: 40; display: none; align-items: center; justify-content: center;
+    background: rgba(2, 10, 20, 0.72); padding: 20px;
+  }
+  #reviewCard {
+    width: min(560px, 94vw); max-height: 88vh; overflow-y: auto;
+    background: rgba(8, 24, 44, 0.96); color: #eaf2ff;
+    border: 1px solid rgba(255, 215, 106, 0.65); border-radius: 20px; padding: 22px;
+    text-align: center; font-family: monospace;
+  }
+  #reviewCard h2 { margin: 0 0 4px; padding-bottom: 10px; border-bottom: 1px solid rgba(255, 215, 106, 0.35); font-size: 22px; letter-spacing: 0.1em; color: #ffd76a; }
+  #reviewBody { margin-top: 16px; font-size: 15px; line-height: 1.5; text-align: left; }
+  #reviewBody .sub { font-size: 15px; color: #9fd8ef; text-align: center; }
+  #reviewCard button.ctl2, #reviewBody button.ctl2 {
+    padding: 8px 12px; font-size: 14px; font-family: monospace; cursor: pointer;
+    background: rgba(8, 24, 44, 0.8); color: #ffd76a; border: 1px solid rgba(255, 215, 106, 0.65);
+    border-radius: 14px; touch-action: manipulation; margin: 4px;
+  }
+  #reviewBody button.ctl2:disabled { opacity: 0.55; cursor: default; }
+  #reviewBody button.ctl2.listening { background: #c81e1e; color: #fff; border-color: #ff6b6b; }
+  .rev-row { display: flex; align-items: center; gap: 6px; padding: 6px 0; border-bottom: 1px solid rgba(255, 215, 106, 0.15); flex-wrap: wrap; }
+  .rev-row .rev-text { flex: 1 1 220px; }
+  .rev-fb { min-height: 18px; font-size: 13px; color: #ffd166; flex-basis: 100%; }
+  .rev-fb.ok { color: #7dff9b; }
+  #reviewPrivacy { margin-top: 10px; font-size: 11px; color: #8fa8c8; line-height: 1.5; }
   /* Round 18: uniform audio row in the tool panel (Hear ES/EN + Say-it). */
   #toolAudio { display: none; margin-top: 14px; border-top: 1px solid rgba(89, 214, 255, 0.25); padding-top: 12px; }
   #toolCard button.ctl2.listening { background: #c81e1e; color: #fff; border-color: #ff6b6b; animation: collectPulse 1s infinite; }
@@ -283,11 +309,11 @@
   <div class="controls">Progress counts spoken Spanish only \u2014 flipping, tapping, and listening don\u2019t count; English practice doesn\u2019t count either.</div>
   </div><button class="subHead" data-sub="manual" data-label="CREW MANUAL // CONTROLS" type="button">▸ CREW MANUAL // CONTROLS</button><div class="subBody" id="sub-manual">
   <div class="controls">
-    Desktop: Click to look &middot; WASD walk &middot; Shift run &middot; Q auto-walk &middot; Space jump &middot; F depart (docking is automatic) &middot; nav readout always on while flying &middot; H ship menu &middot; W/S thrust/retro &middot; A/D turn &middot; &uarr;/&darr; pitch &middot; Space brake (in flight) &middot; M mine near an aura asteroid &middot; R retry after crash &middot; fly within 250 m of a floating word to pronounce it and collect +5 WATER / +5 METAL<br>
-    Touch: Touch left half for floating stick (push to its edge to run) &middot; Drag right side to look/steer &middot; Button: DEPART (docking is automatic within 100 m of any port) &middot; nav readout always on while flying &middot; JUMP (docked only) &middot; MINE (near an aura asteroid) &middot; &#9776; ship menu<br>Cells: walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to enter; EXIT door, EXIT button, or E to leave. Stations: walk up to a glowing-ring tool station and tap Open (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). HOME in this menu saves your journey and returns to the title screen
+    Desktop: Click to look &middot; WASD walk &middot; Shift run &middot; Q auto-walk &middot; Space jump &middot; F depart (docking is automatic) &middot; nav readout always on while flying &middot; H ship menu &middot; W/S thrust/retro &middot; A/D turn &middot; &uarr;/&darr; pitch &middot; Space brake (in flight) &middot; M mine near an aura asteroid &middot; R retry after crash &middot; in flight the mouse looks around the shuttle (steering stays A/D + &uarr;/&darr;, no recenter button — the view eases back on its own when idle) &middot; fly within 250 m of a floating word to pronounce it and collect +5 WATER / +5 METAL<br>
+    Touch: Touch left half for floating stick (push to its edge to run) &middot; Drag right side to look around the shuttle (steering is the left stick; the view eases back on its own when idle, no recenter button) &middot; Button: DEPART (docking is automatic within 100 m of any port) &middot; nav readout always on while flying &middot; JUMP (docked only) &middot; MINE (near an aura asteroid) &middot; &#9776; ship menu<br>Cells: walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to enter; EXIT door, EXIT button, or E to leave. Stations: walk up to a glowing-ring tool station and tap Open (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). HOME in this menu saves your journey and returns to the title screen
   </div>
   </div><button class="subHead" data-sub="note" data-label="NOTE" type="button">▸ NOTE</button><div class="subBody" id="sub-note">
-  <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; aura asteroids can be mined (hold M) for water from comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. (Jump arcs feel Mars-like by movement tuning; the ship&rsquo;s spin gravity itself is unchanged.) After departing, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, and a MEDICAL BAY room. Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 25 km from the ship, grows urgent past 40 km, and past 50 km you are LOST and the run ends (retry returns you aboard, haul kept, free). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, the belt stretches to about 20 km, and all 1,000 Spanish vocabulary words float among the rocks — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold word arrow under the port readout points to the nearest uncollected word, and distant words show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, you return to your last save.</div>
+  <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; aura asteroids can be mined (hold M) for water from comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. (Jump arcs feel Mars-like by movement tuning; the ship&rsquo;s spin gravity itself is unchanged.) After departing, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, and a MEDICAL BAY room. Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 25 km from the ship, grows urgent past 40 km, and past 50 km you are LOST and the run ends (retry returns you aboard, haul kept, free). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, the belt stretches to about 20 km, and all 1,000 Spanish vocabulary words float among the rocks, plus exercise questions closer in — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold arrow under the port readout points to the nearest uncollected item — word or exercise question — with a tag saying which, and distant items show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, you return to your last save.</div>
   </div>
   <button class="closeBtn" id="btn-menu-home" type="button">GO TO HOME SCREEN</button>
   <button class="closeBtn" id="btn-menu-close" type="button">CLOSE</button>
@@ -333,6 +359,18 @@
     </div>
   </div>
 </div>
+<div id="reviewPanel">
+  <div id="reviewCard">
+    <h2>REVIEW TERMINAL</h2>
+    <div class="sub" style="font-size:15px;color:#9fd8ef;">Everything you have learned so far. Hear it again, say it again to rehearse &mdash; review never changes what you have learned.</div>
+    <div id="reviewTabs" style="display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap;"></div>
+    <div id="reviewBody"></div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
+      <button class="ctl2" id="btn-review-close" type="button">Close</button>
+    </div>
+    <div id="reviewPrivacy">Your voice is sent to your browser&rsquo;s speech service to check it &mdash; it isn&rsquo;t stored.</div>
+  </div>
+</div>
 <div id="titlePanel">
   <div id="titleCard">
     <h1>GENERATION SHIP &mdash; ARK-7</h1>
@@ -369,6 +407,7 @@
   <button class="ctl" id="btn-mine" type="button" style="display:none">MINE</button>
   <button class="ctl" id="btn-exit" type="button" style="display:none">EXIT</button>
   <button class="ctl" id="btn-station" type="button" style="display:none">OPEN</button>
+  <button class="ctl" id="btn-terminal" type="button" style="display:none">OPEN REVIEW TERMINAL</button>
 </div>
 <canvas id="game"></canvas>
 <script type="module">
@@ -397,6 +436,16 @@ const METAL_YIELD = 15;       // metal per mined metal rock
 const SHUTTLE_THRUST = 12;    // m/s^2
 const SHUTTLE_YAW_RATE = 0.9; // rad/s
 const SHUTTLE_PITCH_RATE = 0.7; // rad/s
+// Decoupled flight camera (round 30 shuttle pass): mouse drag / touch
+// drag in flight looks around the shuttle instead of steering it —
+// steering is A/D + arrows + joystick only. camYaw/camPitch are the look
+// offsets relative to the shuttle frame; any look input sets them and
+// resets the idle timer, cancelling the auto-ease instantly. There is NO
+// recenter button and NO recenter key by design: recentering is idle
+// auto-ease only (see the flight camera block in updateFlight).
+let camYaw = 0, camPitch = 0, lastCamInput = 0, lastFlightInput = 0;
+const CAM_IDLE_SECS = 3; // no look input AND no flight input this long -> ease back
+const CAM_EASE_RATE = 0.6; // gentle lerp rate (time constant ~1.7 s, never a snap)
 const MAX_DT = 0.05;          // seconds; clamps hitches / tab-switches
 // Docking ports: nine total. The top end-cap hub port (on the spin axis, so
 // it never whirls) plus 8 body ports — 2 per quadrant × 4 quadrants around
@@ -1107,21 +1156,89 @@ for (const eb of ENTERABLES) {
 {
   const cropBedMat = new THREE.MeshStandardMaterial({ color: 0x6a7a5a, roughness: 1 });
   applyGameTexture(cropBedMat, 'textures/crops.jpg', 2, 24);
-  // Round 29 vegetation: three distinct plant forms (no more cone patches)
-  // — bushy leaf clusters, tall stalks, low leafy hedge rows — plus trees
-  // near the Greenhouse. Shared geometries/materials only; per-plant
-  // variation comes from scale, never from new materials.
+  // Round 30 realism — plants read as PLANTS, not polygonal blobs:
+  // a procedurally canvas-drawn leaf texture (leaf shapes with alpha
+  // gaps, no external asset) on crossed leaf planes + a stem, merged
+  // into ONE geometry per plant form, so mesh counts are unchanged
+  // (one mesh per plant, same as before). Stems sample a solid
+  // stem-colored strip painted at the bottom of the same canvas.
+  // Per-plant variation still comes from scale, never new materials.
+  function makeLeafTexture() {
+    const c = document.createElement('canvas');
+    c.width = 256; c.height = 256;
+    const g = c.getContext('2d');
+    const greens = ['#2e7d32', '#43a047', '#66bb6a', '#81c784', '#1b5e20', '#388e3c', '#a5d6a7'];
+    g.fillStyle = '#6f9153'; g.fillRect(0, 240, 256, 16);
+    let seed = 1234567;
+    function lrnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    for (let i = 0; i < 54; i++) {
+      const x = 8 + lrnd() * 240, y = 8 + lrnd() * 224;
+      const w = 22 + lrnd() * 34, h = 12 + lrnd() * 20, a = lrnd() * Math.PI;
+      g.save();
+      g.translate(x, y); g.rotate(a);
+      g.fillStyle = greens[(lrnd() * greens.length) | 0];
+      g.beginPath();
+      g.moveTo(-w / 2, 0);
+      g.quadraticCurveTo(0, -h, w / 2, 0);
+      g.quadraticCurveTo(0, h, -w / 2, 0);
+      g.fill();
+      g.strokeStyle = 'rgba(220,255,220,0.35)'; g.lineWidth = 1;
+      g.beginPath(); g.moveTo(-w / 2, 0); g.lineTo(w / 2, 0); g.stroke();
+      g.restore();
+    }
+    const tx = new THREE.CanvasTexture(c);
+    tx.colorSpace = THREE.SRGBColorSpace;
+    return tx;
+  }
+  function mergeGeos(parts) {
+    let vCount = 0, iCount = 0;
+    for (const gg of parts) { vCount += gg.attributes.position.count; iCount += gg.index.count; }
+    const pos = new Float32Array(vCount * 3), nor = new Float32Array(vCount * 3), uv = new Float32Array(vCount * 2);
+    const idx = new Uint32Array(iCount);
+    let vo = 0, io = 0;
+    for (const gg of parts) {
+      pos.set(gg.attributes.position.array, vo * 3);
+      nor.set(gg.attributes.normal.array, vo * 3);
+      uv.set(gg.attributes.uv.array, vo * 2);
+      const gi = gg.index.array;
+      for (let k = 0; k < gi.length; k++) idx[io + k] = gi[k] + vo;
+      vo += gg.attributes.position.count; io += gi.length;
+    }
+    const out = new THREE.BufferGeometry();
+    out.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    out.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+    out.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    out.setIndex(new THREE.BufferAttribute(idx, 1));
+    return out;
+  }
+  function stemGeo(rTop, rBot, h) {
+    const gg = new THREE.CylinderGeometry(rTop, rBot, h, 5);
+    const uvs = gg.attributes.uv;
+    for (let i = 0; i < uvs.count; i++) uvs.setXY(i, 0.02 + uvs.getX(i) * 0.16, 0.005 + uvs.getY(i) * 0.05);
+    return gg;
+  }
+  function leafCross(w, h, y, angles) {
+    const parts = [];
+    for (const a of angles) {
+      const pl = new THREE.PlaneGeometry(w, h);
+      pl.rotateY(a); pl.translate(0, y, 0);
+      parts.push(pl);
+    }
+    return parts;
+  }
+  const leafyMat = new THREE.MeshStandardMaterial({ map: makeLeafTexture(), alphaTest: 0.45, side: THREE.DoubleSide, roughness: 0.9 });
+  function leafyPlant(planes, stem) {
+    return mergeGeos(planes.concat([stem]));
+  }
+  function shiftedStem(rTop, rBot, h, y) {
+    const s = stemGeo(rTop, rBot, h); s.translate(0, y, 0); return s;
+  }
   const vegGeos = {
-    bush: new THREE.IcosahedronGeometry(0.9, 1),
-    stalk: new THREE.CylinderGeometry(0.10, 0.16, 2.2, 6),
-    hedge: new THREE.BoxGeometry(1.5, 0.6, 1.5)
+    bush: leafyPlant(leafCross(1.9, 1.5, 0.85, [0, Math.PI / 3, 2 * Math.PI / 3]), shiftedStem(0.07, 0.10, 0.8, 0.4)),
+    stalk: leafyPlant(leafCross(0.8, 2.3, 1.35, [0, Math.PI / 2]), shiftedStem(0.05, 0.08, 1.9, 0.95)),
+    hedge: leafyPlant(leafCross(2.3, 1.0, 0.6, [0, Math.PI / 3, 2 * Math.PI / 3]), shiftedStem(0.06, 0.09, 0.7, 0.35))
   };
-  const vegMats = {
-    bushA: new THREE.MeshStandardMaterial({ color: 0x2e7d32, roughness: 0.9 }),
-    bushB: new THREE.MeshStandardMaterial({ color: 0x43a047, roughness: 0.9 }),
-    stalk: new THREE.MeshStandardMaterial({ color: 0x7cb342, roughness: 0.9 }),
-    hedge: new THREE.MeshStandardMaterial({ color: 0x558b2f, roughness: 0.9 })
-  };
+  const vegMats = { bushA: leafyMat, bushB: leafyMat, stalk: leafyMat, hedge: leafyMat };
   // Form per bed-row offset: bush / stalk / hedge / bush (taller, 2nd green).
   const vegRows = [
     { off: -2.6, geo: vegGeos.bush, mat: vegMats.bushA, squash: 0.75 },
@@ -1154,8 +1271,8 @@ for (const eb of ENTERABLES) {
   // (and of the Cognates console at angle 0.2618, z -120).
   const trunkGeo = new THREE.CylinderGeometry(0.3, 0.45, 3.5, 8);
   const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5d4037, roughness: 1 });
-  const canopyGeo = new THREE.IcosahedronGeometry(2.0, 1);
-  const canopyMat = new THREE.MeshStandardMaterial({ color: 0x2f6b2f, roughness: 0.9 });
+  const canopyGeo = mergeGeos(leafCross(4.6, 3.6, 0, [0, Math.PI / 3, 2 * Math.PI / 3]));
+  const canopyMat = leafyMat;
   {
     const fa = 0.6;
     const radial = new THREE.Vector3(Math.cos(fa), Math.sin(fa), 0);
@@ -1562,6 +1679,88 @@ for (const eb of ENTERABLES) {
     ship.add(tgrp);
   }
 }
+// ---------- Round 30 realism — industrial-half dressing ----------
+// The far side of the industrial half (away from the promenade at
+// angles 0.85...2.45 and the gallery arc 4.45...4.95) was bare hull.
+// Dressing uses shared materials only (pipe/crate/line + one cool
+// emissive strip material, no new textures, NO new real lights).
+// Everything is decorative: no walk-collision or trigger changes,
+// and nothing stands in a doorway, stair, station, or review-terminal
+// trigger (terminals sit at angles 4.53...4.87, z 68...132, on the
+// mezzanine deck — every prop below is outside that arc or far in z).
+{
+  const coolStripMat = new THREE.MeshBasicMaterial({ color: 0xcfe8ff });
+  // Overhead ceiling conduits (radius 141, just below the 140 shell):
+  // tech span z 40...280 + edu span z 200...320, four angles.
+  for (const ca of [0.3, 3.0, 3.9, 5.9]) {
+    const radial = new THREE.Vector3(Math.cos(ca), Math.sin(ca), 0);
+    const tech = new THREE.Mesh(pipeGeo, pipeMat);
+    tech.position.copy(radial).multiplyScalar(141);
+    tech.position.z = 160;
+    tech.quaternion.copy(basisQuat(radial));
+    ship.add(tech);
+    const edu = new THREE.Mesh(pipeGeo, pipeMat);
+    edu.position.copy(radial).multiplyScalar(141);
+    edu.position.z = 260;
+    edu.quaternion.copy(basisQuat(radial));
+    edu.scale.z = 0.5;
+    ship.add(edu);
+  }
+  // Crate stacks on the far side: two on deck + one stacked on top.
+  for (const [ca, cz] of [[3.1, 60], [3.1, 180], [3.9, 90], [3.9, 240], [5.9, 70], [5.9, 220], [0.3, 120], [0.3, 260]]) {
+    const radial = new THREE.Vector3(Math.cos(ca), Math.sin(ca), 0);
+    const tang = new THREE.Vector3(-Math.sin(ca), Math.cos(ca), 0);
+    for (const to of [-0.8, 0.8]) {
+      const crate = new THREE.Mesh(crateGeo, crateMat);
+      crate.position.copy(radial).multiplyScalar(RADIUS - 0.6).add(tang.clone().multiplyScalar(to));
+      crate.position.z = cz;
+      crate.quaternion.copy(basisQuat(radial));
+      ship.add(crate);
+    }
+    const top = new THREE.Mesh(crateGeo, crateMat);
+    top.position.copy(radial).multiplyScalar(RADIUS - 1.8);
+    top.position.z = cz;
+    top.quaternion.copy(basisQuat(radial));
+    ship.add(top);
+  }
+  // Gantry frames over open deck: posts + high beam, 6 m clearance.
+  for (const [ga, gz] of [[3.5, 120], [3.5, 220], [5.9, 150]]) {
+    const radial = new THREE.Vector3(Math.cos(ga), Math.sin(ga), 0);
+    const grp = new THREE.Group();
+    grp.position.copy(radial).multiplyScalar(RADIUS);
+    grp.position.z = gz;
+    grp.quaternion.copy(basisQuat(radial));
+    for (const px of [-4, 4]) {
+      const post = new THREE.Mesh(new THREE.BoxGeometry(0.4, 6, 0.4), lineMat);
+      post.position.set(px, 3, 0);
+      grp.add(post);
+    }
+    const beam = new THREE.Mesh(new THREE.BoxGeometry(8.8, 0.4, 0.4), lineMat);
+    beam.position.set(0, 6.2, 0);
+    grp.add(beam);
+    ship.add(grp);
+  }
+  // Cool ceiling light strips (emissive only, no real lights).
+  for (const sa of [1.0, 2.6, 5.2]) {
+    const radial = new THREE.Vector3(Math.cos(sa), Math.sin(sa), 0);
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 280), coolStripMat);
+    strip.position.copy(radial).multiplyScalar(142.5);
+    strip.position.z = 160;
+    strip.quaternion.copy(basisQuat(radial));
+    ship.add(strip);
+  }
+  // Equipment cabinets against the bulkhead face (z 1, inside tech),
+  // clear of all four bulkhead doorways (angles 0, 1.5708, 3.1416, 4.7124).
+  for (const ba of [0.8, 2.2, 3.8, 5.6]) {
+    const radial = new THREE.Vector3(Math.cos(ba), Math.sin(ba), 0);
+    const cab = new THREE.Mesh(new THREE.BoxGeometry(2.5, 3, 1), pipeMat);
+    cab.position.copy(radial).multiplyScalar(RADIUS - 1.5);
+    cab.position.z = 1;
+    cab.quaternion.copy(basisQuat(radial));
+    ship.add(cab);
+  }
+}
+
 // ---------- Round 11: lived-in habitat dressing ----------
 // The bare floors are dressed as a place people live, not a warehouse:
 //   * crew quarters: two rows of housing units (technology z 55...155,
@@ -1838,6 +2037,63 @@ for (const eb of ENTERABLES) {
     ship.add(con);
   }
 }
+// Round 30 review terminals (FIVE): gold consoles on the gallery upper deck
+// (the mezzanine in technology), radius 150 (deck surface), spread along the
+// deck so a walker finds one within a short walk anywhere on it. Sides
+// alternate (back-wall / railing / centre / back-wall / railing) and z runs
+// 68..132, clear of both stair zones (40..60, 140..160), the three centre
+// tables (angle 4.70, z 80/100/120), the back wall (4.95) and the railing
+// (4.45); nearest pair is 32.5 m apart, so no two 4 m triggers ever overlap.
+// Same pedestal/screen/sign pattern as station consoles, but gold, and each
+// beacon pillar is 6 m (not 14): from the 150 deck a 14 m pillar would poke
+// through the industrial ceiling shell at radius 140, while 6 m tops out at
+// radius 141.3, clear by 1.3 m. NOT stations: no STATIONS entries, no tools
+// — proximity opens the ONE shared review panel (see checkTerminal).
+// Same pedestal/screen/sign pattern as station consoles, but gold, and
+// the beacon pillar is 6 m (not 14): from the 150 deck a 14 m pillar
+// would poke through the industrial ceiling shell at radius 140, while
+// 6 m tops out at radius 141.3, clear by 1.3 m. NOT a station: no STATIONS
+// entry, no tool — proximity opens the review panel (see checkTerminal).
+const REVIEW_TERMINALS_POS = [
+  { angle: 4.85, z: 68 },   // back-wall side, low end
+  { angle: 4.53, z: 88 },   // railing side, mid-low
+  { angle: 4.70, z: 108 },  // centre line, mid-high (clear of the z 100/120 tables)
+  { angle: 4.87, z: 128 },  // back-wall side, high end
+  { angle: 4.55, z: 132 },  // railing side, high end
+];
+for (const tp of REVIEW_TERMINALS_POS) {
+  const trad = new THREE.Vector3(Math.cos(tp.angle), Math.sin(tp.angle), 0);
+  const tgrp = new THREE.Group();
+  const tped = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.6, 1.1),
+    new THREE.MeshStandardMaterial({ color: 0x2c3644, roughness: 0.6, metalness: 0.4 }));
+  tped.position.set(0, 1.3, 0); tgrp.add(tped);
+  const tscrTex = fitTextTexture('REVIEW TERMINAL', '#ffd76a');
+  const tscrMat = new THREE.MeshBasicMaterial({ map: tscrTex, transparent: true, side: THREE.DoubleSide });
+  const tscrF = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.5), tscrMat);
+  tscrF.position.set(0, 2.3, 0.57); tgrp.add(tscrF);
+  const tscrB = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.5), tscrMat);
+  tscrB.position.set(0, 2.3, -0.57); tscrB.rotation.y = Math.PI; tgrp.add(tscrB);
+  const tstrip = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.15, 1.15),
+    new THREE.MeshBasicMaterial({ color: 0xffd76a }));
+  tstrip.position.set(0, 2.65, 0); tgrp.add(tstrip);
+  const tRingMat = new THREE.MeshBasicMaterial({ color: 0xffd76a, transparent: true, opacity: 0.9, side: THREE.DoubleSide });
+  const tHaloMat = new THREE.MeshBasicMaterial({ color: 0xffd76a, transparent: true, opacity: 0.35, side: THREE.DoubleSide });
+  const tRing = new THREE.Mesh(stationAuraRingGeo, tRingMat);
+  tRing.rotation.x = Math.PI / 2; tRing.position.set(0, 0.15, 0); tgrp.add(tRing);
+  const tHalo = new THREE.Mesh(stationAuraHaloGeo, tHaloMat);
+  tHalo.rotation.x = Math.PI / 2; tHalo.position.set(0, 0.12, 0); tgrp.add(tHalo);
+  const tBeamMat = new THREE.MeshBasicMaterial({ color: 0xffd76a, transparent: true, opacity: 0.28, blending: THREE.AdditiveBlending, depthWrite: false });
+  const tBeam = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 6, 12), tBeamMat);
+  tBeam.position.set(0, 2.7 + 3, 0); tgrp.add(tBeam);
+  stationBeacons.push(tBeamMat);
+  const tSign = makeMountedSign('REVIEW TERMINAL', '#ffd76a', 5.5);
+  tSign.position.set(-3.6, 4.6, 0);
+  tgrp.add(tSign);
+  tgrp.position.copy(trad).multiplyScalar(150);
+  tgrp.position.z = tp.z;
+  tgrp.quaternion.copy(basisQuat(trad));
+  ship.add(tgrp);
+}
 // Round 30 (layout): the four cell consoles above no longer stand outside
 // their buildings' doorways — all six stations now live in the agriculture
 // ring (see the unified station block above). The rooms stay enterable
@@ -2099,6 +2355,7 @@ function updateCellWalk(dt) {
 // ---------- Shuttle (undocked) ----------
 const shuttle = new THREE.Group();
 const shuttleBodyMat = new THREE.MeshStandardMaterial({ color: 0xd8dde2, roughness: 0.35, metalness: 0.65 });
+applyGameTexture(shuttleBodyMat, 'textures/hull-panels.jpg', 2, 1); // round 30 shuttle pass: paneled hull; flat light-grey stays the fallback
 const fuselageGeo = new THREE.CapsuleGeometry(1.05, 3.0, 6, 18);
 fuselageGeo.rotateX(Math.PI / 2); // capsule axis (Y) -> Z (shuttle forward)
 shuttle.add(new THREE.Mesh(fuselageGeo, shuttleBodyMat));
@@ -2126,6 +2383,7 @@ function makeWingGeometry() {
 }
 const wingGeo = makeWingGeometry();
 const wingMat = new THREE.MeshStandardMaterial({ color: 0xd8dde2, roughness: 0.35, metalness: 0.65, side: THREE.DoubleSide });
+applyGameTexture(wingMat, 'textures/hull-panels.jpg', 2, 1); // round 30 shuttle pass: wings + fin share the hull panels; flat light-grey stays the fallback
 const wingR = new THREE.Mesh(wingGeo, wingMat);
 wingR.position.set(0.6, -0.1, -0.3);
 shuttle.add(wingR);
@@ -2143,6 +2401,31 @@ flameGeo.rotateX(-Math.PI / 2); // tip -> -Z (exhaust trails behind)
 const flame = new THREE.Mesh(flameGeo, new THREE.MeshBasicMaterial({ color: 0xffa63d }));
 flame.position.z = -3.6; flame.visible = false;
 shuttle.add(flame);
+// Retro (front) thrusters (round 30 shuttle pass): twin nose-side glows,
+// same orange burn family as the main flame. They fire on REVERSE THRUST
+// (S key / stick pulled back, thrust < -0.05 -> 'RETRO BURN') — NOT on the
+// Space brake assist, which is a separate drive state. Visual only.
+const retroFlameGeo = new THREE.ConeGeometry(0.32, 1.4, 12);
+retroFlameGeo.rotateX(Math.PI / 2); // tip -> +Z (exhaust pushes forward)
+const retroFlameMat = new THREE.MeshBasicMaterial({ color: 0xffa63d });
+const retroL = new THREE.Mesh(retroFlameGeo, retroFlameMat);
+retroL.position.set(-0.85, 0, 3.4); retroL.visible = false;
+const retroR = new THREE.Mesh(retroFlameGeo, retroFlameMat);
+retroR.position.set(0.85, 0, 3.4); retroR.visible = false;
+shuttle.add(retroL, retroR);
+// Side (RCS) thrusters (round 30 shuttle pass): rear side pods, same orange
+// burn family. A left turn (A / stick left, yawIn > 0) fires the RIGHT-rear
+// pod backward — pushing the right side forward swings the nose left —
+// and vice versa. Visual only; yaw itself is unchanged (A/D + stick X at
+// SHUTTLE_YAW_RATE, pre-existing).
+const sideFlameGeo = new THREE.ConeGeometry(0.28, 1.2, 12);
+sideFlameGeo.rotateX(-Math.PI / 2); // tip -> -Z (exhaust trails behind)
+const sideFlameMat = new THREE.MeshBasicMaterial({ color: 0xffa63d });
+const sideL = new THREE.Mesh(sideFlameGeo, sideFlameMat);
+sideL.position.set(-1.5, 0, -2.2); sideL.visible = false;
+const sideR = new THREE.Mesh(sideFlameGeo, sideFlameMat);
+sideR.position.set(1.5, 0, -2.2); sideR.visible = false;
+shuttle.add(sideL, sideR);
 shuttle.visible = false;
 scene.add(shuttle);
 const shuttleVel = new THREE.Vector3();
@@ -2320,13 +2603,15 @@ const wordTiles = []; // { sprite, base, phase, speed, amp, live }
 for (let wi = 0; wi < WORDS.length; wi++) {
   const pair = WORDS[wi];
   const es = pair[0], en = pair[1], emoji = WORD_EMOJI[wi];
-  // Position: 1.5–20 km, same taper as the rocks, kept 40 m clear of far
-  // rocks and near-belt rocks, and 300 m clear of the mining aura asteroids
-  // (so a word never pops its collect prompt while the player is mining).
+  // Position: 3–20 km (round 30 question-tiles: word tiles revert to the
+  // outer band; question tiles take the closer 1.5–3 km band), same taper
+  // as the rocks, kept 40 m clear of far rocks and near-belt rocks, and
+  // 300 m clear of the mining aura asteroids (so a word never pops its
+  // collect prompt while the player is mining).
   let pos = null;
   for (let tries = 0; tries < 8 && !pos; tries++) {
     const dir = seededDir(farRng);
-    const dist = 1500 + 18500 * Math.pow(farRng(), 1.7);
+    const dist = 3000 + 17000 * Math.pow(farRng(), 1.7);
     const p = dir.multiplyScalar(dist);
     let clear = true;
     for (const rp of farRockPos) { if (p.distanceToSquared(rp) < 40 * 40) { clear = false; break; } }
@@ -2459,6 +2744,7 @@ const COLLECT_REARM_DIST = 400; // metres: after Leaving a tile, it re-arms only
 // updateFlight every frame — nearest uncollected, unsuppressed tile, plus
 // how many words remain uncollected in total.
 let guideWord = null, guideWordD2 = Infinity, guideUncollected = 0;
+let guideTag = 'WORD'; // round 30 correction: WORD / COGNATE / CONJUGATION / IDIOM / DICTATION / SER-ESTAR — the gold arrow now targets the nearest item of ANY type, not words only
 const COLLECT_WATER = 5;        // water per collected word
 const COLLECT_METAL = 5;        // metal per collected word
 let mineHeld = false, mineProgress = 0, mineTarget = null, mineTimer = null;
@@ -2495,7 +2781,7 @@ const btnMine = document.getElementById('btn-mine');
 let autoWalk = false;
 function stopAutoWalk() { autoWalk = false; }
 function toggleAutoWalk() {
-  if (menuOn || mode !== 'walk' || inCell || crashed || titleOpen || toolOpen || collectOpen) return;
+  if (menuOn || mode !== 'walk' || inCell || crashed || titleOpen || toolOpen || collectOpen || reviewOpen) return;
   autoWalk = !autoWalk;
 }
 const failText = document.getElementById('failText');
@@ -2702,7 +2988,7 @@ function updateProgressUI() {
   setTxt('progIdioms', prog.idioms.size, TOOL_IDIOMS.length);
   setTxt('progPractice', prog.practice.size, WORDS.length);
   setTxt('progConj', prog.conjugation.size, TOOL_VERBS.length * 5 * 3);
-  setTxt('progDict', prog.dictation.size, WORDS.length);
+  setTxt('progDict', prog.dictation.size, WORDS.length + TOOL_VERBS.length * 5 * 3 + TOOL_IDIOMS.length);
   setTxt('progSer', prog.serestar.size, TOOL_SER.length);
 }
 updateHint();
@@ -2722,6 +3008,7 @@ function undock() {
   shuttle.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), tangent);
   // Co-rotating start: the shuttle inherits the station's local velocity.
   shuttleVel.copy(tangent).multiplyScalar(OMEGA * rr);
+  camYaw = 0; camPitch = 0; // fresh flight starts on the neutral trailing view
   shuttle.visible = true;
   btnMode.style.display = 'none';
   modeText.textContent = 'Departed';
@@ -2777,8 +3064,13 @@ document.addEventListener('mousemove', function (e) {
     yaw -= e.movementX * 0.0022;
     pitch = Math.max(-1.45, Math.min(1.45, pitch - e.movementY * 0.0022));
   } else {
-    // Shuttle forward is +Z with up +Y, so a right turn is a negative Y rotation.
-    rotateShuttle(-e.movementX * 0.0022, e.movementY * 0.0022);
+    // Flight look (round 30 shuttle pass, decoupled camera): dragging the
+    // mouse looks around the shuttle; it NEVER turns the ship. Steering
+    // is A/D + arrows + joystick. Any look input resets the idle timer,
+    // cancelling the auto-ease instantly.
+    camYaw -= e.movementX * 0.0022;
+    camPitch = Math.max(-1.45, Math.min(1.45, camPitch - e.movementY * 0.0022));
+    lastCamInput = performance.now();
   }
 });
 document.addEventListener('keydown', function (e) {
@@ -2788,10 +3080,12 @@ document.addEventListener('keydown', function (e) {
   if (document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
   if (e.code === 'Escape' && !e.repeat && collectOpen) { closeCollect(false); return; }
   if (e.code === 'Escape' && !e.repeat && toolOpen) { closeTool(); return; }
-  if (collectOpen || toolOpen) return; // a prompt owns all input while open
+  if (e.code === 'Escape' && !e.repeat && reviewOpen) { closeReview(); return; }
+  if (collectOpen || toolOpen || reviewOpen) return; // a prompt owns all input while open
   if (titleOpen) return; // title owns all input until a choice is made
   if (crashed) { if (e.code === 'KeyR' && !e.repeat) failPrimaryAction(); return; } // fail screen owns all input until repaired
   if (e.code === 'Enter' && !e.repeat && stationNear) { openTool(stationNear.id); return; }
+  if (e.code === 'Enter' && !e.repeat && terminalNear) { openReview(); return; }
   if (e.code === 'Space' && !e.repeat && mode === 'walk') doJump();
   if (e.code === 'KeyF' && !e.repeat) toggleMode();
   if (e.code === 'KeyH' && !e.repeat) toggleMenu();
@@ -2827,7 +3121,12 @@ window.addEventListener('pointermove', function (e) {
       yaw -= dx * 0.005;
       pitch = Math.max(-1.45, Math.min(1.45, pitch - dy * 0.005));
     } else {
-      rotateShuttle(-dx * 0.005, dy * 0.005);
+      // Flight look (round 30 shuttle pass, decoupled camera): dragging
+      // looks around the shuttle; it NEVER turns the ship. Steering is
+      // the left stick + A/D + arrows.
+      camYaw -= dx * 0.005;
+      camPitch = Math.max(-1.45, Math.min(1.45, camPitch - dy * 0.005));
+      lastCamInput = performance.now();
     }
   } else if (e.pointerId === joyPointerId) {
     let dx = (e.clientX - joyCX) / joyRad, dy = (e.clientY - joyCY) / joyRad;
@@ -3044,6 +3343,7 @@ function updateFlight(dt) {
   yawIn = Math.max(-1, Math.min(1, yawIn));
   thrust = Math.max(-1, Math.min(1, thrust));
   lastThrust = thrust; // burn sound reads this in animate()
+  if (yawIn !== 0 || pitchIn !== 0 || thrust !== 0 || keys.Space) lastFlightInput = performance.now();
 
   rotateShuttle(yawIn * SHUTTLE_YAW_RATE * dt, pitchIn * SHUTTLE_PITCH_RATE * dt);
   const fwd = new THREE.Vector3(0, 0, 1).applyQuaternion(shuttle.quaternion);
@@ -3051,6 +3351,9 @@ function updateFlight(dt) {
   if (keys.Space) shuttleVel.multiplyScalar(Math.max(0, 1 - 2.5 * dt)); // brake assist only; no ambient drag
   shuttle.position.addScaledVector(shuttleVel, dt);
   flame.visible = thrust > 0.05;
+  retroL.visible = retroR.visible = thrust < -0.05; // reverse thrust only, never the Space brake
+  sideR.visible = yawIn > 0.05; // left turn fires the right-rear pod
+  sideL.visible = yawIn < -0.05; // right turn fires the left-rear pod
 
   // Drive state for the ship-status menu (real thrust state, never faked).
   if (thrust > 0.05) driveState = 'BURNING — MAIN DRIVE';
@@ -3135,31 +3438,61 @@ function updateFlight(dt) {
   // leaving never re-triggers the same tile instantly.
   if (!collectOpen) {
     let best = null, bestD2 = COLLECT_DIST * COLLECT_DIST;
-    guideWord = null; guideWordD2 = Infinity; guideUncollected = 0;
+    guideWord = null; guideWordD2 = Infinity; guideUncollected = 0; guideTag = 'WORD';
     for (const w of wordTiles) {
       if (w.collected) continue;
       guideUncollected++;
       const d2 = shuttle.position.distanceToSquared(w.base);
       if (w.suppress) { if (d2 > COLLECT_REARM_DIST * COLLECT_REARM_DIST) w.suppress = false; continue; }
       if (d2 < bestD2) { bestD2 = d2; best = w; }
-      if (d2 < guideWordD2) { guideWordD2 = d2; guideWord = w; }
+      if (d2 < guideWordD2) { guideWordD2 = d2; guideWord = w; guideTag = 'WORD'; }
+    }
+    // Round 30 question-tiles: the same scan, over the five question-tile
+    // collections. Nearest in-range tile wins the prompt (word or
+    // question); known items (in a progress set) never trigger or guide.
+    for (const t of questionTiles) {
+      if (t.collected || qKnown(t)) continue;
+      guideUncollected++;
+      const d2 = shuttle.position.distanceToSquared(t.base);
+      if (t.suppress) { if (d2 > COLLECT_REARM_DIST * COLLECT_REARM_DIST) t.suppress = false; continue; }
+      if (d2 < bestD2) { bestD2 = d2; best = t; }
+      if (d2 < guideWordD2) { guideWordD2 = d2; guideWord = t; guideTag = t.q.tag; }
     }
     if (best) openCollect(best);
   }
 
-  // Chase camera: stays behind the shuttle along its rear axis so steering is
-  // intuitive (forward on screen is always shuttle forward). The behind-point
-  // is recomputed from the shuttle's CURRENT heading every frame and followed
-  // with a fast dt-based factor, so the camera never swings off-axis mid-turn
-  // the way the old slower follow did.
+  // Decoupled flight camera (round 30 shuttle pass): the camera orbits
+  // the shuttle on look offsets the player controls separately from ship
+  // heading — mouse drag / touch drag looks around, A/D + arrows +
+  // joystick steer. Neutral (offsets zero) trails the shuttle: behind the
+  // direction of TRAVEL when moving fast, behind the NOSE when
+  // near-stationary (neutral forward blends nose toward velocity with
+  // speed). Idle auto-ease ONLY: with no look input AND no flight input
+  // for CAM_IDLE_SECS, the offsets ease gently toward zero (slow lerp,
+  // never a snap); any look input cancels instantly by resetting the
+  // timer and setting fresh offsets. No recenter button, no recenter key.
+  const nowMs = performance.now();
+  if (nowMs - lastCamInput > CAM_IDLE_SECS * 1000 && nowMs - lastFlightInput > CAM_IDLE_SECS * 1000) {
+    const k = 1 - Math.exp(-CAM_EASE_RATE * dt);
+    camYaw *= (1 - k); camPitch *= (1 - k);
+  }
+  const speedNow = shuttleVel.length();
+  const velDir = speedNow > 0.01 ? shuttleVel.clone().divideScalar(speedNow) : fwd;
+  const neutralFwd = fwd.clone().lerp(velDir, Math.min(1, speedNow / 100));
+  if (neutralFwd.lengthSq() < 0.000001) neutralFwd.copy(fwd); // nose/travel opposed: never normalize a near-zero vector
+  neutralFwd.normalize();
   const upS = new THREE.Vector3(0, 1, 0).applyQuaternion(shuttle.quaternion);
-  const desired = shuttle.position.clone().addScaledVector(fwd, -20).addScaledVector(upS, 7);
+  const camFwd = neutralFwd.clone().applyAxisAngle(upS, camYaw);
+  const camRight = new THREE.Vector3().crossVectors(upS, camFwd).normalize();
+  camFwd.applyAxisAngle(camRight, -camPitch); // positive camPitch looks up
+  const camUp = upS.clone().applyAxisAngle(camRight, -camPitch);
+  const desired = shuttle.position.clone().addScaledVector(camFwd, -20).addScaledVector(camUp, 7);
   camera.position.lerp(desired, 1 - Math.exp(-8 * dt));
-  camera.up.copy(upS);
+  camera.up.copy(camUp);
   camera.lookAt(
-    shuttle.position.x + fwd.x * 12,
-    shuttle.position.y + fwd.y * 12,
-    shuttle.position.z + fwd.z * 12
+    shuttle.position.x + camFwd.x * 12,
+    shuttle.position.y + camFwd.y * 12,
+    shuttle.position.z + camFwd.z * 12
   );
   // Flight nav readout (navigation aid ONLY — display only, never moves the
   // shuttle): screen-space direction from the camera to the NEAREST of the
@@ -3178,8 +3511,8 @@ function updateFlight(dt) {
     // Elevation to the nearest port (round 14 guidance): the flat arrow
     // gives bearing only, so this adds the missing up/down half — ▲ means
     // the port sits above the view centre (pitch up), ▼ below (pitch down).
-    // Camera space here matches the shuttle frame (chase cam looks along
-    // shuttle forward with shuttle up), so this is a true steering cue.
+    // Camera space here is the LIVE camera frame (decoupled look offsets
+    // included), so this stays a true steering cue at any look angle.
     const elevDeg = Math.atan2(camDir.y, Math.hypot(camDir.x, camDir.z)) * 180 / Math.PI;
     guideElev.textContent = (elevDeg > 5 ? '▲ ' : elevDeg < -5 ? '▼ ' : '— ') + Math.abs(elevDeg).toFixed(0) + '°';
     // Beacon-range warnings (staged): first warning past 25 km,
@@ -3208,19 +3541,23 @@ function updateFlight(dt) {
     beaconBeamMat.opacity = 0.4 * Math.max(0, Math.min(1, (dist - 500) / 2500));
     beaconBeam.visible = true;
     navLine.style.display = 'flex';
-    // Word guidance (guidance round): gold arrow + distance to the nearest
-    // uncollected, unsuppressed word tile, reusing the collect scan's
-    // result above. Display only — it never moves the shuttle. Arrival
-    // stays a reveal: the word itself is never printed, and no emoji is
-    // shown (arrow + distance only). Hidden while any prompt is open, and
-    // replaced by an all-collected state when no uncollected words remain
-    // at all (a merely-suppressed remainder hides the line instead, since
-    // those tiles re-arm and are not actually gone).
-    if (collectOpen || toolOpen) {
+    // Word guidance (guidance round, round 30 correction): gold arrow +
+    // distance to the nearest uncollected, unsuppressed item of ANY type
+    // (word tiles + all five question-tile types), reusing the collect
+    // scan's result above, with a type tag (WORD / COGNATE / CONJUGATION /
+    // IDIOM / DICTATION / SER-ESTAR) so the player knows what they are
+    // flying toward. Display only — it never moves the shuttle. Arrival
+    // stays a reveal: the item itself is never printed, and no emoji is
+    // shown (arrow + distance + tag only). Hidden while any prompt is
+    // open, and replaced by an all-collected state only when no
+    // uncollected items of ANY type remain at all (a merely-suppressed
+    // remainder hides the line instead, since those tiles re-arm and are
+    // not actually gone).
+    if (collectOpen || toolOpen || reviewOpen) {
       wordLine.style.display = 'none';
     } else if (guideUncollected === 0) {
       wordArrow.style.display = 'none';
-      wordDist.textContent = '✓ ALL WORDS COLLECTED';
+      wordDist.textContent = '✓ ALL ITEMS COLLECTED';
       wordLine.style.display = 'flex';
     } else if (guideWord) {
       const toWord = guideWord.base.clone().sub(camera.position);
@@ -3229,7 +3566,7 @@ function updateFlight(dt) {
       const wAngle = Math.atan2(-wCam.y, wCam.x) * 180 / Math.PI + 90;
       wordArrow.style.display = '';
       wordArrow.style.transform = 'rotate(' + wAngle.toFixed(1) + 'deg)';
-      wordDist.textContent = wordDistVal >= 1000 ? (wordDistVal / 1000).toFixed(2) + ' km to nearest word' : wordDistVal.toFixed(0) + ' m to nearest word';
+      wordDist.textContent = wordDistVal >= 1000 ? (wordDistVal / 1000).toFixed(2) + ' km to nearest ' + guideTag : wordDistVal.toFixed(0) + ' m to nearest ' + guideTag;
       wordLine.style.display = 'flex';
     } else {
       wordLine.style.display = 'none';
@@ -3410,6 +3747,15 @@ function endRecogAttempt(msg) {
   if (recogActive) { recogActive = false; setMicUI(false); }
   if (msg) setFeedback(msg);
 }
+// Round 30 question-tiles: the Say-it answer for the open prompt.
+// Word tiles: the Spanish word in userData.es. Question tiles: q.answer
+// (also stored in userData.es, but this helper keeps the check explicit
+// so the two paths cannot drift apart).
+function collectAnswer() {
+  if (!collectTile) return '';
+  if (collectTile.q) return collectTile.q.answer;
+  return collectTile.sprite.userData.es;
+}
 function startRecogAttempt() {
   const mySeq = ++recogSeq;
   try { if (recog) recog.stop(); } catch (e) {}
@@ -3426,7 +3772,7 @@ function startRecogAttempt() {
       try { recog.stop(); } catch (e) {}
       if (recogTimer) { clearTimeout(recogTimer); recogTimer = null; }
       recogActive = false; setMicUI(false);
-      if (collectTile && spokenMatches(heard, collectTile.sprite.userData.es)) onCollectCorrect();
+      if (collectTile && spokenMatches(heard, collectAnswer())) onCollectCorrect();
       else setFeedback('Heard: "' + heard + '" \u2014 not quite, try again');
     } catch (e) {
       try { recog.stop(); } catch (e2) {}
@@ -3481,9 +3827,24 @@ function openCollect(w) {
   try { if (document.exitPointerLock) document.exitPointerLock(); } catch (e) {}
   try { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch (e) {}
   updateBurnSound(0); // burn stops the instant the prompt opens
-  collectEmoji.textContent = w.sprite.userData.emoji;
-  collectEs.textContent = w.sprite.userData.es;
-  collectEn.textContent = w.sprite.userData.en;
+  if (w.q) {
+    // Question tile: the prompt shows the QUESTION side only, never the
+    // answer (dictation excepted: its audio inherently IS the word). One
+    // Hear button speaking the question side in its language; the EN
+    // button is hidden because tiles have no direction toggle (Spanish
+    // answer only, fixed dir-es).
+    collectEmoji.textContent = w.q.icon;
+    collectEs.textContent = w.q.promptBig;
+    collectEn.textContent = w.q.promptSub;
+    document.getElementById('btn-collect-hear').textContent = '🔊 Hear';
+    document.getElementById('btn-collect-hear-en').style.display = 'none';
+  } else {
+    collectEmoji.textContent = w.sprite.userData.emoji;
+    collectEs.textContent = w.sprite.userData.es;
+    collectEn.textContent = w.sprite.userData.en;
+    document.getElementById('btn-collect-hear').textContent = '🔊 Hear (ES)';
+    document.getElementById('btn-collect-hear-en').style.display = '';
+  }
   setFeedback('');
   collectNoMic.style.display = WordRec ? 'none' : 'block';
   btnCollectMic.disabled = !WordRec;
@@ -3500,6 +3861,8 @@ function closeCollect(collected) {
   try { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch (e) {}
   collectOpen = false;
   collectTile = null;
+  document.getElementById('btn-collect-hear').textContent = '🔊 Hear (ES)';
+  document.getElementById('btn-collect-hear-en').style.display = '';
   collectPanel.style.display = 'none';
   if (menuOn) updateMenu();
 }
@@ -3513,15 +3876,24 @@ function onCollectCorrect() {
     try { if (w.sprite.material.map) w.sprite.material.map.dispose(); } catch (e) {}
     w.sprite.material.map = null;
     w.live = false;
-    wordTileLive--;
+    if (w.q) { if (qTileLive > 0) qTileLive--; } else { wordTileLive--; }
   }
   scene.remove(w.sprite);
   w.sprite.visible = false;
   w.collected = true;
+  if (w.q) {
+    // Round 30 question-tiles: credit the SHARED station progress set
+    // (tile visibility = item not in progress set, so station speech and
+    // space speech share one known set), then refresh the menu counts
+    // and the question dots.
+    try { prog[w.q.set].add(w.q.key); } catch (e) {}
+    try { syncQuestionDots(); } catch (e) {}
+    try { updateProgressUI(); } catch (e) {}
+  }
   water += COLLECT_WATER;
   metal += COLLECT_METAL;
-  saveGame(); // word collect saves the journey
-  hint.textContent = '+' + COLLECT_WATER + ' WATER, +' + COLLECT_METAL + ' METAL collected \u2014 ' + w.sprite.userData.es;
+  saveGame(); // collect saves the journey (word or question tile)
+  hint.textContent = '+' + COLLECT_WATER + ' WATER, +' + COLLECT_METAL + ' METAL collected — ' + (w.q ? w.q.tag + ': ' : '') + w.sprite.userData.es;
   if (mineTimer) clearTimeout(mineTimer);
   mineTimer = setTimeout(updateHint, 3000);
   setTimeout(function () { closeCollect(true); }, 900);
@@ -3559,12 +3931,19 @@ document.getElementById('btn-collect-hear').addEventListener('click', function (
   // on the tap gesture - the station wiring is proven on this device.
   // Round 29: the onState callback is the watchdog above — Playing…
   // shows only when synthesis actually starts.
-  if (collectTile) speakWord(collectTile.sprite.userData.es, collectHearState(document.getElementById('btn-collect-hear'), '🔊 Hear (ES)'));
+  if (!collectTile) return;
+  if (collectTile.q) {
+    // Question side only — never the answer (dictation excepted: its
+    // audio IS the word). Same in-gesture speak + watchdog as words.
+    stopListening(false);
+    if (collectTile.q.hearLang === 'en') speakEn(collectTile.q.hearText, collectHearState(document.getElementById('btn-collect-hear'), '🔊 Hear'));
+    else speakWord(collectTile.q.hearText, collectHearState(document.getElementById('btn-collect-hear'), '🔊 Hear'));
+  } else speakWord(collectTile.sprite.userData.es, collectHearState(document.getElementById('btn-collect-hear'), '🔊 Hear (ES)'));
 });
 document.getElementById('btn-collect-hear-en').addEventListener('click', function () {
   // Round 28: plain click, matching the working station Hear buttons (see Hear ES).
   // English gloss only — saying the English must NOT collect the tile.
-  if (collectTile) { stopListening(false); speakEn(collectTile.sprite.userData.en, collectHearState(document.getElementById('btn-collect-hear-en'), '🔊 Hear (EN)')); }
+  if (collectTile && !collectTile.q) { stopListening(false); speakEn(collectTile.sprite.userData.en, collectHearState(document.getElementById('btn-collect-hear-en'), '🔊 Hear (EN)')); }
 });
 btnCollectMic.addEventListener('click', function () {
   // Round 28 sweep: plain click, matching the station Say-it button -
@@ -3641,6 +4020,12 @@ const toolAudioBtns = document.getElementById('toolAudioBtns');
 // Dictation (hearing IS the question) and flashcards (no question) are
 // never gated. Tools stay unblocked: not speaking never blocks progress.
 let toolAudio = null, toolSayDir = 'es';
+// Round 30 review terminal: feedback-only Say-it state. When set, the
+// shared recognition result writes ONLY to the review row (ding + echo)
+// and never calls creditSpoken, never saves, never changes known status.
+// Declared here (not in the terminal block) so the audio handlers below
+// can reference it without TDZ issues.
+let reviewSay = null;
 let toolRecog = null, toolRecogActive = false, toolRecogTimer = null;
 function setToolAudio(es, en, esGated, enGated) {
   toolAudio = (es || en) ? { es: es || '', en: en || '', esGated: !!esGated, enGated: !!enGated } : null;
@@ -3670,6 +4055,7 @@ function toolSayUI(listening) {
 }
 let toolRecogSeq = 0, toolRecogLangs = [], toolRecogLangIdx = 0, toolRecogGotResult = false, toolRecogClosed = false;
 function stopToolListening(showTry) {
+  if (reviewSay) { const r = reviewSay; reviewSay = null; r.btn.textContent = '🎤 Say it'; r.btn.classList.remove('listening'); if (showTry) r.fb.textContent = 'Try again — tap 🎤 when you are ready.'; }
   toolRecogSeq++; // invalidate any pending handlers from the stopped attempt
   toolRecogClosed = true;
   try { if (toolRecog) toolRecog.stop(); } catch (e) {}
@@ -3683,6 +4069,7 @@ function endToolRecogAttempt(msg) {
   toolRecogClosed = true;
   if (toolRecogTimer) { clearTimeout(toolRecogTimer); toolRecogTimer = null; }
   if (toolRecogActive) { toolRecogActive = false; toolSayUI(false); }
+  if (reviewSay) { const r = reviewSay; reviewSay = null; r.btn.textContent = '🎤 Say it'; r.btn.classList.remove('listening'); if (msg) r.fb.textContent = msg; }
   if (msg) setToolSayFeedback(msg);
 }
 function startToolRecogAttempt() {
@@ -3704,7 +4091,15 @@ function startToolRecogAttempt() {
       const dir = toolSayDir;
       const target = dir === 'es' ? toolAudio.es : toolAudio.en;
       const ok = dir === 'es' ? spokenMatches(heard, target) : spokenMatchesEn(heard, target);
-      if (ok) { try { playDing(); } catch (e) {} setToolSayFeedback('\u2713 Correct!', true); if (dir === 'es') creditSpoken(); }
+      if (reviewSay) {
+        // Round 30 review terminal: feedback ONLY — ding + echo, never
+        // creditSpoken, never save, never change known status.
+        const r = reviewSay; reviewSay = null;
+        r.btn.textContent = '🎤 Say it'; r.btn.classList.remove('listening');
+        if (ok) { try { playDing(); } catch (e) {} r.fb.textContent = '✓ Correct!'; r.fb.classList.add('ok'); }
+        else { r.fb.textContent = 'Heard: "' + heard + '" — not quite, try again'; r.fb.classList.remove('ok'); }
+      }
+      else if (ok) { try { playDing(); } catch (e) {} setToolSayFeedback('\u2713 Correct!', true); if (dir === 'es') creditSpoken(); }
       else setToolSayFeedback('Heard: "' + heard + '" \u2014 not quite, try again');
     } catch (e) {
       try { toolRecog.stop(); } catch (e2) {}
@@ -3761,7 +4156,7 @@ function currentSpokenKey() {
     if (!qz.qs || !qz.qs[qz.qi]) return null;
     const q = qz.qs[qz.qi];
     if (toolId === 'practice') return (q.wid === undefined) ? null : { set: 'practice', key: q.wid };
-    if (toolId === 'dictation') return (q.wid === undefined) ? null : { set: 'dictation', key: q.wid };
+    if (toolId === 'dictation') return q.dkey ? { set: 'dictation', key: q.dkey } : ((q.wid === undefined) ? null : { set: 'dictation', key: 'vocab:' + q.wid });
     if (toolId === 'conjugation') return q.ckey ? { set: 'conjugation', key: q.ckey } : null;
     return (q.sid === undefined) ? null : { set: 'serestar', key: q.sid };
   }
@@ -3858,7 +4253,7 @@ function stationDist2(st) {
   return tang * tang + dz * dz;
 }
 function checkStations() {
-  if (toolOpen) { btnStation.style.display = 'none'; stationNear = null; return; }
+  if (toolOpen || reviewOpen) { btnStation.style.display = 'none'; stationNear = null; return; }
   let best = null, bestD2 = STATION_DIST * STATION_DIST;
   for (const st of STATIONS) {
     const d2 = stationDist2(st);
@@ -3911,6 +4306,179 @@ btnStation.addEventListener('pointerdown', function (e) {
 document.getElementById('btn-tool-close').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur(); closeTool();
 });
+// ---------- Round 30 review terminal ----------
+// Gold console on the gallery upper deck (the mezzanine in technology).
+// Trigger is HEIGHT-GATED per terminal: galleryFactor > 0.9 means fully on
+// the upper deck (ramps give 0-1, main deck outside the arc gives 0), so
+// walking the main deck below can never open any of the five. 4 m walk-up
+// range each, same as stations; nearest terminal wins (min distance). All
+// five open the ONE shared review panel via openReview() below — the panel
+// code exists once, not five times. The panel is review-only: it reads the
+// shared progress/known sets, never writes them.
+const REVIEW_DIST = 4;
+let reviewOpen = false, terminalNear = false;
+const btnTerminal = document.getElementById('btn-terminal');
+const reviewPanel = document.getElementById('reviewPanel');
+function terminalDist2() {
+  if (mode !== 'walk' || inCell || transitioning || toolOpen || reviewOpen) return Infinity;
+  if (galleryFactor(playerAngle, playerZ) < 0.9) return Infinity;
+  let best = Infinity;
+  for (const tp of REVIEW_TERMINALS_POS) {
+    const tang = Math.abs(angDiff(playerAngle, tp.angle)) * 150;
+    const dz = playerZ - tp.z;
+    const d2 = tang * tang + dz * dz;
+    if (d2 < best) best = d2;
+  }
+  return best;
+}
+function checkTerminal() {
+  if (reviewOpen || toolOpen) { btnTerminal.style.display = 'none'; terminalNear = false; return; }
+  const near = terminalDist2() < REVIEW_DIST * REVIEW_DIST;
+  if (near !== terminalNear) {
+    terminalNear = near;
+    if (near) { btnTerminal.textContent = 'OPEN REVIEW TERMINAL'; btnTerminal.style.display = ''; hint.textContent = 'Near the review terminal — tap Open or press Enter'; }
+    else { btnTerminal.style.display = 'none'; if (hint.textContent.indexOf('Near the review terminal') === 0) hint.textContent = ''; }
+  }
+}
+function openReview() {
+  reviewOpen = true;
+  stopAutoWalk();
+  try { if (document.exitPointerLock) document.exitPointerLock(); } catch (e) {}
+  try { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch (e) {}
+  btnTerminal.style.display = 'none';
+  hint.textContent = '';
+  renderReviewTabs();
+  renderReviewList();
+  reviewPanel.style.display = 'flex';
+}
+function closeReview() {
+  if (!reviewOpen) return;
+  reviewOpen = false;
+  if (reviewSay) stopToolListening(false);
+  try { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch (e) {}
+  // Review always speaks Spanish; leave the station toggle label honest.
+  toolSayDir = 'es'; btnToolDir.textContent = 'Say: Spanish';
+  reviewPanel.style.display = 'none';
+}
+btnTerminal.addEventListener('pointerdown', function (e) {
+  e.preventDefault(); e.target.blur();
+  if (terminalNear) openReview();
+});
+document.getElementById('btn-review-close').addEventListener('pointerdown', function (e) {
+  e.preventDefault(); e.target.blur(); closeReview();
+});
+const TERM_SER_FORM = { yo: ['soy', 'estoy'], tu: ['eres', 'estás'], el: ['es', 'está'], nos: ['somos', 'estamos'], ellos: ['son', 'están'] };
+function resolveDictKey(k) {
+  if (typeof k !== 'string') return null;
+  if (k.indexOf('vocab:') === 0) { const n = parseInt(k.slice(6), 10); return (Number.isInteger(n) && n >= 0 && n < WORDS.length) ? { es: WORDS[n][0], en: WORDS[n][1] } : null; }
+  if (k.indexOf('idiom:') === 0) { const n = parseInt(k.slice(6), 10); return (Number.isInteger(n) && n >= 0 && n < TOOL_IDIOMS.length) ? { es: TOOL_IDIOMS[n][0], en: TOOL_IDIOMS[n][1] } : null; }
+  if (k.indexOf('verb:') === 0) {
+    const parts = k.slice(5).split('|'); if (parts.length !== 3) return null;
+    const vi = parseInt(parts[0], 10);
+    const si = ['yo', 'tú', 'él/ella', 'nosotros', 'ellos/as'].indexOf(parts[1]);
+    const ti = ['Present', 'Preterite', 'Future'].indexOf(parts[2]);
+    if (!Number.isInteger(vi) || vi < 0 || vi >= TOOL_VERBS.length || si < 0 || ti < 0) return null;
+    const v = TOOL_VERBS[vi];
+    return { es: v[2][ti][si], en: v[0] + ' (' + v[1] + '), ' + parts[1] + ' ' + parts[2] };
+  }
+  return null;
+}
+function reviewKnownItems(tab) {
+  if (tab === 'cognates') return Array.from(prog.cognates).sort(function (a, b) { return a - b; }).map(function (i) { return { es: TOOL_COG[i][1], en: TOOL_COG[i][0] }; });
+  if (tab === 'practice') {
+    const set = new Set();
+    for (let i = 0; i < wordTiles.length; i++) if (wordTiles[i].collected) set.add(i);
+    for (const i of prog.practice) set.add(i);
+    return Array.from(set).sort(function (a, b) { return a - b; }).map(function (wi) { return { es: WORDS[wi][0], en: WORDS[wi][1] }; });
+  }
+  if (tab === 'conjugation') return Array.from(prog.conjugation).sort().map(function (k) {
+    const parts = k.split('|'); const vi = parseInt(parts[0], 10);
+    const si = ['yo', 'tú', 'él/ella', 'nosotros', 'ellos/as'].indexOf(parts[1]);
+    const ti = ['Present', 'Preterite', 'Future'].indexOf(parts[2]);
+    if (vi < 0 || vi >= TOOL_VERBS.length || si < 0 || ti < 0) return null;
+    const v = TOOL_VERBS[vi];
+    return { es: v[2][ti][si], en: v[0] + ' (' + v[1] + '), ' + parts[1] + ' ' + parts[2] };
+  }).filter(Boolean);
+  if (tab === 'idioms') return Array.from(prog.idioms).sort(function (a, b) { return a - b; }).map(function (i) { return { es: TOOL_IDIOMS[i][0], en: TOOL_IDIOMS[i][1] }; });
+  if (tab === 'dictation') return Array.from(prog.dictation).sort().map(resolveDictKey).filter(Boolean);
+  if (tab === 'serestar') return Array.from(prog.serestar).sort(function (a, b) { return a - b; }).map(function (si) {
+    const q = TOOL_SER[si]; if (!q) return null;
+    const correct = TERM_SER_FORM[q[1]][q[2] === 'ser' ? 0 : 1];
+    return { es: q[0].replace('___', correct), en: q[3] };
+  }).filter(Boolean);
+  return [];
+}
+const REVIEW_TABS = [
+  { id: 'cognates', label: 'Cognates' },
+  { id: 'practice', label: 'Practice' },
+  { id: 'conjugation', label: 'Conjugation' },
+  { id: 'idioms', label: 'Idioms' },
+  { id: 'dictation', label: 'Dictation' },
+  { id: 'serestar', label: 'Ser vs. estar' },
+];
+let reviewTab = 'cognates', reviewPage = 0;
+const REVIEW_PAGE = 50;
+function renderReviewTabs() {
+  const tabsEl = document.getElementById('reviewTabs');
+  let html = '';
+  REVIEW_TABS.forEach(function (tb) {
+    const active = tb.id === reviewTab;
+    html += '<button class="ctl2" data-tab="' + tb.id + '"' + (active ? ' style="background:#ffd76a;color:#06101e;"' : '') + '>' + tb.label + ' (' + reviewKnownItems(tb.id).length + ')</button>';
+  });
+  tabsEl.innerHTML = html;
+  tabsEl.querySelectorAll('button').forEach(function (b) {
+    b.addEventListener('click', function () { reviewTab = b.getAttribute('data-tab'); reviewPage = 0; renderReviewTabs(); renderReviewList(); });
+  });
+}
+function renderReviewList() {
+  const items = reviewKnownItems(reviewTab);
+  const body = document.getElementById('reviewBody');
+  const pages = Math.max(1, Math.ceil(items.length / REVIEW_PAGE));
+  if (reviewPage >= pages) reviewPage = pages - 1;
+  if (!items.length) {
+    body.innerHTML = '<div class="sub">Nothing learned here yet — collect words and answer questions out in space or at the stations, then come back.</div>';
+    return;
+  }
+  const start = reviewPage * REVIEW_PAGE, page = items.slice(start, start + REVIEW_PAGE);
+  let html = '<div class="sub">Showing ' + (start + 1) + '–' + Math.min(items.length, start + REVIEW_PAGE) + ' of ' + items.length + ' learned</div>';
+  page.forEach(function (it, pi) {
+    const idx = start + pi;
+    html += '<div class="rev-row"><span class="rev-text">' + escHtml(it.es) + ' = ' + escHtml(it.en) + '</span>' +
+      '<button class="ctl2 rev-hear-es" data-i="' + idx + '">🔊 ES</button>' +
+      (it.en ? '<button class="ctl2 rev-hear-en" data-i="' + idx + '">🔊 EN</button>' : '') +
+      '<button class="ctl2 rev-say" data-i="' + idx + '">🎤 Say it</button>' +
+      '<span class="rev-fb" id="rev-fb-' + idx + '"></span></div>';
+  });
+  if (pages > 1) {
+    html += '<div style="text-align:center;margin-top:10px;"><button class="ctl2" id="rev-prev"' + (reviewPage === 0 ? ' disabled' : '') + '>← Prev</button>' +
+      '<span style="margin:0 10px;">Page ' + (reviewPage + 1) + ' / ' + pages + '</span>' +
+      '<button class="ctl2" id="rev-next"' + (reviewPage >= pages - 1 ? ' disabled' : '') + '>Next →</button></div>';
+  }
+  body.innerHTML = html;
+  body.querySelectorAll('.rev-hear-es').forEach(function (b) { b.addEventListener('click', function () { const it = items[parseInt(b.getAttribute('data-i'), 10)]; stopToolListening(false); speakWord(it.es); }); });
+  body.querySelectorAll('.rev-hear-en').forEach(function (b) { b.addEventListener('click', function () { const it = items[parseInt(b.getAttribute('data-i'), 10)]; stopToolListening(false); speakEn(it.en); }); });
+  body.querySelectorAll('.rev-say').forEach(function (b) { b.addEventListener('click', function () { const idx = parseInt(b.getAttribute('data-i'), 10); const it = items[idx]; startReviewSay(b, document.getElementById('rev-fb-' + idx), it.es); }); });
+  const pv = document.getElementById('rev-prev'); if (pv) pv.addEventListener('click', function () { if (reviewPage > 0) { reviewPage--; renderReviewList(); } });
+  const nx = document.getElementById('rev-next'); if (nx) nx.addEventListener('click', function () { if (reviewPage < pages - 1) { reviewPage++; renderReviewList(); } });
+}
+// Review Say-it: feedback ONLY. Reuses the station recognition stack
+// (same hardening: continuous + stop-on-first-result, language fallback,
+// attempt guard, 12 s timeout) but the result branch writes only to the
+// row (ding + echo) and never calls creditSpoken — see the reviewSay
+// guards in stopToolListening / endToolRecogAttempt / onresult.
+function startReviewSay(btn, fb, target) {
+  ensureAudio();
+  if (reviewSay && reviewSay.btn === btn) { stopToolListening(false); return; } // tap-to-stop
+  if (reviewSay) stopToolListening(false);
+  if (!WordRec) { fb.textContent = 'Speech recognition isn\'t available on this device or browser.'; return; }
+  toolAudio = { es: target, en: '', esGated: false, enGated: false };
+  toolSayDir = 'es';
+  fb.textContent = ''; fb.classList.remove('ok');
+  startToolListening();
+  if (!toolRecogActive) { fb.textContent = 'Try again — tap 🎤 when you are ready.'; return; }
+  reviewSay = { btn: btn, fb: fb };
+  btn.textContent = '● Listening… — tap to stop'; btn.classList.add('listening');
+}
 // ---------- Flashcards (Cognates, Idioms) ----------
 // Full verbatim decks: all 487 cognates (with category filter) and all
 // 135 idioms. Cognate cards show Spanish first, Flip reveals English;
@@ -3972,10 +4540,10 @@ function renderFlashcards() {
 // ---------- Quiz engine (Practice, Conjugation, Dictation, Ser vs. estar) ----------
 // 10 questions, score at the end, no known-marking, no persistence.
 let qz = { qs: [], qi: 0, score: 0, answered: false };
-function runQuiz(qs) { qz = { qs: shuf(qs).slice(0, 10), qi: 0, score: 0, answered: false }; renderQuiz(); }
+function runQuiz(qs, count) { qz = { qs: shuf(qs).slice(0, count || 10), qi: 0, score: 0, answered: false }; renderQuiz(); }
 function renderQuiz() {
   if (qz.qi >= qz.qs.length) {
-    toolBody.innerHTML = '<div class="big">Score: ' + qz.score + ' / ' + qz.qs.length + '</div><div class="sub">Nice work — close the panel to keep walking, or restart for a fresh round.</div><div style="margin-top:14px;"><button class="ctl2" id="qz-restart">Restart round</button></div>';
+    toolBody.innerHTML = '<div class="big">Score: ' + qz.score + ' / ' + qz.qs.length + '</div><div class="sub">Nice work — pick a new focus below, or close the panel to keep walking.</div><div style="margin-top:14px;"><button class="ctl2" id="qz-restart">Choose focus</button></div>';
     document.getElementById('qz-restart').addEventListener('click', function () { renderTool(toolId); });
     setToolFeedback('');
     setToolAudio(null);
@@ -4015,10 +4583,18 @@ function renderQuiz() {
     });
   });
 }
+// Round 30 known-exclusion: a word counts as known for the Practice
+// station when its word tile was collected in space OR it was spoken
+// correctly at the station — either way the station never quizzes it again.
+function isPracticeKnown(wi) {
+  try { if (wordTiles[wi] && wordTiles[wi].collected) return true; } catch (e) {}
+  try { return prog.practice.has(wi); } catch (e) { return false; }
+}
 function buildPracticeQs() {
   // Reuses the WORDS + WORD_EMOJI data already in the file. Omits vs. the
-  // full practice tool: flashcards, El or la?, known-marking, sets, rounds.
-  const idx = shuf(WORDS.map(function (_, i) { return i; }));
+  // full practice tool: flashcards, El or la?, sets, rounds. Round 30:
+  // known words (space-collected or station-spoken) are excluded.
+  const idx = shuf(WORDS.map(function (_, i) { return i; }).filter(function (wi) { return !isPracticeKnown(wi); }));
   return idx.map(function (wi) {
     const es = WORDS[wi][0], en = WORDS[wi][1];
     const pool = shuf(WORDS.map(function (p) { return p[1]; }).filter(function (e) { return e !== en; }));
@@ -4026,47 +4602,113 @@ function buildPracticeQs() {
     return { wid: wi, prompt: '<div style="font-size:56px;">' + escHtml(WORD_EMOJI[wi]) + '</div><div class="big">' + escHtml(es) + '</div><div class="sub">Pick the English meaning.</div>', choices: choices, answer: choices.indexOf(en), reveal: es + ' = ' + en, audioEs: es, audioEn: en, esGated: false, enGated: true };
   });
 }
-function buildConjQs() {
-  // All 113 verbs, Present/Preterite/Future, 5 subjects (vosotros dropped,
-  // matching the web tool's default). Omits vs. the full tool: spelling
-  // notes on reveal, tense filter. (Round 18: Hear ES/EN + Say-it live in
-  // the panel audio row; Hear ES is gated until after answering.)
-  // Question shows infinitive +
-  // gloss + subject + tense; choices are that tense's forms.
+function buildConjQs(tense) {
+  // Round 30: the FULL pool — all 113 verbs x 5 subjects x 3 tenses =
+  // 1,695 triples (vosotros dropped, matching the web tool's default) —
+  // filtered by the chosen tense ('Mixed' = all three) and by known
+  // exclusion (spoken triples never reappear). The old build drew only
+  // 24 random triples, which made tense choice and exclusion impossible.
+  // Question shows infinitive + gloss + subject + tense; choices are
+  // that tense's forms (same choice logic as before, per triple).
   const SUBJ = ['yo', 'tú', 'él/ella', 'nosotros', 'ellos/as'];
   const TENSE = ['Present', 'Preterite', 'Future'];
   const qs = [];
-  for (let k = 0; k < 24; k++) {
-    const v = TOOL_VERBS[(Math.random() * TOOL_VERBS.length) | 0];
-    const ti = (Math.random() * 3) | 0, si = (Math.random() * 5) | 0;
-    const forms = v[2][ti];
-    const correct = forms[si];
-    let ch = [correct];
-    for (let s = 0; s < 5 && ch.length < 4; s++) { if (s !== si && ch.indexOf(forms[s]) < 0) ch.push(forms[s]); }
-    let guard = 0;
-    while (ch.length < 4 && guard++ < 40) {
-      const v2 = TOOL_VERBS[(Math.random() * TOOL_VERBS.length) | 0];
-      const f2 = v2[2][ti][(Math.random() * 5) | 0];
-      if (ch.indexOf(f2) < 0) ch.push(f2);
+  for (let vi = 0; vi < TOOL_VERBS.length; vi++) {
+    const v = TOOL_VERBS[vi];
+    for (let ti = 0; ti < 3; ti++) {
+      if (tense && tense !== 'Mixed' && TENSE[ti] !== tense) continue;
+      const forms = v[2][ti];
+      for (let si = 0; si < 5; si++) {
+        const ckey = vi + '|' + SUBJ[si] + '|' + TENSE[ti];
+        if (prog.conjugation.has(ckey)) continue;
+        const correct = forms[si];
+        let ch = [correct];
+        for (let s = 0; s < 5 && ch.length < 4; s++) { if (s !== si && ch.indexOf(forms[s]) < 0) ch.push(forms[s]); }
+        let guard = 0;
+        while (ch.length < 4 && guard++ < 40) {
+          const v2 = TOOL_VERBS[(Math.random() * TOOL_VERBS.length) | 0];
+          const f2 = v2[2][ti][(Math.random() * 5) | 0];
+          if (ch.indexOf(f2) < 0) ch.push(f2);
+        }
+        ch = shuf(ch);
+        qs.push({ ckey: ckey, prompt: '<div class="big">' + escHtml(v[0]) + '</div><div class="sub">' + escHtml(v[1]) + ' — ' + SUBJ[si] + ' — ' + TENSE[ti] + '</div><div class="sub">Pick the correct form.</div>', choices: ch, answer: ch.indexOf(correct), reveal: v[0] + ' (' + v[1] + '), ' + SUBJ[si] + ' ' + TENSE[ti] + ' = ' + correct, audioEs: correct, audioEn: v[1], esGated: true, enGated: false });
+      }
     }
-    ch = shuf(ch);
-    qs.push({ ckey: TOOL_VERBS.indexOf(v) + '|' + SUBJ[si] + '|' + TENSE[ti], prompt: '<div class="big">' + escHtml(v[0]) + '</div><div class="sub">' + escHtml(v[1]) + ' — ' + SUBJ[si] + ' — ' + TENSE[ti] + '</div><div class="sub">Pick the correct form.</div>', choices: ch, answer: ch.indexOf(correct), reveal: v[0] + ' (' + v[1] + '), ' + SUBJ[si] + ' ' + TENSE[ti] + ' = ' + correct, audioEs: correct, audioEn: v[1], esGated: true, enGated: false });
   }
   return qs;
 }
-function buildDictQs() {
-  // Reuses WORDS. Hear the Spanish form, pick it from 4 similar choices
-  // (same initial letter of the stripped form where possible) — the
-  // dictation tool's Vocab-tab pattern. Omits: Verbs/Modismos tabs.
-  const idx = shuf(WORDS.map(function (_, i) { return i; }));
+function buildDictQs(tab) {
+  // Round 30: three tabs like the web tool. Vocab keeps the original
+  // WORDS pattern; Verbs/Modismos are new, built from in-game data.
+  // All three tabs exclude known items (prefixed progress keys).
+  if (tab === 'Verbs') return buildDictVerbsQs();
+  if (tab === 'Modismos') return buildDictIdiomsQs();
+  return buildDictVocabQs();
+}
+function buildDictVocabQs() {
+  // Hear the Spanish form, pick it from 4 similar choices (same initial
+  // letter of the stripped form where possible) — the original pattern.
+  const idx = shuf(WORDS.map(function (_, i) { return i; }).filter(function (wi) { return !prog.dictation.has('vocab:' + wi); }));
   return idx.map(function (wi) {
     const es = WORDS[wi][0], en = WORDS[wi][1];
     const first = stripArticle(es).trim().charAt(0).toLowerCase();
     let pool = shuf(WORDS.map(function (p) { return p[0]; }).filter(function (e) { return e !== es && stripArticle(e).trim().charAt(0).toLowerCase() === first; }));
     if (pool.length < 3) pool = pool.concat(shuf(WORDS.map(function (p) { return p[0]; }).filter(function (e) { return e !== es && pool.indexOf(e) < 0; })));
     const choices = shuf([es].concat(pool.slice(0, 3)));
-    return { wid: wi, prompt: '<div class="big">🎧 Listen</div><div class="sub">Tap Hear (ES) below to listen again, then pick the word you heard.</div>', choices: choices, answer: choices.indexOf(es), reveal: es + ' = ' + en, hear: es, audioEs: es, audioEn: en, esGated: false, enGated: true };
+    return { dkey: 'vocab:' + wi, wid: wi, prompt: '<div class="big">🎧 Listen</div><div class="sub">Tap Hear (ES) below to listen again, then pick the word you heard.</div>', choices: choices, answer: choices.indexOf(es), reveal: es + ' = ' + en, hear: es, audioEs: es, audioEn: en, esGated: false, enGated: true };
   });
+}
+function buildDictVerbsQs() {
+  // Conjugated forms as dictation items. Similarity rule: same tense +
+  // same subject from different verbs first (shared person/tense
+  // endings sound alike), then same tense any subject, then any form.
+  // (The Vocab initial-letter rule cannot transfer: forms share
+  // endings, not initials.)
+  const SUBJ = ['yo', 'tú', 'él/ella', 'nosotros', 'ellos/as'];
+  const TENSE = ['Present', 'Preterite', 'Future'];
+  const qs = [];
+  for (let vi = 0; vi < TOOL_VERBS.length; vi++) {
+    const v = TOOL_VERBS[vi];
+    for (let ti = 0; ti < 3; ti++) for (let si = 0; si < 5; si++) {
+      const form = v[2][ti][si];
+      const dkey = 'verb:' + vi + '|' + SUBJ[si] + '|' + TENSE[ti];
+      if (prog.dictation.has(dkey)) continue;
+      let ch = [form];
+      for (let vj = 0; vj < TOOL_VERBS.length && ch.length < 4; vj++) {
+        if (vj === vi) continue;
+        const f = TOOL_VERBS[vj][2][ti][si];
+        if (ch.indexOf(f) < 0) ch.push(f);
+      }
+      if (ch.length < 4) for (let vj = 0; vj < TOOL_VERBS.length && ch.length < 4; vj++) {
+        if (vj === vi) continue;
+        for (let sj = 0; sj < 5 && ch.length < 4; sj++) {
+          const f = TOOL_VERBS[vj][2][ti][sj];
+          if (ch.indexOf(f) < 0) ch.push(f);
+        }
+      }
+      if (ch.length < 4) { let guard = 0; while (ch.length < 4 && guard++ < 60) { const v2 = TOOL_VERBS[(Math.random() * TOOL_VERBS.length) | 0]; const f2 = v2[2][(Math.random() * 3) | 0][(Math.random() * 5) | 0]; if (ch.indexOf(f2) < 0) ch.push(f2); } }
+      ch = shuf(ch);
+      qs.push({ dkey: dkey, prompt: '<div class="big">🎧 Listen</div><div class="sub">Tap Hear (ES) below to listen again, then pick the form you heard.</div>', choices: ch, answer: ch.indexOf(form), reveal: form + ' = ' + v[0] + ' (' + v[1] + '), ' + SUBJ[si] + ' ' + TENSE[ti], hear: form, audioEs: form, audioEn: v[1], esGated: false, enGated: true });
+    }
+  }
+  return qs;
+}
+function buildDictIdiomsQs() {
+  // Idioms as dictation items. Similarity rule: same initial letter of
+  // the Spanish idiom where possible (mirrors the Vocab rule), then
+  // random idioms from the pool.
+  const qs = [];
+  for (let i = 0; i < TOOL_IDIOMS.length; i++) {
+    const es = TOOL_IDIOMS[i][0], en = TOOL_IDIOMS[i][1];
+    const dkey = 'idiom:' + i;
+    if (prog.dictation.has(dkey)) continue;
+    const first = es.trim().charAt(0).toLowerCase();
+    let pool = shuf(TOOL_IDIOMS.map(function (p) { return p[0]; }).filter(function (e) { return e !== es && e.trim().charAt(0).toLowerCase() === first; }));
+    if (pool.length < 3) pool = pool.concat(shuf(TOOL_IDIOMS.map(function (p) { return p[0]; }).filter(function (e) { return e !== es && pool.indexOf(e) < 0; })));
+    const choices = shuf([es].concat(pool.slice(0, 3)));
+    qs.push({ dkey: dkey, prompt: '<div class="big">🎧 Listen</div><div class="sub">Tap Hear (ES) below to listen again, then pick the idiom you heard.</div>', choices: choices, answer: choices.indexOf(es), reveal: es + ' = ' + en, hear: es, audioEs: es, audioEn: en, esGated: false, enGated: true });
+  }
+  return qs;
 }
 function buildSerQs() {
   // All 100 verbatim ser/estar questions (50 ser / 50 estar). Omits vs.
@@ -4089,17 +4731,293 @@ function buildSerQs() {
     const ok2 = others.filter(function (k) { return k !== ok; })[(Math.random() * (others.length - 1)) | 0];
     const choices = shuf([correct, FORM[ok][vi], FORM[q[1]][1 - vi], FORM[ok2][1 - vi]]);
     const completed = q[0].replace('___', correct);
-    return { sid: si, prompt: '<div class="big">' + escHtml(q[0]) + '</div>', choices: choices, answer: choices.indexOf(correct), reveal: q[3] + ' — ' + q[4], audioEs: completed, audioEn: q[3], esGated: true, enGated: true };
+    return { sid: si, verb: q[2], prompt: '<div class="big">' + escHtml(q[0]) + '</div>', choices: choices, answer: choices.indexOf(correct), reveal: q[3] + ' — ' + q[4], audioEs: completed, audioEn: q[3], esGated: true, enGated: true };
   });
 }
 function renderTool(id) {
   setToolFeedback('');
   if (id === 'cognates') { fc = { kind: 'cog', filter: 'all', deck: shuf(TOOL_COG), pos: 0, flipped: false }; renderFlashcards(); }
   else if (id === 'idioms') { fc = { kind: 'idiom', filter: 'all', deck: shuf(TOOL_IDIOMS), pos: 0, flipped: false }; renderFlashcards(); }
-  else if (id === 'practice') runQuiz(buildPracticeQs());
-  else if (id === 'conjugation') runQuiz(buildConjQs());
-  else if (id === 'dictation') runQuiz(buildDictQs());
-  else if (id === 'serestar') runQuiz(buildSerQs());
+  else if (id === 'practice') showChoice('practice');
+  else if (id === 'conjugation') showChoice('conjugation');
+  else if (id === 'dictation') showChoice('dictation');
+  else if (id === 'serestar') showChoice('serestar');
+}
+// Round 30 choice screens: no quiz station auto-starts 10 random
+// questions any more. Each quiz station shows a focus choice first
+// (website-style), runs in the chosen focus, and returns here at run
+// end (the end-screen button calls renderTool, which routes back here).
+// Audio gating applies per question after the choice, exactly as before.
+function showChoice(id) {
+  qz = { qs: [], qi: 0, score: 0, answered: false };
+  stopToolListening(false);
+  setToolAudio(null);
+  setToolFeedback('');
+  let head = '', btns = [];
+  if (id === 'conjugation') { head = '<div class="big">Pick a tense</div><div class="sub">Then 10 questions in that tense. Forms you already know are skipped.</div>'; btns = ['Present', 'Preterite', 'Future', 'Mixed']; }
+  else if (id === 'serestar') { head = '<div class="big">Pick a verb</div><div class="sub">Then 10 questions with that verb. Sentences you already know are skipped.</div>'; btns = ['Ser', 'Estar', 'Mixed']; }
+  else if (id === 'dictation') { head = '<div class="big">Pick a tab</div><div class="sub">Then 10 items from that tab. Items you already know are skipped.</div>'; btns = ['Vocab', 'Verbs', 'Modismos']; }
+  else if (id === 'practice') { head = '<div class="big">How many questions?</div><div class="sub">Words you already know are skipped.</div>'; btns = ['10', '20', '50']; }
+  let html = head + '<div style="margin-top:12px;">';
+  btns.forEach(function (b) { html += '<button class="ctl2 qz-focus" data-f="' + b + '">' + b + '</button>'; });
+  html += '</div>';
+  toolBody.innerHTML = html;
+  toolBody.querySelectorAll('.qz-focus').forEach(function (b) {
+    b.addEventListener('click', function () { startChoiceRun(id, b.getAttribute('data-f')); });
+  });
+}
+function startChoiceRun(id, choice) {
+  let qs = [], count = 10;
+  if (id === 'conjugation') qs = buildConjQs(choice);
+  else if (id === 'serestar') qs = buildSerQs().filter(function (q) { return (choice === 'Mixed' || q.verb === choice.toLowerCase()) && !prog.serestar.has(q.sid); });
+  else if (id === 'dictation') qs = buildDictQs(choice);
+  else if (id === 'practice') { qs = buildPracticeQs(); count = parseInt(choice, 10) || 10; }
+  if (!qs.length) {
+    setToolAudio(null);
+    toolBody.innerHTML = '<div class="big">All mastered in this focus!</div><div class="sub">Review them at the mezzanine terminal.</div><div style="margin-top:14px;"><button class="ctl2" id="qz-back-choice">Choose another focus</button></div>';
+    document.getElementById('qz-back-choice').addEventListener('click', function () { showChoice(id); });
+    return;
+  }
+  runQuiz(qs, count);
+}
+
+
+// ---------- Round 30: question tiles (speak-to-collect) ----------
+// One floating tile per exercise question, for FIVE tools — Brant's
+// confirmed mechanic: "Speak the answer to collect". Practice is EXCLUDED
+// (its content is already the floating vocab words). A tile is shown iff
+// its item is NOT in that tool's station progress set, so station speech
+// and space speech share one known set; station question pools are NOT
+// changed here (excluding known items from stations is the next round).
+// Placement: a CLOSER band than word tiles (1.5–3 km from ship centre;
+// words revert to 3–20 km), volume-uniform in the shell, with runtime
+// clearance checks in the nearRockPos style: 40 m clear of near-belt and
+// far rocks, 300 m clear of the 4 mining aura asteroids, 150 m clear of
+// every other question tile and of every word tile (300 m spacing was
+// rejected: for 3,417 items in this shell the expected random
+// nearest-neighbour distance is ~307 m, so a 300 m floor is near the
+// packing limit and would skip items; 150 m still keeps two prompts from
+// competing because the collect scan only ever opens the NEAREST
+// in-range tile). Tiles stream plates lazily exactly like word tiles
+// (3.5 km render / 4.2 km drop, 6 new per tick) with their own 80-live
+// cap, so the total live cap is now 80 words + 80 questions = 160.
+// Glow dots: one Points cloud per tool in a distinct colour (words stay
+// cyan). Prompt behaviour mirrors the word collect prompt: 250 m trigger
+// (COLLECT_DIST), full pause, Hear = question side only, Say-it =
+// Spanish answer only (fixed dir-es, no direction toggle), transcript
+// echo on a miss, 12 s timeout, privacy line, Leave + Escape (suppressed
+// until 400 m clear), unlimited retries; correct = site-standard sine
+// ding + progress-set add + SAVE + +5 WATER +5 METAL + tile removed.
+const QTILE_MIN_DIST = 1500; // metres from ship centre (closer band)
+const QTILE_MAX_DIST = 3000;
+const QTILE_SPACING = 150; // metres: min question-question AND question-word clearance
+const QTILE_ROCK_CLEAR = 40; // metres: min clearance from near-belt + far rocks
+const QTILE_AURA_CLEAR = 300; // metres: exclusion around mining aura asteroids
+const QTILE_MAX_LIVE = 80; // live question plates (words keep their own 80)
+const QTILE_NEW_PER_TICK = 6;
+const QTILE_COLORS = { cognates: 0x7dff9b, conjugation: 0xffb347, idioms: 0xff7ad9, dictation: 0xffe066, serestar: 0xc792ff };
+const QTILE_CSS = { cognates: '#7dff9b', conjugation: '#ffb347', idioms: '#ff7ad9', dictation: '#ffe066', serestar: '#c792ff' };
+const QTILE_DOT_TAGS = ['cognates', 'conjugation', 'idioms', 'dictation', 'serestar'];
+// Per-item shape: { tool, set, key, tag, icon, promptBig, promptSub,
+// hearText, hearLang, answer, plateLine }. Keys REUSE the station
+// progress-set identifiers exactly (see buildConjQs / buildSerQs /
+// buildDictQs and the cognate/idiom flashcard indices).
+function buildQuestionTileItems() {
+  const items = [];
+  // Cognates: 487 items, key = cognate index. Prompt = ENGLISH word.
+  for (let i = 0; i < TOOL_COG.length; i++) {
+    items.push({ tool: 'cognates', set: 'cognates', key: i, tag: 'COGNATE', icon: '📖', promptBig: TOOL_COG[i][0], promptSub: 'Speak the Spanish cognate', hearText: TOOL_COG[i][0], hearLang: 'en', answer: TOOL_COG[i][1], plateLine: TOOL_COG[i][0] });
+  }
+  // Conjugation: 113 verbs x 5 subjects x 3 tenses = 1,695 items,
+  // key = verbIndex|subject|tense triple (same arrays as buildConjQs).
+  const CONJ_SUBJ = ['yo', 'tú', 'él/ella', 'nosotros', 'ellos/as'];
+  const CONJ_TENSE = ['Present', 'Preterite', 'Future'];
+  for (let vi = 0; vi < TOOL_VERBS.length; vi++) {
+    const v = TOOL_VERBS[vi];
+    for (let si = 0; si < 5; si++) for (let ti = 0; ti < 3; ti++) {
+      items.push({ tool: 'conjugation', set: 'conjugation', key: vi + '|' + CONJ_SUBJ[si] + '|' + CONJ_TENSE[ti], tag: 'CONJUGATION', icon: '⚙️', promptBig: v[0], promptSub: v[1] + ' — ' + CONJ_SUBJ[si] + ' — ' + CONJ_TENSE[ti], hearText: v[0], hearLang: 'es', answer: v[2][ti][si], plateLine: v[0] });
+    }
+  }
+  // Idioms: 135 items, key = idiom index. Prompt = full ENGLISH meaning;
+  // plate = short meaning (first clause, so plates stay readable).
+  for (let i = 0; i < TOOL_IDIOMS.length; i++) {
+    const meaning = TOOL_IDIOMS[i][1];
+    items.push({ tool: 'idioms', set: 'idioms', key: i, tag: 'IDIOM', icon: '💬', promptBig: meaning, promptSub: 'Speak the Spanish idiom', hearText: meaning, hearLang: 'en', answer: TOOL_IDIOMS[i][0], plateLine: meaning.split(',')[0] });
+  }
+  // Dictation: Vocab-tab items only (the station's other tabs have no
+  // space tiles yet), 1,000 items, key = 'vocab:' + word index (same
+  // prefixed format as the station's Vocab tab). Prompt plays the audio.
+  for (let wi = 0; wi < WORDS.length; wi++) {
+    items.push({ tool: 'dictation', set: 'dictation', key: 'vocab:' + wi, tag: 'DICTATION', icon: '🎧', promptBig: '🎧 LISTEN', promptSub: 'Tap Hear to listen, then speak the word', hearText: WORDS[wi][0], hearLang: 'es', answer: WORDS[wi][0], plateLine: '🎧 LISTEN' });
+  }
+  // Ser vs. estar: 100 items, key = question index (sid, same as
+  // buildSerQs). Prompt = blank sentence; Hear = English translation;
+  // answer = FULL completed sentence (same FORM map as buildSerQs).
+  const SER_FORM = { yo: ['soy', 'estoy'], tu: ['eres', 'estás'], el: ['es', 'está'], nos: ['somos', 'estamos'], ellos: ['son', 'están'] };
+  const SER_DISP = { yo: 'yo', tu: 'tú', el: 'él/ella', nos: 'nosotros', ellos: 'ellos/as' };
+  for (let si = 0; si < TOOL_SER.length; si++) {
+    const q = TOOL_SER[si];
+    const correct = SER_FORM[q[1]][q[2] === 'ser' ? 0 : 1];
+    items.push({ tool: 'serestar', set: 'serestar', key: si, tag: 'SER-ESTAR', icon: '⚖️', promptBig: q[0], promptSub: 'Speak the full completed sentence', hearText: q[3], hearLang: 'en', answer: q[0].replace('___', correct), plateLine: SER_DISP[q[1]] + ' ___' });
+  }
+  // Practice: NO tiles — its content is already the floating vocab words.
+  return items;
+}
+// Tile visibility: known (in a progress set) items are never textured,
+// dotted, prompted, or guided to — checked dynamically every frame, so
+// station speech hides a tile and space speech hides the station item's
+// counterpart without touching the save schema.
+function qKnown(t) {
+  try { return prog[t.q.set].has(t.q.key); } catch (e) { return false; }
+}
+// Question plate: tool tag + key word only, tool-coloured border, same
+// dark-plate house style and 512x384 size as word plates.
+function makeQuestionTileTexture(tag, line, css) {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 384;
+  const g = c.getContext('2d');
+  g.fillStyle = 'rgba(6, 14, 22, 0.82)';
+  g.fillRect(0, 0, 512, 384);
+  g.strokeStyle = css; g.lineWidth = 6;
+  g.strokeRect(10, 10, 492, 364);
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.font = 'bold 44px sans-serif';
+  g.fillStyle = css;
+  g.fillText(tag, 256, 84);
+  let font = 92;
+  g.font = 'bold ' + font + 'px sans-serif';
+  while (g.measureText(line).width > 512 - 2 * 24 && font > 30) { font -= 4; g.font = 'bold ' + font + 'px sans-serif'; }
+  g.fillStyle = '#eaf7ff';
+  g.fillText(line, 256, 216);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+// White radial glow (tinted per tool by the PointsMaterial colour), so
+// question dots are distinct from the cyan word dots and from each other.
+function makeQuestionGlowTexture() {
+  const c = document.createElement('canvas'); c.width = 64; c.height = 64;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grad.addColorStop(0, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.35, 'rgba(255,255,255,0.9)');
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = grad; g.fillRect(0, 0, 64, 64);
+  return new THREE.CanvasTexture(c);
+}
+const questionTiles = []; // { sprite, base, phase, speed, amp, live, collected, suppress, dotHidden, q }
+const questionTilesByTool = { cognates: [], conjugation: [], idioms: [], dictation: [], serestar: [] };
+let qTileLive = 0, qTileSkipped = 0;
+const _qTileQueue = [];
+const _qGrid = new Map(); // 150 m cells of placed question bases, for spacing checks
+function _qGridClear(p) {
+  const cx = Math.floor(p.x / QTILE_SPACING), cy = Math.floor(p.y / QTILE_SPACING), cz = Math.floor(p.z / QTILE_SPACING);
+  for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) for (let dz = -1; dz <= 1; dz++) {
+    const cell = _qGrid.get((cx + dx) + ',' + (cy + dy) + ',' + (cz + dz));
+    if (!cell) continue;
+    for (const q of cell) { if (p.distanceToSquared(q) < QTILE_SPACING * QTILE_SPACING) return false; }
+  }
+  return true;
+}
+const _qItems = buildQuestionTileItems();
+for (const q of _qItems) {
+  let pos = null;
+  for (let tries = 0; tries < 200 && !pos; tries++) {
+    const dir = seededDir(farRng);
+    // Volume-uniform in the 1.5–3 km shell (not radius-uniform, which
+    // would bunch tiles toward the inner edge).
+    const dist = Math.cbrt(QTILE_MIN_DIST * QTILE_MIN_DIST * QTILE_MIN_DIST + farRng() * (QTILE_MAX_DIST * QTILE_MAX_DIST * QTILE_MAX_DIST - QTILE_MIN_DIST * QTILE_MIN_DIST * QTILE_MIN_DIST));
+    const p = dir.multiplyScalar(dist);
+    let clear = true;
+    for (const rp of farRockPos) { if (p.distanceToSquared(rp) < QTILE_ROCK_CLEAR * QTILE_ROCK_CLEAR) { clear = false; break; } }
+    if (clear) for (const rp of nearRockPos) { if (p.distanceToSquared(rp) < QTILE_ROCK_CLEAR * QTILE_ROCK_CLEAR) { clear = false; break; } }
+    if (clear) for (const ap of auraPos) { if (p.distanceToSquared(ap) < QTILE_AURA_CLEAR * QTILE_AURA_CLEAR) { clear = false; break; } }
+    if (clear) for (const w of wordTiles) { if (p.distanceToSquared(w.base) < QTILE_SPACING * QTILE_SPACING) { clear = false; break; } }
+    if (clear && _qGridClear(p)) pos = p;
+  }
+  if (!pos) { qTileSkipped++; continue; } // expected 0 (see spacing note above)
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, depthWrite: false }));
+  sp.userData.es = q.answer; sp.userData.en = q.promptSub; sp.userData.emoji = q.icon;
+  sp.scale.set(30, 22.5, 1);
+  sp.position.copy(pos);
+  sp.visible = false;
+  scene.add(sp);
+  const t = { sprite: sp, base: pos.clone(), phase: farRng() * Math.PI * 2, speed: 0.3 + farRng() * 0.5, amp: 2 + farRng() * 3, live: false, collected: false, suppress: false, dotHidden: false, q: q };
+  questionTiles.push(t);
+  questionTilesByTool[q.tool].push(t);
+  const gk = Math.floor(pos.x / QTILE_SPACING) + ',' + Math.floor(pos.y / QTILE_SPACING) + ',' + Math.floor(pos.z / QTILE_SPACING);
+  if (!_qGrid.has(gk)) _qGrid.set(gk, []);
+  _qGrid.get(gk).push(pos.clone());
+}
+// One glow-dot cloud per tool, distinct colours; same shunt-to-hide
+// mechanism as word dots, plus the known-item rule.
+const _qGlowTex = makeQuestionGlowTexture();
+const questionDots = [];
+for (const tool of QTILE_DOT_TAGS) {
+  const tiles = questionTilesByTool[tool];
+  const geo = new THREE.BufferGeometry();
+  const dp = new Float32Array(tiles.length * 3);
+  for (let i = 0; i < tiles.length; i++) { dp[i * 3] = tiles[i].base.x; dp[i * 3 + 1] = tiles[i].base.y; dp[i * 3 + 2] = tiles[i].base.z; }
+  geo.setAttribute('position', new THREE.BufferAttribute(dp, 3));
+  const mat = new THREE.PointsMaterial({ size: 6, sizeAttenuation: false, map: _qGlowTex, color: QTILE_COLORS[tool], transparent: true, opacity: 0.9, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending });
+  const pts = new THREE.Points(geo, mat);
+  pts.frustumCulled = false;
+  scene.add(pts);
+  questionDots.push({ tool: tool, tiles: tiles, geo: geo, pos: dp });
+}
+function syncQuestionDots() {
+  for (const d of questionDots) {
+    let dirty = false;
+    for (let i = 0; i < d.tiles.length; i++) {
+      const t = d.tiles[i];
+      const hide = t.collected || t.live || qKnown(t);
+      if (hide !== t.dotHidden) {
+        t.dotHidden = hide;
+        if (hide) { d.pos[i * 3 + 1] = -100000000; }
+        else { d.pos[i * 3] = t.base.x; d.pos[i * 3 + 1] = t.base.y; d.pos[i * 3 + 2] = t.base.z; }
+        dirty = true;
+      }
+    }
+    if (dirty) d.geo.attributes.position.needsUpdate = true;
+  }
+}
+function updateQuestionTiles(dt, elapsed) {
+  // Same lazy discipline as updateWordTiles: nearest-first queue, at most
+  // 6 new textures per tick, own 80-live cap. Known items never texture.
+  _qTileQueue.length = 0;
+  for (const t of questionTiles) {
+    if (t.collected || qKnown(t)) continue;
+    const d2 = shuttle.position.distanceToSquared(t.base);
+    if (t.live) {
+      if (d2 > TILE_DROP_DIST * TILE_DROP_DIST) {
+        t.sprite.material.map.dispose();
+        t.sprite.material.map = null;
+        t.sprite.material.needsUpdate = true;
+        t.sprite.visible = false;
+        t.live = false;
+        qTileLive--;
+      }
+    } else if (d2 < TILE_RENDER_DIST * TILE_RENDER_DIST) {
+      _qTileQueue.push([d2, t]);
+    }
+  }
+  if (_qTileQueue.length > 1) _qTileQueue.sort((a, b) => a[0] - b[0]);
+  let made = 0;
+  for (const entry of _qTileQueue) {
+    if (made >= QTILE_NEW_PER_TICK || qTileLive >= QTILE_MAX_LIVE) break;
+    const t = entry[1];
+    t.sprite.material.map = makeQuestionTileTexture(t.q.tag, t.q.plateLine, QTILE_CSS[t.q.tool]);
+    t.sprite.material.needsUpdate = true;
+    t.sprite.visible = true;
+    t.live = true;
+    qTileLive++;
+    made++;
+  }
+  for (const t of questionTiles) {
+    if (!t.live || t.collected) continue;
+    t.sprite.position.y = t.base.y + Math.sin(elapsed * t.speed + t.phase) * t.amp;
+  }
+  syncQuestionDots();
 }
 
 // ---------- Resize ----------
@@ -4119,7 +5037,7 @@ function animate() {
   // tile bobbing, no walk/flight input. Rendering continues so the prompt
   // sits over a live (frozen) scene. A mining hold also freezes, because
   // its progress only advances inside updateFlight.
-  if (!collectOpen && !toolOpen && !titleOpen) {
+  if (!collectOpen && !toolOpen && !titleOpen && !reviewOpen) {
     cylAngle += OMEGA * dt;                        // cylinder spin
     ship.rotation.z = cylAngle;
     // The port aura breathes gently so the docking point stays findable.
@@ -4130,11 +5048,12 @@ function animate() {
     // Belt rocks tumble slowly on their own axes.
     for (const a of asteroids) a.mesh.rotateOnAxis(a.spinAxis, a.spinRate * dt);
     updateWordTiles(dt, clock.elapsedTime);
+    updateQuestionTiles(dt, clock.elapsedTime);
     if (!crashed) {
       if (mode === 'walk') { if (inCell) updateCellWalk(dt); else updateWalk(dt); }
       else updateFlight(dt);
     }
-    if (!crashed && mode === 'walk') checkStations();
+    if (!crashed && mode === 'walk') { checkStations(); checkTerminal(); }
   }
   // Round 25: auto-walk backstop. Any dock/undock transition or cell
   // entry clears auto-walk even if a dedicated call site is missed.
@@ -4180,7 +5099,17 @@ function progFromSave(p) {
   prog.cognates = new Set(cleanIdx(src.cognates, TOOL_COG.length));
   prog.idioms = new Set(cleanIdx(src.idioms, TOOL_IDIOMS.length));
   prog.practice = new Set(cleanIdx(src.practice, WORDS.length));
-  prog.dictation = new Set(cleanIdx(src.dictation, WORDS.length));
+  // Round 30 dictation key migration: keys are now tab-prefixed
+  // ('vocab:wid' / 'verb:triple' / 'idiom:index'). Old saves with plain
+  // numeric indices read as Vocab tab (migrate-on-read, never reject).
+  prog.dictation = new Set((Array.isArray(src.dictation) ? src.dictation : []).map(function (k) {
+    if (Number.isInteger(k) && k >= 0 && k < WORDS.length) return 'vocab:' + k;
+    if (typeof k !== 'string') return null;
+    if (k.indexOf('vocab:') === 0) { const n = parseInt(k.slice(6), 10); return (Number.isInteger(n) && n >= 0 && n < WORDS.length) ? k : null; }
+    if (k.indexOf('idiom:') === 0) { const n = parseInt(k.slice(6), 10); return (Number.isInteger(n) && n >= 0 && n < TOOL_IDIOMS.length) ? k : null; }
+    if (k.indexOf('verb:') === 0) { const parts = k.slice(5).split('|'); if (parts.length !== 3) return null; const vi = parseInt(parts[0], 10); return (Number.isInteger(vi) && vi >= 0 && vi < TOOL_VERBS.length && ['yo', 'tú', 'él/ella', 'nosotros', 'ellos/as'].indexOf(parts[1]) >= 0 && ['Present', 'Preterite', 'Future'].indexOf(parts[2]) >= 0) ? k : null; }
+    return null;
+  }).filter(function (k) { return k !== null; }));
   prog.serestar = new Set(cleanIdx(src.serestar, TOOL_SER.length));
   prog.conjugation = new Set((Array.isArray(src.conjugation) ? src.conjugation : []).filter(function (k) {
     if (typeof k !== 'string') return false;
@@ -4328,6 +5257,7 @@ function applySave(s) {
   }
   restoreSavedPosition(s.pos);
   try { syncWordDots(); } catch (e) {}
+  try { syncQuestionDots(); } catch (e) {}
   updateMenu();
 }
 // Fresh state: haul zeroed, every tile uncollected (sprites restored to the
@@ -4344,11 +5274,22 @@ function resetProgress() {
     try { scene.add(w.sprite); } catch (e) {}
   }
   wordTileLive = 0;
+  // Round 30 question-tiles: same restore as word tiles.
+  for (const t of questionTiles) {
+    if (t.live) {
+      try { if (t.sprite.material.map) t.sprite.material.map.dispose(); } catch (e) {}
+      t.sprite.material.map = null; t.live = false;
+    }
+    t.collected = false; t.suppress = false; t.sprite.visible = false;
+    try { scene.add(t.sprite); } catch (e) {}
+  }
+  qTileLive = 0;
   for (const a of auraAsteroids) {
     a.mined = false; a.ring.visible = true; a.halo.visible = true;
     if (a.coma) a.coma.visible = true;
   }
   try { syncWordDots(); } catch (e) {}
+  try { syncQuestionDots(); } catch (e) {}
   updateMenu();
 }
 // Docked-aboard reset shared by Resume and HOME: mirrors retryMission's
