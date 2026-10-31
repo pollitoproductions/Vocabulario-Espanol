@@ -287,7 +287,7 @@
     Touch: Touch left half for floating stick (push to its edge to run) &middot; Drag right side to look/steer &middot; Button: DEPART (docking is automatic within 100 m of any port) &middot; nav readout always on while flying &middot; JUMP (docked only) &middot; MINE (near an aura asteroid) &middot; &#9776; ship menu<br>Cells: walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to enter; EXIT door, EXIT button, or E to leave. Stations: walk up to a glowing-ring tool station and tap Open (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). HOME in this menu saves your journey and returns to the title screen
   </div>
   </div><button class="subHead" data-sub="note" data-label="NOTE" type="button">▸ NOTE</button><div class="subBody" id="sub-note">
-  <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; aura asteroids can be mined (hold M) for water from comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. (Jump arcs feel Mars-like by movement tuning; the ship&rsquo;s spin gravity itself is unchanged.) After departing, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, and a MEDICAL BAY room (Dictation). Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 25 km from the ship, grows urgent past 40 km, and past 50 km you are LOST and the run ends (retry returns you aboard, haul kept, free). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, the belt stretches to about 20 km, and all 1,000 Spanish vocabulary words float among the rocks — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold word arrow under the port readout points to the nearest uncollected word, and distant words show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, you return to your last save.</div>
+  <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; aura asteroids can be mined (hold M) for water from comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. (Jump arcs feel Mars-like by movement tuning; the ship&rsquo;s spin gravity itself is unchanged.) After departing, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, and a MEDICAL BAY room. Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 25 km from the ship, grows urgent past 40 km, and past 50 km you are LOST and the run ends (retry returns you aboard, haul kept, free). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, the belt stretches to about 20 km, and all 1,000 Spanish vocabulary words float among the rocks — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold word arrow under the port readout points to the nearest uncollected word, and distant words show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, you return to your last save.</div>
   </div>
   <button class="closeBtn" id="btn-menu-home" type="button">GO TO HOME SCREEN</button>
   <button class="closeBtn" id="btn-menu-close" type="button">CLOSE</button>
@@ -865,7 +865,7 @@ for (const [bzc, blen] of [[110, 120], [240, 60]]) {
 //   BULKHEAD     z = 0           solid disc + ring, 4 entrance doorways
 //   TECHNOLOGY   z 0 ... +200    enclosed, Workshop cell (z +170)
 //   EDUCATION    z +200 ... +320 enclosed, Classroom cell (z +260)
-//   MEDICAL BAY  room at z +100, angle 5.5 — Dictation station (round 17)
+//   MEDICAL BAY  room at z +100, angle 5.5 (Dictation station moved to the agriculture ring, round-30 layout)
 //   GALLERY HALL two-story hall, angles 4.45 ... 4.95 rad, podium
 //                z +60 ... +140, upper deck radius 150, stair towers
 //                z +40 ... +60 and +140 ... +160
@@ -1151,7 +1151,7 @@ for (const eb of ENTERABLES) {
   }
   // Round 29 trees flanking the Greenhouse axis (angle 0.6): trunks +
   // canopies, 6 trees, tangential offsets clear of the doorway path
-  // (and of the Cognates console at angle 0.644, z -151).
+  // (and of the Cognates console at angle 0.2618, z -120).
   const trunkGeo = new THREE.CylinderGeometry(0.3, 0.45, 3.5, 8);
   const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5d4037, roughness: 1 });
   const canopyGeo = new THREE.IcosahedronGeometry(2.0, 1);
@@ -1198,8 +1198,11 @@ for (const eb of ENTERABLES) {
   // groves too — 25 clusters x 20 plants (seeded, fixed count) plus 8
   // more trees. Same shared geometries/materials as the beds; no new
   // materials, no new lights. Clusters keep clear of the beds, the
-  // sheds, the Greenhouse doorway path, both agriculture consoles, and
+  // sheds, the Greenhouse doorway path, both agriculture consoles at their pre-move positions, and
   // the bulkhead (every ground plant sits at z <= -23).
+  // Round 30 (layout): consoles have since moved to new ring positions;
+  // these exclusions describe the original placement and are intentionally
+  // unchanged so the groves stay put.
   function r30rng(seed) {
     let a = seed >>> 0;
     return function () {
@@ -1807,74 +1810,44 @@ for (const eb of ENTERABLES) {
   }
 }
 
-// ---------- Round 17: open-area tool stations ----------
-// IDIOMS (round 30: moved to agriculture, opposite Cognates) and the
-// gallery (SER VS. ESTAR) stand in the open, not in cells: the
-// IDIOMS console at angle 3.79, z -151; the gallery console on the
-// upper deck at angle 4.7, z 90 (clear of the upper-deck tables at z 80 /
-// 100 / 120). Round 25 removed the entrance arches entirely: after the
-// round 24 sign dedup their signs were gone, leaving purposeless bare
-// posts, so the console sign above each console is now the station's
-// only marker. The arches carried no collision or trigger logic.
+// ---------- Round 30 (layout): all six stations in the agriculture ring ----------
+// Brant: every learning-tool station lives in the agriculture area now,
+// spread evenly around the ring — 60 degrees apart, offset 15 degrees from
+// the bulkhead doorway angles (0/90/180/270), so no console ever blocks a
+// doorway path. All six use beacon 14 (open agriculture, no ceiling) and
+// the same 4 m walk-up trigger as before; the four cells stay enterable
+// rooms, only the consoles moved. The gallery console's warm light went
+// with it — no console is left in the gallery. (Round 25's arch removal
+// still stands: no posts, no calls; the mess and gallery approaches stay
+// clean open walk space.)
 {
-  const idiomsRad = new THREE.Vector3(Math.cos(3.79), Math.sin(3.79), 0);
-  const idiomsCon = makeStationConsole('IDIOMS', '#ffc27a', 14);
-  idiomsCon.position.copy(idiomsRad).multiplyScalar(RADIUS);
-  idiomsCon.position.z = -151;
-  idiomsCon.quaternion.copy(basisQuat(idiomsRad));
-  ship.add(idiomsCon);
-  const galRad = new THREE.Vector3(Math.cos(4.7), Math.sin(4.7), 0);
-  const galCon = makeStationConsole('SER VS. ESTAR', '#d0a0ff', 7);
-  galCon.position.copy(galRad).multiplyScalar(150);
-  galCon.position.z = 90;
-  galCon.quaternion.copy(basisQuat(galRad));
-  ship.add(galCon);
-  // Warm light over the gallery console (polish: the station reads at a glance).
-  const galLight = new THREE.PointLight(0xffc27a, 0.8, 60, 0);
-  galLight.position.copy(galRad).multiplyScalar(147);
-  galLight.position.z = 90;
-  ship.add(galLight);
-  // Round 25: entrance arches deleted outright (see above) — no posts,
-  // no calls. The mess and gallery approaches are now clean open walk
-  // space marked only by the console sign, pillar, and aura.
-}
-// ---------- Round 23: cell stations move OUTSIDE ----------
-// Brant: the activity belongs out in the open, not in the corner of a
-// room. The four cell consoles now stand just outside their buildings'
-// doorways, in open walk space, so a player sees them without entering
-// any room. Placement, per console: 12 m beyond the doorway face
-// (faceZ = eb.z + doorDir * 7; the entry trigger band extends only 7 m
-// beyond the face, and the station trigger radius is 4 m, so even a
-// player standing on the console's near edge is 8 m out — the band can
-// never refire while using the station), and 7 m tangentially off the
-// doorway angle (beside the door, clear of the exit landing, which
-// drops the player 10 m beyond the face at the door angle). The rooms
-// stay enterable and unchanged; the doorway tool labels were removed
-// in round 24 (sign dedup: the console sign is each station's one sign).
-// Beacon heights: 14 in open agriculture (like the mess), 12 under the
-// industrial ceiling shell (shell at 20 m headroom; pillar top 14.7 m).
-{
-  const extStations = [
-    { label: 'COGNATES', css: '#39d97a', angle: 0.644, z: -151, beacon: 14 },
-    { label: 'CONJUGATION', css: '#59d6ff', angle: 2.844, z: 151, beacon: 12 },
-    { label: 'PRACTICE', css: '#e8a33d', angle: 4.544, z: 241, beacon: 12 },
-    { label: 'DICTATION', css: '#9fd8ef', angle: 5.544, z: 81, beacon: 12 },
+  const agriStations = [
+    { label: 'COGNATES', css: '#39d97a', angle: 0.2618, z: -120 },
+    { label: 'DICTATION', css: '#9fd8ef', angle: 1.3090, z: -40 },
+    { label: 'CONJUGATION', css: '#59d6ff', angle: 2.3562, z: -280 },
+    { label: 'IDIOMS', css: '#ffc27a', angle: 3.4034, z: -170 },
+    { label: 'PRACTICE', css: '#e8a33d', angle: 4.4506, z: -100 },
+    { label: 'SER VS. ESTAR', css: '#d0a0ff', angle: 5.4978, z: -200 },
   ];
-  for (const s of extStations) {
+  for (const s of agriStations) {
     const rad = new THREE.Vector3(Math.cos(s.angle), Math.sin(s.angle), 0);
-    const con = makeStationConsole(s.label, s.css, s.beacon);
+    const con = makeStationConsole(s.label, s.css, 14);
     con.position.copy(rad).multiplyScalar(RADIUS);
     con.position.z = s.z;
     con.quaternion.copy(basisQuat(rad));
     ship.add(con);
   }
 }
+// Round 30 (layout): the four cell consoles above no longer stand outside
+// their buildings' doorways — all six stations now live in the agriculture
+// ring (see the unified station block above). The rooms stay enterable
+// and unchanged.
 // Medical bay (round 17): the reserved slot is now a real enterable
 // room — its exterior building, glowing doorway and ENTER sign come
 // from the ENTERABLES loop above (zone 'med'), and its interior cell
 // is built by buildCell('med') below. The old taped outline and
-// 'RESERVED' sign are gone; the bay's tool sign is the DICTATION
-// console sign outside its doorway (round 24 sign dedup).
+// 'RESERVED' sign are gone; the DICTATION console moved to the agriculture ring in the round-30
+// layout; the bay itself is unchanged.
 // Interior cells: enclosed rooms built far from the station (x = 5000 /
 // 5600, clear of the belt's 2600 m reach), so the camera can step into
 // one without the ship's spin or the belt interfering.
@@ -2262,6 +2235,14 @@ function mulberry32(seed) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+// Round 30 (layout): tile placement must clear the near belt too, now that
+// tiles start at 1.5 km — inside the belt's 900–2600 m shell. Snapshot the
+// near-belt centres (36 rocks + 4 aura asteroids, all placed above with
+// unseeded Math.random, so their positions differ every session and the
+// tile loop checks them live). Far rocks are added later and tracked
+// separately as farRockPos.
+const nearRockPos = asteroids.map(function (a) { return a.mesh.position; });
+const auraPos = auraAsteroids.map(function (a) { return a.mesh.position; });
 const farRng = mulberry32(20261030);
 function seededDir(rng) {
   const u = rng() * 2 - 1, th = rng() * Math.PI * 2;
@@ -2339,14 +2320,18 @@ const wordTiles = []; // { sprite, base, phase, speed, amp, live }
 for (let wi = 0; wi < WORDS.length; wi++) {
   const pair = WORDS[wi];
   const es = pair[0], en = pair[1], emoji = WORD_EMOJI[wi];
-  // Position: 3–20 km, same taper as the rocks, kept 40 m clear of far rocks.
+  // Position: 1.5–20 km, same taper as the rocks, kept 40 m clear of far
+  // rocks and near-belt rocks, and 300 m clear of the mining aura asteroids
+  // (so a word never pops its collect prompt while the player is mining).
   let pos = null;
   for (let tries = 0; tries < 8 && !pos; tries++) {
     const dir = seededDir(farRng);
-    const dist = 3000 + 17000 * Math.pow(farRng(), 1.7);
+    const dist = 1500 + 18500 * Math.pow(farRng(), 1.7);
     const p = dir.multiplyScalar(dist);
     let clear = true;
     for (const rp of farRockPos) { if (p.distanceToSquared(rp) < 40 * 40) { clear = false; break; } }
+    if (clear) for (const rp of nearRockPos) { if (p.distanceToSquared(rp) < 40 * 40) { clear = false; break; } }
+    if (clear) for (const ap of auraPos) { if (p.distanceToSquared(ap) < 300 * 300) { clear = false; break; } }
     if (clear) pos = p;
   }
   if (!pos) continue; // vanishingly unlikely; skip rather than embed in a rock
@@ -2452,7 +2437,7 @@ function updateWordTiles(dt, elapsed) {
 // ---------- State ----------
 let mode = 'walk';
 let cylAngle = 0;
-let playerAngle = 0, playerZ = -40, yaw = 0, pitch = 0;
+let playerAngle = 0, playerZ = 40, yaw = 0, pitch = 0;
 let playerEyeR = RADIUS - EYE; // eye radius above the deck; drops 10 m on the gallery
 const keys = {};
 const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
@@ -2663,7 +2648,7 @@ function retryMission() {
   mode = 'walk';
   shuttle.visible = false;
   shuttleVel.set(0, 0, 0);
-  playerAngle = 0; playerZ = -40; yaw = 0; pitch = 0;
+  playerAngle = 0; playerZ = 40; yaw = 0; pitch = 0;
   jumpH = 0; jumpV = 0;
   mineProgress = 0; mineHeld = false; mineTarget = null;
   btnMine.style.display = 'none';
@@ -2745,15 +2730,17 @@ function undock() {
 }
 // Auto-docking: flying within DOCK_RANGE of ANY of the nine ports docks the
 // shuttle automatically. This is a mode change on proximity, not a
-// teleport: the player must actually fly to a port. The walk position is
-// mapped from the port's world angle/axial position (for the top hub port,
-// whose angle is undefined on the axis, this lands at the top interior end).
+// teleport: the player must actually fly to a port. Round 30 (layout):
+// docking at ANY port enters the INDUSTRIAL half — the player always steps
+// aboard at angle 0, z +40 (the old z -40 docked spawn mirrored into the
+// other half). DEPART therefore always launches from over the industrial
+// half, near an industrial body port. portWorld is now only the trigger
+// (which port was touched); the aboard position is fixed.
 function autoDock(portWorld) {
   mode = 'walk';
   driveState = 'DOCKED';
-  const phiW = Math.atan2(portWorld.y, portWorld.x);
-  playerAngle = phiW - cylAngle;
-  playerZ = Math.max(-(LENGTH / 2 - 20), Math.min(LENGTH / 2 - 20, portWorld.z));
+  playerAngle = 0;
+  playerZ = 40;
   yaw = 0; pitch = 0;
   shuttle.visible = false;
   hideNav();
@@ -3842,13 +3829,17 @@ btnToolDir.addEventListener('click', function () {
   if (toolRecogActive) stopToolListening(false);
   setToolSayFeedback('');
 });
+// Round 30 (layout): all six stations in agriculture, 60 degrees apart,
+// offset 15 degrees from the bulkhead doorway angles. kind 'ext' for all:
+// plain 4 m walk-up proximity; the old gallery gate in stationDist2 no
+// longer applies to any station (no station has zone 'gallery' now).
 const STATIONS = [
-  { id: 'cognates', title: 'COGNATES', kind: 'ext', zone: 'agri', angle: 0.644, z: -151 },
-  { id: 'practice', title: 'PRACTICE', kind: 'ext', zone: 'edu', angle: 4.544, z: 241 },
-  { id: 'conjugation', title: 'CONJUGATION', kind: 'ext', zone: 'tech', angle: 2.844, z: 151 },
-  { id: 'dictation', title: 'DICTATION', kind: 'ext', zone: 'med', angle: 5.544, z: 81 },
-  { id: 'idioms', title: 'IDIOMS', kind: 'ext', zone: 'agri', angle: 3.79, z: -151 },
-  { id: 'serestar', title: 'SER VS. ESTAR', kind: 'ship', zone: 'gallery', angle: 4.7, z: 90 },
+  { id: 'cognates', title: 'COGNATES', kind: 'ext', zone: 'agri', angle: 0.2618, z: -120 },
+  { id: 'practice', title: 'PRACTICE', kind: 'ext', zone: 'agri', angle: 4.4506, z: -100 },
+  { id: 'conjugation', title: 'CONJUGATION', kind: 'ext', zone: 'agri', angle: 2.3562, z: -280 },
+  { id: 'dictation', title: 'DICTATION', kind: 'ext', zone: 'agri', angle: 1.3090, z: -40 },
+  { id: 'idioms', title: 'IDIOMS', kind: 'ext', zone: 'agri', angle: 3.4034, z: -170 },
+  { id: 'serestar', title: 'SER VS. ESTAR', kind: 'ext', zone: 'agri', angle: 5.4978, z: -200 },
 ];
 const STATION_DIST = 4; // metres: walk-up range for every station
 function stationDist2(st) {
@@ -4209,7 +4200,7 @@ function capturePosition() {
   if (inCell) {
     return { mode: 'walk', cell: cellZone, cx: cellX, cz: cellZ, cyaw: cellYaw, cpitch: cellPitch };
   }
-  if (driveState === 'DOCKED' && playerAngle === 0 && playerZ === -40) return { mode: 'docked' };
+  if (driveState === 'DOCKED' && playerAngle === 0 && playerZ === 40) return { mode: 'docked' };
   return { mode: 'walk', angle: playerAngle, z: playerZ, yaw: yaw, pitch: pitch };
 }
 // Validate a stored position; anything malformed degrades to null (docked
@@ -4247,7 +4238,7 @@ function restoreSavedPosition(pos) {
     transitioning = false;
     mode = 'walk'; driveState = 'DOCKED'; dockArmed = true;
     shuttle.visible = false; shuttleVel.set(0, 0, 0);
-    playerAngle = 0; playerZ = -40; yaw = 0; pitch = 0;
+    playerAngle = 0; playerZ = 40; yaw = 0; pitch = 0;
     cellX = 0; cellZ = 8; cellYaw = 0; cellPitch = 0;
     btnExit.style.display = 'none';
     btnMode.textContent = 'DEPART'; btnMode.style.display = '';
@@ -4375,7 +4366,7 @@ function returnAboard() {
   mode = 'walk';
   try { shuttle.visible = false; } catch (e) {}
   shuttleVel.set(0, 0, 0);
-  playerAngle = 0; playerZ = -40; yaw = 0; pitch = 0;
+  playerAngle = 0; playerZ = 40; yaw = 0; pitch = 0;
   jumpH = 0; jumpV = 0; cellX = 0; cellZ = 8; cellYaw = 0; cellPitch = 0;
   mineProgress = 0; mineHeld = false; mineTarget = null;
   try { btnMine.style.display = 'none'; } catch (e) {}
