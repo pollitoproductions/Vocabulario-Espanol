@@ -82,19 +82,21 @@
   button.ctl .lbl { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; line-height: 1.2; }
   /* Docked pair, isolated: DEPART bottom-right corner, JUMP top-right
      below the menu button — different screen areas, never adjacent. */
-  #btn-mode { width: 56px; height: 56px; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
-  #btn-jump { right: calc(16px + env(safe-area-inset-right, 0px)); top: calc(76px + env(safe-area-inset-top, 0px)); font-size: 17px; }
-  /* Flight four, spread down the right edge (JUMP is hidden in flight). */
-  #btn-mine { right: calc(16px + env(safe-area-inset-right, 0px)); top: calc(140px + env(safe-area-inset-top, 0px)); }
-  #btn-center { width: 56px; height: 56px; right: calc(16px + env(safe-area-inset-right, 0px)); top: 50%; transform: translateY(-50%); }
-  #btn-looksteer { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(140px + env(safe-area-inset-bottom, 0px)); }
-  #btn-brake { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+  #btn-mode { width: 56px; height: 56px; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
+  #btn-jump { right: calc(91px + env(safe-area-inset-right, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); font-size: 17px; }
+  /* Breakout pattern, copied from backrooms-breakout: right-edge columns
+     right 16 / right 91 (48px button + 27px gap), rows bottom 26 / bottom 101
+     (48px + 27px gap). All nine buttons live in this bottom-right zone. */
+  #btn-mine { right: calc(91px + env(safe-area-inset-right, 0px)); bottom: calc(101px + env(safe-area-inset-bottom, 0px)); }
+  #btn-center { width: 56px; height: 56px; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(101px + env(safe-area-inset-bottom, 0px)); }
+  #btn-looksteer { right: calc(91px + env(safe-area-inset-right, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
+  #btn-brake { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
   /* Walk-up buttons share the bottom-right corner slot with DEPART but
      never co-appear with it: EXIT only in cells (DEPART hidden), OPEN /
      REVIEW only while walking near a station / terminal. OPEN and REVIEW
      get their own rungs above the corner so they never stack on DEPART. */
-  #btn-exit { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
-  #btn-station { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+  #btn-exit { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
+  #btn-station { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(101px + env(safe-area-inset-bottom, 0px)); }
   #btn-terminal { width: 56px; height: 56px; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(176px + env(safe-area-inset-bottom, 0px)); }
   /* Mini menu button: small, rounded, cyber-blue synthetic look. */
   #btn-menu {
@@ -289,12 +291,8 @@
   @media (max-height: 500px) {
     #hud { padding: 10px 12px; }
     #hint { max-width: calc(100vw - 460px); }
-    /* Landscape phones: tighten the right-edge flight spread so all four
-       keep real gaps on a ~375 px tall screen (MINE 70..118, CENTER
-       ~159..215, LOOK/STEER ~251..299, BRAKE ~315..363). */
-    #btn-mine { top: calc(70px + env(safe-area-inset-top, 0px)); }
-    #btn-looksteer { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
-    #btn-brake { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+    /* Landscape phones: the flight four stay in their bottom-right corner
+       cluster (132 px tall) — it fits short screens with no overrides. */
   }
   @media (max-width: 520px) {
     #joy { width: 104px; height: 104px; }
