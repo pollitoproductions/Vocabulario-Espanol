@@ -61,26 +61,41 @@
     border-radius: 50%; background: rgba(255, 255, 255, 0.40); border: 1px solid rgba(255, 255, 255, 0.55);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   }
+  /* Round 30 buttons: Breakout-style circles, each in its own fixed spot —
+     no vertical stack anywhere, so DEPART can never sit on top of JUMP
+     again. #buttons is a pointer-transparent full-screen layer; each
+     button positions itself and re-enables pointer events. */
   #buttons {
-    position: fixed; right: calc(14px + env(safe-area-inset-right, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 6;
-    display: flex; flex-direction: column; gap: 8px; width: 208px;
+    position: fixed; inset: 0; z-index: 6; pointer-events: none;
   }
   button.ctl {
-    width: 100%; height: 36px; border-radius: 18px;
+    position: fixed; width: 48px; height: 48px; border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
     background: linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.07));
     color: #fff; border: 1px solid rgba(255, 255, 255, 0.28);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.30);
-    font-size: 17px; padding: 0; box-sizing: border-box;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.02em; padding: 0; box-sizing: border-box;
     touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
   }
   button.ctl:active, button.ctl.on { background: linear-gradient(160deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.20)); }
-  button.ctl .lbl { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; line-height: 1.2; }
-  #btn-mode { height: 36px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
-  #btn-mine { height: 36px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
-  #btn-looksteer { height: 36px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
-  #btn-center { height: 36px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
-  #btn-brake { height: 36px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
-  #btn-terminal { height: 36px; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; }
+  button.ctl .lbl { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; line-height: 1.2; }
+  /* Docked pair, isolated: DEPART bottom-right corner, JUMP top-right
+     below the menu button — different screen areas, never adjacent. */
+  #btn-mode { width: 56px; height: 56px; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+  #btn-jump { right: calc(16px + env(safe-area-inset-right, 0px)); top: calc(76px + env(safe-area-inset-top, 0px)); font-size: 17px; }
+  /* Flight four, spread down the right edge (JUMP is hidden in flight). */
+  #btn-mine { right: calc(16px + env(safe-area-inset-right, 0px)); top: calc(140px + env(safe-area-inset-top, 0px)); }
+  #btn-center { width: 56px; height: 56px; right: calc(16px + env(safe-area-inset-right, 0px)); top: 50%; transform: translateY(-50%); }
+  #btn-looksteer { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(140px + env(safe-area-inset-bottom, 0px)); }
+  #btn-brake { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+  /* Walk-up buttons share the bottom-right corner slot with DEPART but
+     never co-appear with it: EXIT only in cells (DEPART hidden), OPEN /
+     REVIEW only while walking near a station / terminal. OPEN and REVIEW
+     get their own rungs above the corner so they never stack on DEPART. */
+  #btn-exit { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+  #btn-station { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+  #btn-terminal { width: 56px; height: 56px; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(176px + env(safe-area-inset-bottom, 0px)); }
   /* Mini menu button: small, rounded, cyber-blue synthetic look. */
   #btn-menu {
     position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); z-index: 9;
@@ -274,12 +289,14 @@
   @media (max-height: 500px) {
     #hud { padding: 10px 12px; }
     #hint { max-width: calc(100vw - 460px); }
-    #buttons { gap: 6px; }
+    /* Landscape phones: tighten the right-edge flight spread so all four
+       keep real gaps on a ~375 px tall screen (MINE 70..118, CENTER
+       ~159..215, LOOK/STEER ~251..299, BRAKE ~315..363). */
+    #btn-mine { top: calc(70px + env(safe-area-inset-top, 0px)); }
+    #btn-looksteer { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+    #btn-brake { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
   }
   @media (max-width: 520px) {
-    #buttons { width: 176px; }
-    button.ctl { height: 36px; }
-    #btn-mode, #btn-mine { height: 36px; }
     #joy { width: 104px; height: 104px; }
     #hint { bottom: auto; top: calc(208px + env(safe-area-inset-top, 0px)); }
   }
@@ -335,7 +352,7 @@
     <div class="mHead">COLLECTING IN SPACE</div>
     <div class="mBody">Fly within 250 m of a floating word or exercise question to pause and pronounce it: words ask for the Spanish word; questions ask you to speak the answer (tap Show answer to peek &mdash; peeking never counts, only speaking does). Say it right to collect it for +5 WATER and +5 METAL; Leave (or Escape) flies on, and the item waits until you are 400 m clear. A gold arrow points to the nearest uncollected item &mdash; word or question &mdash; with a tag saying which; distant items show as small glow dots until their plates stream in.</div>
     <div class="mHead">REVIEW TERMINALS</div>
-    <div class="mBody">Eight gold review terminals stand around the industrial side &mdash; three on the mezzanine, five on the main deck. Walk up and tap Open (or press Enter) to review everything you have already spoken, by tool, with Hear in both languages. Reviewing never changes progress.</div>
+    <div class="mBody">Eight gold review terminals stand around the industrial side &mdash; one on the mezzanine, seven on the main deck, two of them in the Residential Zone city. Walk up and tap Review (or press Enter) to review everything you have already spoken, by tool, with Hear in both languages. Reviewing never changes progress.</div>
     <div class="mHead">SAVING</div>
     <div class="mBody">SAVE JOURNEY in this menu saves at once; the game also saves after every collect, every mining yield, and every docking. GO TO HOME SCREEN saves, then returns to the title screen. Resuming restores your haul, your collected items, and your position &mdash; aboard, inside a cell, or in flight.</div>
   </div>
@@ -446,7 +463,7 @@
   <button class="ctl" id="btn-brake" type="button" style="display:none">BRAKE</button>
   <button class="ctl" id="btn-exit" type="button" style="display:none">EXIT</button>
   <button class="ctl" id="btn-station" type="button" style="display:none">OPEN</button>
-  <button class="ctl" id="btn-terminal" type="button" style="display:none">OPEN REVIEW TERMINAL</button>
+  <button class="ctl" id="btn-terminal" type="button" style="display:none">REVIEW</button>
 </div>
 <canvas id="game"></canvas>
 <script type="module">
@@ -1763,9 +1780,9 @@ for (const eb of ENTERABLES) {
 // emissive strip material, no new textures, NO new real lights).
 // Everything is decorative: no walk-collision or trigger changes,
 // and nothing stands in a doorway, stair, station, or review-terminal
-// trigger (eight terminals: three on the mezzanine at angles
-// 4.55...4.85, z 68...132, five on the industrial main deck — every
-// prop below was checked clear of all eight trigger zones).
+// trigger (eight terminals: one on the mezzanine at angle 4.70, z 108,
+// seven on the industrial main deck — every prop below was checked
+// clear of all eight trigger zones).
 {
   const coolStripMat = new THREE.MeshBasicMaterial({ color: 0xcfe8ff });
   // Overhead ceiling conduits (radius 141, just below the 140 shell):
@@ -1836,6 +1853,124 @@ for (const eb of ENTERABLES) {
     cab.position.z = 1;
     cab.quaternion.copy(basisQuat(radial));
     ship.add(cab);
+  }
+}
+
+// ---------- Round 30: Residential Zone little city ----------
+// Brant named this sector the RESIDENTIAL ZONE: the quarters rows at
+// angle 1.15 were houses with nothing else around them. This keeps the
+// houses and adds the rest of a city — streets, lamps, a plaza, shops,
+// greenery, benches, crates, corner signs — on the open residential deck
+// (angles ~1.3..2.0, z 50..290), clear of the quarters-row and mess
+// blocked zones, the promenade walls, the education arch, cell doorways,
+// bulkhead doorways, and both moved review-terminal triggers (4 m each;
+// every city prop below sits 15+ m from either terminal). Decorative
+// only: no walk-collision, no triggers, NO new real lights (lamp heads
+// are emissive MeshBasicMaterial). Long tangential runs are segmented
+// (16 m) so they follow the deck curve instead of cutting through it;
+// the plaza is a small disc (sag 0.11 m) ringed with planters. A
+// RESIDENTIAL ZONE sign in the existing fitted-sign style stands over
+// the main approach: the bulkhead doorway at angle 1.5708, facing
+// arrivals from the bulkhead.
+{
+  const streetMat = new THREE.MeshStandardMaterial({ color: 0x2a2e33, roughness: 1 });
+  const plazaMat = new THREE.MeshStandardMaterial({ color: 0x3a3f45, roughness: 1 });
+  const cityLeafMat = new THREE.MeshStandardMaterial({ color: 0x3fae5a, roughness: 0.9 });
+  const cityTrunkMat = new THREE.MeshStandardMaterial({ color: 0x4a3b28, roughness: 1 });
+  const cityBenchMat = new THREE.MeshStandardMaterial({ color: 0x6b5a3a, roughness: 0.9 });
+  const cityPostMat = new THREE.MeshStandardMaterial({ color: 0x4a5560, roughness: 0.85 });
+  const cityLampMat = new THREE.MeshBasicMaterial({ color: 0xffc27a });
+  const cityBoardMat = new THREE.MeshStandardMaterial({ color: 0x8a7a5c, roughness: 0.9 });
+  const stallMats = [0xd94f30, 0x3fae5a, 0xe8a33d, 0x59d6ff].map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.85 }));
+  function cityGroup(angle, z, rOff) {
+    const radial = new THREE.Vector3(Math.cos(angle), Math.sin(angle), 0);
+    const grp = new THREE.Group();
+    grp.position.copy(radial).multiplyScalar(RADIUS - rOff);
+    grp.position.z = z;
+    grp.quaternion.copy(basisQuat(radial));
+    ship.add(grp);
+    return grp;
+  }
+  function cityBox(grp, w, h, d, mat, x, y, z) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    m.position.set(x, y, z);
+    grp.add(m);
+    return m;
+  }
+  // Main street along the deck (axis-straight, no curve issue): angle 1.5, z 50..290.
+  {
+    const g = cityGroup(1.5, 170, 0.12);
+    cityBox(g, 6, 0.15, 240, streetMat, 0, 0, 0);
+  }
+  // Cross street at z 180, angles 1.35..1.95, in 16 m arc segments.
+  for (let i = 0; i < 6; i++) {
+    const g = cityGroup(1.375 + i * 0.1, 180, 0.12);
+    cityBox(g, 16, 0.15, 6, streetMat, 0, 0, 0);
+  }
+  // Plaza medallion at the crossroads (1.55, 180).
+  {
+    const g = cityGroup(1.55, 180, 0.12);
+    const disc = new THREE.Mesh(new THREE.CylinderGeometry(6, 6, 0.2, 24), plazaMat);
+    g.add(disc);
+  }
+  // RESIDENTIAL ZONE sign over the main approach (bulkhead doorway 1.5708, z 12, facing arrivals).
+  mountAxialSign('RESIDENTIAL ZONE', '#ffc27a', 5.5, 1.5708, RADIUS - 4.2, 12, -1, true);
+  // Street lamps: emissive heads, no real lights.
+  for (const [la, lz] of [[1.42, 60], [1.42, 110], [1.42, 160], [1.42, 210], [1.42, 260], [1.42, 285], [1.49, 172], [1.61, 188]]) {
+    const g = cityGroup(la, lz, 0.4);
+    cityBox(g, 0.25, 3, 0.25, cityPostMat, 0, 1.1, 0);
+    cityBox(g, 0.5, 0.3, 0.5, cityLampMat, 0, 2.7, 0);
+  }
+  // Market stalls around the plaza.
+  [[1.35, 165], [1.75, 165], [1.35, 195], [1.75, 195]].forEach(([sa, sz], si) => {
+    const g = cityGroup(sa, sz, 0.4);
+    cityBox(g, 0.25, 2.2, 0.25, cityPostMat, -1.5, 0.7, 0);
+    cityBox(g, 0.25, 2.2, 0.25, cityPostMat, 1.5, 0.7, 0);
+    cityBox(g, 3.6, 0.15, 3, cityPostMat, 0, 1.9, 0);
+    cityBox(g, 3, 1, 0.6, cityBenchMat, 0, 0.1, 0.9);
+    cityBox(g, 3.6, 0.1, 1.0, stallMats[si], 0, 1.6, 1.4);
+  });
+  // Planters ringing the plaza.
+  for (const [pa, pz] of [[1.45, 172], [1.65, 172], [1.45, 188], [1.65, 188]]) {
+    const g = cityGroup(pa, pz, 0.4);
+    cityBox(g, 1.6, 0.8, 4, cityBenchMat, 0, 0, 0);
+    for (const pz2 of [-1.2, 0, 1.2]) {
+      const plant = new THREE.Mesh(new THREE.ConeGeometry(0.45, 1.1, 8), cityLeafMat);
+      plant.position.set(0, 0.9, pz2);
+      g.add(plant);
+    }
+  }
+  // Trees.
+  for (const [ta, tz] of [[1.30, 210], [1.80, 210]]) {
+    const g = cityGroup(ta, tz, 0.4);
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 3, 8), cityTrunkMat);
+    trunk.position.set(0, 1.1, 0);
+    g.add(trunk);
+    [[1.2, 2.6], [0.9, 3.6], [0.6, 4.4]].forEach(([cr, cy]) => {
+      const cone = new THREE.Mesh(new THREE.ConeGeometry(cr, 2.0, 8), cityLeafMat);
+      cone.position.set(0, cy, 0);
+      g.add(cone);
+    });
+  }
+  // Benches.
+  for (const [ba, bz] of [[1.42, 80], [1.42, 200], [1.42, 240], [1.58, 168]]) {
+    const g = cityGroup(ba, bz, 0.4);
+    cityBox(g, 3.5, 0.15, 0.5, cityBenchMat, 0, 0.1, 0);
+    cityBox(g, 0.2, 0.5, 0.4, cityPostMat, -1.4, -0.15, 0);
+    cityBox(g, 0.2, 0.5, 0.4, cityPostMat, 1.4, -0.15, 0);
+  }
+  // Crates near the stalls.
+  for (const [ca, cz] of [[1.30, 170], [1.80, 190], [1.30, 230], [1.80, 270]]) {
+    const g = cityGroup(ca, cz, 0.4);
+    const crate = new THREE.Mesh(crateGeo, crateMat);
+    crate.position.set(0, 0.2, 0);
+    g.add(crate);
+  }
+  // Corner / street-end sign boards (plain geometry, no text).
+  for (const [sa, sz] of [[1.35, 180], [1.95, 180], [1.5, 55], [1.5, 285]]) {
+    const g = cityGroup(sa, sz, 0.4);
+    cityBox(g, 0.3, 2.6, 0.3, cityPostMat, 0, 0.9, 0);
+    cityBox(g, 2.2, 1.0, 0.15, cityBoardMat, 0, 2.0, 0);
   }
 }
 
@@ -2116,16 +2251,18 @@ for (const eb of ENTERABLES) {
   }
 }
 // Round 30 review terminals (EIGHT): gold consoles spread across the
-// industrial half, not all on one platform — three on the gallery upper
-// deck (the mezzanine in technology, radius 150) and five on the
-// industrial main deck (radius 160: three in technology, two in
-// education). Mezzanine three keep the low/mid/high spread (z 68/108/132,
-// clear of both stair zones 40..60/140..160, the three centre tables at
-// angle 4.70 z 80/100/120, the back wall 4.95 and the railing 4.45).
-// Main-deck five sit outside the promenade band and the gallery arc,
-// clear of crates, gantries, cabinets, cell doorways and bulkhead
-// doorways (clearances computed against the real prop list); nearest pair
-// is ~33 m apart, so no two 4 m triggers ever overlap. Same
+// industrial half, not all on one platform — ONE remains on the gallery
+// upper deck (the mezzanine in technology, radius 150) and seven on the
+// industrial main deck (radius 160: five from before plus two moved from
+// the mezzanine into the Residential Zone city). The kept mezzanine
+// terminal is the centre line (z 108, clear of both stair zones
+// 40..60/140..160, the three centre tables at angle 4.70 z 80/100/120,
+// the back wall 4.95 and the railing 4.45).
+// Main-deck seven sit outside the promenade band and the gallery arc,
+// clear of crates, gantries, cabinets, cell doorways, bulkhead
+// doorways, houses, mess tables and city props (clearances computed
+// against the real prop list); nearest same-deck pair is ~150 m apart
+// (the two city terminals). Same
 // pedestal/screen/sign pattern as station consoles, but gold, and each
 // beacon pillar is 6 m (not 14): from the 150 deck a 14 m pillar would poke
 // through the industrial ceiling shell at radius 140, while 6 m tops out at
@@ -2135,10 +2272,11 @@ for (const eb of ENTERABLES) {
 // (see checkTerminal), with a per-terminal deck gate so a terminal
 // never fires from the wrong level.
 const REVIEW_TERMINALS_POS = [
-  // Mezzanine upper deck (radius 150): three of the original five, low/mid/high.
-  { deck: 'mezz', angle: 4.85, z: 68 },   // back-wall side, low end
-  { deck: 'mezz', angle: 4.70, z: 108 },  // centre line, mid-high (clear of the z 100/120 tables)
-  { deck: 'mezz', angle: 4.55, z: 132 },  // railing side, high end
+  // Mezzanine upper deck (radius 150): ONE kept (centre line).
+  { deck: 'mezz', angle: 4.70, z: 108 },  // centre line, kept (clear of the z 100/120 tables)
+  // Residential Zone main deck (radius 160): two moved off the mezzanine.
+  { deck: 'main', angle: 1.65, z: 100 },  // city, north end (clear of quarters row, mess, walls)
+  { deck: 'main', angle: 1.65, z: 250 },  // city, south end (clear of lounge, arch, classroom)
   // Technology main deck (radius 160), outside the promenade band + gallery arc.
   { deck: 'main', angle: 3.5, z: 40 },    // tech, open deck near the bulkhead end
   { deck: 'main', angle: 5.2, z: 130 },   // tech, far side (overhead light strip only)
@@ -4519,8 +4657,9 @@ document.getElementById('btn-tool-close').addEventListener('pointerdown', functi
   e.preventDefault(); e.target.blur(); closeTool();
 });
 // ---------- Round 30 review terminals (EIGHT) ----------
-// Gold consoles spread across the industrial half: three on the gallery
-// upper deck (mezzanine), five on the industrial main deck.
+// Gold consoles spread across the industrial half: one on the gallery
+// upper deck (mezzanine), seven on the industrial main deck (two in the
+// Residential Zone city).
 // Trigger is LEVEL-GATED per terminal: mezzanine terminals fire only
 // when galleryFactor >= 0.9 (fully on the upper deck; ramps give 0-1,
 // main deck outside the arc gives 0), and main-deck terminals fire only
@@ -4556,7 +4695,7 @@ function checkTerminal() {
   const near = terminalDist2() < REVIEW_DIST * REVIEW_DIST;
   if (near !== terminalNear) {
     terminalNear = near;
-    if (near) { btnTerminal.textContent = 'OPEN REVIEW TERMINAL'; btnTerminal.style.display = ''; hint.textContent = 'Near the review terminal — tap Open or press Enter'; }
+    if (near) { btnTerminal.textContent = 'REVIEW'; btnTerminal.style.display = ''; hint.textContent = 'Near the review terminal — tap Review or press Enter'; }
     else { btnTerminal.style.display = 'none'; if (hint.textContent.indexOf('Near the review terminal') === 0) hint.textContent = ''; }
   }
 }
