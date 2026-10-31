@@ -287,7 +287,7 @@
     Touch: Touch left half for floating stick (push to its edge to run) &middot; Drag right side to look/steer &middot; Button: UNDOCK (docking is automatic within 100 m of any port) &middot; nav readout always on while flying &middot; JUMP (docked only) &middot; MINE (near an aura asteroid) &middot; &#9776; ship menu<br>Cells: walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to enter; EXIT door, EXIT button, or E to leave. Stations: walk up to a glowing-ring tool station and tap Open (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). HOME in this menu saves your journey and returns to the title screen
   </div>
   </div><button class="subHead" data-sub="note" data-label="NOTE" type="button">▸ NOTE</button><div class="subBody" id="sub-note">
-  <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; aura asteroids can be mined (hold M) for water from comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. (Jump arcs float Moon-like by movement tuning; the ship&rsquo;s spin gravity itself is unchanged.) After undocking, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, and a MEDICAL BAY room (Dictation). Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 20 km from the ship; past 30 km you are LOST and the run ends (retry returns you aboard, haul kept). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, the belt stretches to about 20 km, and all 1,000 Spanish vocabulary words float among the rocks — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold word arrow under the port readout points to the nearest uncollected word, and distant words show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, the journey ends.</div>
+  <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; aura asteroids can be mined (hold M) for water from comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. (Jump arcs float Moon-like by movement tuning; the ship&rsquo;s spin gravity itself is unchanged.) After undocking, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, and a MEDICAL BAY room (Dictation). Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 20 km from the ship; past 30 km you are LOST and the run ends (retry returns you aboard, haul kept). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, the belt stretches to about 20 km, and all 1,000 Spanish vocabulary words float among the rocks — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold word arrow under the port readout points to the nearest uncollected word, and distant words show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, you return to your last save.</div>
   </div>
   <button class="closeBtn" id="btn-menu-home" type="button">GO TO HOME SCREEN</button>
   <button class="closeBtn" id="btn-menu-close" type="button">CLOSE</button>
@@ -2143,12 +2143,14 @@ function doJump() {
 // (beyond beacon range — same fail screen, same retry, haul kept).
 // Crash-repair economy (crashes only; LOST keeps its free retry):
 // the first crash of a journey is a free repair and teaches the rule;
-// later crashes cost 10 WATER + 10 METAL, and a broke crash ends the
-// journey (save wiped, title shows BEGIN only). failKind is the fail
+// later crashes cost 10 WATER + 10 METAL, and a broke crash returns the
+// player to the last save (the journey ends, save wiped, title shows
+// BEGIN only, solely when no save exists to return to). failKind is the fail
 // screen's state: 'lost' | 'free' | 'pay' | 'over'. While any fail screen
 // is open, crashed gates all input (see keydown + toggleMenu + mousemove),
 // so the repair decision cannot be dodged through the menu.
 let failKind = null;
+let overHasSave = false; // 'over' variant chosen at fail-show time: save exists?
 function crashMission(cause) {
   if (crashed) return;
   if (menuOn) toggleMenu();
@@ -2163,7 +2165,7 @@ function crashMission(cause) {
   failTitle.textContent = failKind === 'over' ? 'GAME OVER' : 'MISSION FAILED';
   failText.textContent = cause === 'asteroid' ? 'You crashed into an asteroid.' : cause === 'lost' ? 'LOST — beyond beacon range. The ARK-7\'s beacon cannot reach you here.' : 'You crashed into the mothership.';
   if (failKind === 'free') {
-    failWarn.textContent = 'FIRST CRASH — FREE REPAIR. From now on, repairing your ship costs 10 WATER + 10 METAL. If you can\'t pay, the journey ends. Mine asteroids and collect words to stay stocked.';
+    failWarn.textContent = 'FIRST CRASH — FREE REPAIR. From now on, repairing your ship costs 10 WATER + 10 METAL. If you can\'t pay, you return to your last save. Mine asteroids and collect words to stay stocked.';
     failWarn.style.display = '';
     failHint.textContent = 'Press R or tap RETRY to return aboard, free this time.';
     btnRetry.textContent = 'RETRY — FREE REPAIR';
@@ -2177,12 +2179,23 @@ function crashMission(cause) {
     btnRetry.style.display = '';
     btnFailTitle.style.display = 'none';
   } else if (failKind === 'over') {
-    failText.textContent = 'The journey ends — the ARK-7 could not be repaired.';
-    failWarn.textContent = 'Repair costs 10 WATER + 10 METAL, but you have only ' + water + ' WATER and ' + metal + ' METAL.';
-    failWarn.style.display = '';
-    failHint.textContent = 'Press R or tap the button to return to the title screen.';
-    btnRetry.style.display = 'none';
-    btnFailTitle.style.display = '';
+    overHasSave = !!readSave();
+    if (overHasSave) {
+      failTitle.textContent = 'MISSION FAILED';
+      failWarn.textContent = 'Repair costs 10 WATER + 10 METAL, but you have only ' + water + ' WATER and ' + metal + ' METAL. Returning to your last save keeps your saved haul, words, and progress.';
+      failWarn.style.display = '';
+      failHint.textContent = 'Press R or tap the button to return to your last save.';
+      btnRetry.textContent = 'RETURN TO LAST SAVE';
+      btnRetry.style.display = '';
+      btnFailTitle.style.display = 'none';
+    } else {
+      failText.textContent = 'The journey ends — the ARK-7 could not be repaired.';
+      failWarn.textContent = 'Repair costs 10 WATER + 10 METAL, but you have only ' + water + ' WATER and ' + metal + ' METAL.';
+      failWarn.style.display = '';
+      failHint.textContent = 'Press R or tap the button to return to the title screen.';
+      btnRetry.style.display = 'none';
+      btnFailTitle.style.display = '';
+    }
   } else {
     failWarn.style.display = 'none';
     failHint.textContent = 'Press R or tap RETRY to return aboard.';
@@ -2197,6 +2210,23 @@ function crashMission(cause) {
 function failPrimaryAction() {
   if (!crashed) return;
   if (failKind === 'over') {
+    if (overHasSave) {
+      const s = readSave();
+      if (s) {
+        // Exact last-save semantics: reset first so items collected/mined
+        // after the save return uncollected, then restore the save's sets
+        // AND the saved position (applySave restores mode/spot; no forced
+        // docked restart here, unlike free/pay retries).
+        resetProgress();
+        applySave(s);
+        failKind = null;
+        crashed = false;
+        failOverlay.style.display = 'none';
+        mineProgress = 0; mineHeld = false; mineTarget = null;
+        btnMine.style.display = 'none';
+        return;
+      }
+    }
     try { window.localStorage.removeItem(SAVE_KEY); } catch (e) {}
     resetProgress();
     failKind = null;
@@ -2206,14 +2236,15 @@ function failPrimaryAction() {
   }
   if (failKind === 'free') {
     freeCrashUsed = true;
-    saveGame();
   } else if (failKind === 'pay') {
     water -= 10; metal -= 10;
-    saveGame();
-    updateMenu();
   }
   failKind = null;
   retryMission();
+  // Save AFTER the docked restart, so the stored position is the docked
+  // spawn — never the crash site the shuttle just died at.
+  saveGame();
+  updateMenu();
 }
 // Retry after a crash: back aboard, shuttle reset, run restarts docked.
 function retryMission() {
@@ -3633,13 +3664,20 @@ function animate() {
 // Save schema (key generationShipSave_v1): { v: 1, water, metal,
 // words: [collected word-tile indices], mined: [mined aura-asteroid indices],
 // freeCrashUsed: bool, progress: { cognates, idioms, practice, conjugation,
-// dictation, serestar: per-item identifier arrays } }. A round-21 save
+// dictation, serestar: per-item identifier arrays },
+// pos: { mode: 'walk'|'flight'|'docked', ... } }. A round-21 save
 // without the flag migrates to false (flag missing/non-boolean never
 // rejects the save, it just means unused); a save without progress fields
 // migrates to empty progress sets, same pattern, never rejected.
-// Resume restores haul + collections + mined asteroids and ALWAYS starts
-// docked aboard — no shuttle position/velocity or mid-flight state is saved,
-// matching the existing retry semantics (retry returns you aboard, haul kept).
+// Round 26: position is captured at save time (single site: saveGame) and
+// restored on load. Walk restores deck angle/z/yaw/pitch (mezzanine height
+// derives from angle/z, as in live walk); in-cell restores cell + local
+// coords; flight restores shuttle position + orientation with velocity
+// zeroed; docked restores the standard spawn. A save without pos (any
+// pre-round-26 save) loads as docked, exactly as before. Resume and
+// return-to-last-save both restore the saved position — the restore point
+// is the last save, NEVER the crash site: no code path saves at crash
+// time, and free/pay retries save only AFTER the docked restart.
 // Every storage access is wrapped in try/catch: a missing, corrupt, or
 // inaccessible save behaves exactly as no save, and never breaks loading.
 const SAVE_KEY = 'generationShipSave_v1';
@@ -3665,6 +3703,102 @@ function progFromSave(p) {
     const vi = parseInt(parts[0], 10); return Number.isInteger(vi) && vi >= 0 && vi < TOOL_VERBS.length;
   }));
 }
+// Round 26: position capture + restore. capturePosition is called only
+// from saveGame, so every stored position is a genuine save-time spot:
+// a word-collect, mine, dock, spoken pass, SAVE press, or HOME press —
+// never a crash site (free/pay retries save after the docked restart).
+function capturePosition() {
+  if (mode === 'flight') {
+    return { mode: 'flight', x: shuttle.position.x, y: shuttle.position.y, z: shuttle.position.z,
+      qx: shuttle.quaternion.x, qy: shuttle.quaternion.y, qz: shuttle.quaternion.z, qw: shuttle.quaternion.w };
+  }
+  if (inCell) {
+    return { mode: 'walk', cell: cellZone, cx: cellX, cz: cellZ, cyaw: cellYaw, cpitch: cellPitch };
+  }
+  if (driveState === 'DOCKED' && playerAngle === 0 && playerZ === -40) return { mode: 'docked' };
+  return { mode: 'walk', angle: playerAngle, z: playerZ, yaw: yaw, pitch: pitch };
+}
+// Validate a stored position; anything malformed degrades to null (docked
+// fallback) and never rejects the save itself.
+function validPos(p) {
+  if (!p || typeof p !== 'object') return null;
+  if (p.mode === 'docked') return { mode: 'docked' };
+  if (p.mode === 'flight') {
+    if (![p.x, p.y, p.z, p.qx, p.qy, p.qz, p.qw].every(Number.isFinite)) return null;
+    return { mode: 'flight', x: p.x, y: p.y, z: p.z, qx: p.qx, qy: p.qy, qz: p.qz, qw: p.qw };
+  }
+  if (p.mode === 'walk') {
+    if (p.cell) {
+      if (p.cell !== 'agri' && p.cell !== 'tech' && p.cell !== 'edu' && p.cell !== 'med') return null;
+      if (![p.cx, p.cz, p.cyaw, p.cpitch].every(Number.isFinite)) return null;
+      return { mode: 'walk', cell: p.cell, cx: p.cx, cz: p.cz, cyaw: p.cyaw, cpitch: p.cpitch };
+    }
+    if (![p.angle, p.z, p.yaw, p.pitch].every(Number.isFinite)) return null;
+    return { mode: 'walk', angle: p.angle, z: p.z, yaw: p.yaw, pitch: p.pitch };
+  }
+  return null;
+}
+// Restore a saved position + mode. Called from applySave, so both title
+// Resume and return-to-last-save share it. Jump state is never restored
+// (a mid-jump save lands the player back on deck). Flight restores with
+// zero velocity and auto-dock disarmed, so a restored shuttle never
+// respawns mid-drift into a rock or snaps straight to a port.
+function restoreSavedPosition(pos) {
+  jumpH = 0; jumpV = 0;
+  const hideCell = function () {
+    if (inCell) { try { if (cellGroup) cellGroup.visible = false; } catch (e) {} inCell = false; cellGroup = null; cellZone = null; }
+  };
+  if (!pos || pos.mode === 'docked') {
+    hideCell();
+    transitioning = false;
+    mode = 'walk'; driveState = 'DOCKED'; dockArmed = true;
+    shuttle.visible = false; shuttleVel.set(0, 0, 0);
+    playerAngle = 0; playerZ = -40; yaw = 0; pitch = 0;
+    cellX = 0; cellZ = 8; cellYaw = 0; cellPitch = 0;
+    btnExit.style.display = 'none';
+    btnMode.textContent = 'UNDOCK'; btnMode.style.display = '';
+    modeText.textContent = 'Docked'; btnJump.style.visibility = 'visible';
+    hideNav(); updateHint();
+    return;
+  }
+  if (pos.mode === 'flight') {
+    hideCell();
+    transitioning = false;
+    mode = 'flight'; driveState = 'COAST'; dockArmed = false;
+    shuttle.position.set(pos.x, pos.y, pos.z);
+    shuttle.quaternion.set(pos.qx, pos.qy, pos.qz, pos.qw);
+    shuttleVel.set(0, 0, 0); shuttle.visible = true;
+    btnMode.style.display = 'none'; btnJump.style.visibility = 'hidden';
+    modeText.textContent = 'Undocked'; btnExit.style.display = 'none';
+    updateHint();
+    return;
+  }
+  // Walk: aboard, deck height deriving from angle/z as in live walk.
+  mode = 'walk'; driveState = 'DOCKED'; dockArmed = true;
+  shuttle.visible = false; shuttleVel.set(0, 0, 0);
+  if (pos.cell) {
+    try { if (cellGroup) cellGroup.visible = false; } catch (e) {}
+    cellZone = pos.cell;
+    cellGroup = pos.cell === 'agri' ? agriCell : pos.cell === 'tech' ? techCell : pos.cell === 'med' ? medCell : eduCell;
+    cellX = pos.cx; cellZ = pos.cz; cellYaw = pos.cyaw; cellPitch = pos.cpitch;
+    cellGroup.visible = true; inCell = true;
+    savedExterior = null; // exitCell's doorway override places the player; no stale exterior is restored
+    btnMode.style.display = 'none'; btnExit.style.display = '';
+    modeText.textContent = 'Docked'; btnJump.style.visibility = 'visible';
+    updateHint();
+  } else {
+    hideCell();
+    transitioning = false;
+    playerAngle = pos.angle; playerZ = pos.z; yaw = pos.yaw; pitch = pos.pitch;
+    // Brief re-entry cooldown: a restored deck spot near a doorway can
+    // never refire a cell trigger on the first frame back.
+    noReenterUntil = performance.now() + 3000;
+    btnExit.style.display = 'none';
+    btnMode.textContent = 'UNDOCK'; btnMode.style.display = '';
+    modeText.textContent = 'Docked'; btnJump.style.visibility = 'visible';
+    hideNav(); updateHint();
+  }
+}
 function readSave() {
   try {
     const raw = window.localStorage.getItem(SAVE_KEY);
@@ -3676,7 +3810,7 @@ function readSave() {
     if (!Array.isArray(s.words) || !Array.isArray(s.mined)) return null;
     const words = s.words.filter(function (i) { return Number.isInteger(i) && i >= 0 && i < wordTiles.length; });
     const mined = s.mined.filter(function (i) { return Number.isInteger(i) && i >= 0 && i < auraAsteroids.length; });
-    return { water: Math.floor(s.water), metal: Math.floor(s.metal), words: words, mined: mined, freeCrashUsed: s.freeCrashUsed === true, progress: (s.progress && typeof s.progress === 'object') ? s.progress : null };
+    return { water: Math.floor(s.water), metal: Math.floor(s.metal), words: words, mined: mined, freeCrashUsed: s.freeCrashUsed === true, progress: (s.progress && typeof s.progress === 'object') ? s.progress : null, pos: validPos(s.pos) };
   } catch (e) { return null; }
 }
 function saveGame() {
@@ -3685,7 +3819,7 @@ function saveGame() {
     for (let i = 0; i < wordTiles.length; i++) if (wordTiles[i].collected) words.push(i);
     const mined = [];
     for (let i = 0; i < auraAsteroids.length; i++) if (auraAsteroids[i].mined) mined.push(i);
-    window.localStorage.setItem(SAVE_KEY, JSON.stringify({ v: 1, water: water, metal: metal, words: words, mined: mined, freeCrashUsed: freeCrashUsed, progress: progToSave() }));
+    window.localStorage.setItem(SAVE_KEY, JSON.stringify({ v: 1, water: water, metal: metal, words: words, mined: mined, freeCrashUsed: freeCrashUsed, progress: progToSave(), pos: capturePosition() }));
   } catch (e) {}
 }
 function applySave(s) {
@@ -3707,6 +3841,7 @@ function applySave(s) {
     a.mined = true; a.ring.visible = false; a.halo.visible = false;
     if (a.coma) a.coma.visible = false;
   }
+  restoreSavedPosition(s.pos);
   try { syncWordDots(); } catch (e) {}
   updateMenu();
 }
