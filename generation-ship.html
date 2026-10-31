@@ -317,7 +317,8 @@
     <div id="toolBody"></div>
     <div id="toolFeedback"></div>
     <div id="toolAudio">
-      <div style="display:flex;gap:10px;justify-content:center;margin-top:4px;flex-wrap:wrap;">
+      <div id="toolAudioGate" style="display:none;margin-top:4px;font-size:15px;color:#9fd8ef;">Answer the question first — then listen.</div>
+      <div id="toolAudioBtns" style="display:flex;gap:10px;justify-content:center;margin-top:4px;flex-wrap:wrap;">
         <button class="ctl2" id="btn-tool-hear-es" type="button">&#128266; Hear (ES)</button>
         <button class="ctl2" id="btn-tool-hear-en" type="button">&#128266; Hear (EN)</button>
         <button class="ctl2" id="btn-tool-say" type="button">&#127908; Say it</button>
@@ -3642,16 +3643,35 @@ const btnToolHearEs = document.getElementById('btn-tool-hear-es');
 const btnToolHearEn = document.getElementById('btn-tool-hear-en');
 const btnToolSay = document.getElementById('btn-tool-say');
 const btnToolDir = document.getElementById('btn-tool-dir');
+const toolAudioGate = document.getElementById('toolAudioGate');
+const toolAudioBtns = document.getElementById('toolAudioBtns');
 // Current speakable item: { es, en, esGated, enGated }. A gated Hear item
 // is an answer not yet revealed (e.g. a conjugation's correct form): it
-// only speaks after the question is answered. Say-it never reveals
-// anything, so it is never gated.
+// only speaks after the question is answered. Round 30: on the three quiz
+// stations (Practice, Conjugation, Ser vs. estar) the WHOLE audio row is
+// gated until the question is answered — Hear ES/EN, Say-it, and the
+// direction toggle are all hidden/unusable, and only the gate line shows.
+// Dictation (hearing IS the question) and flashcards (no question) are
+// never gated. Tools stay unblocked: not speaking never blocks progress.
 let toolAudio = null, toolSayDir = 'es';
 let toolRecog = null, toolRecogActive = false, toolRecogTimer = null;
 function setToolAudio(es, en, esGated, enGated) {
   toolAudio = (es || en) ? { es: es || '', en: en || '', esGated: !!esGated, enGated: !!enGated } : null;
   toolAudioEl.style.display = toolAudio ? 'block' : 'none';
   setToolSayFeedback('');
+  refreshToolAudioGate();
+}
+// Round 30 quiz gating: true only while a Practice/Conjugation/Ser-vs-estar
+// question is on screen and unanswered. Dictation and flashcards never gate.
+function toolAudioGated() {
+  return (toolId === 'practice' || toolId === 'conjugation' || toolId === 'serestar') && qz.qs.length > 0 && qz.qi < qz.qs.length && !qz.answered;
+}
+function refreshToolAudioGate() {
+  if (!toolAudio) { toolAudioGate.style.display = 'none'; return; }
+  const gated = toolAudioGated();
+  toolAudioBtns.style.display = gated ? 'none' : 'flex';
+  toolAudioGate.style.display = gated ? 'block' : 'none';
+  if (gated) setToolSayFeedback('');
 }
 function setToolSayFeedback(msg, ok) {
   toolSayFeedback.textContent = msg;
@@ -3794,6 +3814,7 @@ function startToolListening() {
 }
 function toolHear(lang) {
   if (!toolAudio) return;
+  if (toolAudioGated()) { setToolSayFeedback('Answer the question first — then listen.'); setToolFeedback('Answer the question first — then listen.'); return; }
   stopToolListening(false);
   const gated = lang === 'es' ? toolAudio.esGated : toolAudio.enGated;
   if (gated && !qz.answered) {
@@ -3810,22 +3831,24 @@ function toolHear(lang) {
 btnToolHearEs.addEventListener('click', function () { toolHear('es'); });
 btnToolHearEn.addEventListener('click', function () { toolHear('en'); });
 btnToolSay.addEventListener('click', function () {
+  if (toolAudioGated()) { setToolSayFeedback('Answer the question first — then listen.'); setToolFeedback('Answer the question first — then listen.'); return; }
   ensureAudio();
   if (toolRecogActive) stopToolListening(true); else startToolListening();
 });
 btnToolDir.addEventListener('click', function () {
+  if (toolAudioGated()) return; // Round 30: the toggle has no effect before answering.
   toolSayDir = toolSayDir === 'es' ? 'en' : 'es';
   btnToolDir.textContent = toolSayDir === 'es' ? 'Say: Spanish' : 'Say: English';
   if (toolRecogActive) stopToolListening(false);
   setToolSayFeedback('');
 });
 const STATIONS = [
-  { id: 'cognates', title: 'COGNATES', logic: 'Words with shared roots — like plants sharing root systems. That is why they live in the Greenhouse.', kind: 'ext', zone: 'agri', angle: 0.644, z: -151 },
-  { id: 'practice', title: 'PRACTICE', logic: 'The main trainer lives where you study: the School.', kind: 'ext', zone: 'edu', angle: 4.544, z: 241 },
-  { id: 'conjugation', title: 'CONJUGATION', logic: 'Verbs are the machinery of the language — so they live in the Workshop.', kind: 'ext', zone: 'tech', angle: 2.844, z: 151 },
-  { id: 'dictation', title: 'DICTATION', logic: 'A quiet room for a listening exercise — the medical bay, finally with a job.', kind: 'ext', zone: 'med', angle: 5.544, z: 81 },
-  { id: 'idioms', title: 'IDIOMS', logic: 'Idioms are everyday speech — and food words belong near the fields that grow the food.', kind: 'ext', zone: 'agri', angle: 3.79, z: -151 },
-  { id: 'serestar', title: 'SER VS. ESTAR', logic: 'The lookout: the place you stand and judge what things are versus how they seem.', kind: 'ship', zone: 'gallery', angle: 4.7, z: 90 },
+  { id: 'cognates', title: 'COGNATES', kind: 'ext', zone: 'agri', angle: 0.644, z: -151 },
+  { id: 'practice', title: 'PRACTICE', kind: 'ext', zone: 'edu', angle: 4.544, z: 241 },
+  { id: 'conjugation', title: 'CONJUGATION', kind: 'ext', zone: 'tech', angle: 2.844, z: 151 },
+  { id: 'dictation', title: 'DICTATION', kind: 'ext', zone: 'med', angle: 5.544, z: 81 },
+  { id: 'idioms', title: 'IDIOMS', kind: 'ext', zone: 'agri', angle: 3.79, z: -151 },
+  { id: 'serestar', title: 'SER VS. ESTAR', kind: 'ship', zone: 'gallery', angle: 4.7, z: 90 },
 ];
 const STATION_DIST = 4; // metres: walk-up range for every station
 function stationDist2(st) {
@@ -3872,7 +3895,8 @@ function openTool(id) {
   btnStation.style.display = 'none';
   hint.textContent = '';
   toolTitle.textContent = st.title;
-  toolLogic.textContent = st.logic;
+  idiomExplainerOpen = false; // Round 30: explainer starts collapsed on every panel open.
+  toolLogic.style.display = 'none'; // Round 30: assignment-rationale blurbs removed (Brant) — the panel shows the tool only, no placement logic.
   setToolFeedback('');
   renderTool(id);
   toolNoMic.style.display = WordRec ? 'none' : 'block';
@@ -3903,6 +3927,7 @@ document.getElementById('btn-tool-close').addEventListener('pointerdown', functi
 // only. Hear (ES/EN) + Say-it live in the uniform tool-panel audio row
 // (round 18). No known-marking — flashcards only.
 let fc = { kind: 'cog', filter: 'all', deck: [], pos: 0, flipped: false };
+let idiomExplainerOpen = false; // Round 30: Idioms explainer pop-out state (collapsed by default).
 function renderFlashcards() {
   const card = fc.deck[fc.pos];
   // COG rows are [English, Spanish, category]; IDIOMS rows are [Spanish, English].
@@ -3921,6 +3946,12 @@ function renderFlashcards() {
   html += '<div class="big" style="margin:14px 0;">' + escHtml(fc.flipped ? en : es) + '</div>';
   html += '<div class="sub">' + (fc.flipped ? 'English — tap Flip to see the Spanish again.' : 'Spanish — tap Flip to reveal the English.') + '</div>';
   html += '<div style="margin-top:14px;"><button class="ctl2" id="fc-flip">Flip</button><button class="ctl2" id="fc-next">Next →</button><button class="ctl2" id="fc-shuffle">Shuffle</button></div>';
+  if (fc.kind === 'idiom') {
+    // Round 30: collapsed-by-default explainer pop-out (Idioms only). It is a
+    // separate control below the card buttons; it never touches Flip/Next/
+    // Shuffle, the filters, or the audio row.
+    html += '<div style="margin-top:14px;"><button class="ctl2" id="idiom-explainer-btn">\u25b8 What is an idiom?</button><div id="idiom-explainer" style="display:none;margin-top:10px;text-align:left;line-height:1.5;font-size:15px;color:#cfe9f7;">' + "What is an idiom? An idiom is a phrase whose meaning isn't the sum of its words. 'Tomar el pelo' literally says 'to take the hair,' but it really means to pull someone's leg — to tease someone. Why do idioms matter? Native speakers use them constantly. If you only know the literal words, you'll misunderstand real conversations, jokes, movies, and songs. Knowing idioms is what makes your Spanish sound natural instead of textbook." + '</div></div>';
+  }
   toolBody.innerHTML = html;
   setToolAudio(es, en, false, false);
   document.getElementById('fc-flip').addEventListener('click', function () { fc.flipped = !fc.flipped; renderFlashcards(); });
@@ -3933,6 +3964,19 @@ function renderFlashcards() {
       fc.pos = 0; fc.flipped = false; renderFlashcards();
     });
   });
+  if (fc.kind === 'idiom') {
+    const eb = document.getElementById('idiom-explainer-btn');
+    const ex = document.getElementById('idiom-explainer');
+    if (eb && ex) {
+      ex.style.display = idiomExplainerOpen ? 'block' : 'none';
+      eb.textContent = (idiomExplainerOpen ? '\u25be ' : '\u25b8 ') + 'What is an idiom?';
+      eb.addEventListener('click', function () {
+        idiomExplainerOpen = !idiomExplainerOpen;
+        ex.style.display = idiomExplainerOpen ? 'block' : 'none';
+        eb.textContent = (idiomExplainerOpen ? '\u25be ' : '\u25b8 ') + 'What is an idiom?';
+      });
+    }
+  }
 }
 // ---------- Quiz engine (Practice, Conjugation, Dictation, Ser vs. estar) ----------
 // 10 questions, score at the end, no known-marking, no persistence.
@@ -3962,6 +4006,7 @@ function renderQuiz() {
     b.addEventListener('click', function () {
       if (qz.answered) return;
       qz.answered = true;
+      refreshToolAudioGate(); // Round 30: answering reveals the full audio row.
       const picked = parseInt(b.getAttribute('data-i'), 10);
       btns.forEach(function (bb, j) {
         bb.disabled = true;
