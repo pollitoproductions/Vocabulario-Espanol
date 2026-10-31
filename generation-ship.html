@@ -3337,8 +3337,11 @@ function onCollectCorrect() {
   mineTimer = setTimeout(updateHint, 3000);
   setTimeout(function () { closeCollect(true); }, 900);
 }
-document.getElementById('btn-collect-hear').addEventListener('pointerdown', function (e) {
-  e.preventDefault(); e.target.blur();
+document.getElementById('btn-collect-hear').addEventListener('click', function () {
+  // Round 28: plain click, matching the working station Hear buttons.
+  // The old pointerdown + preventDefault wiring was the one structural
+  // difference from the stations, and iOS Safari gates speechSynthesis
+  // on the tap gesture - the station wiring is proven on this device.
   // Round 23 diagnostic: while the utterance is actually speaking, the
   // button reads Playing — so a tap with no sound is distinguishable
   // from a tap that never registered.
@@ -3346,15 +3349,18 @@ document.getElementById('btn-collect-hear').addEventListener('pointerdown', func
     document.getElementById('btn-collect-hear').textContent = speaking ? '🔊 Playing…' : '🔊 Hear (ES)';
   });
 });
-document.getElementById('btn-collect-hear-en').addEventListener('pointerdown', function (e) {
-  e.preventDefault(); e.target.blur();
+document.getElementById('btn-collect-hear-en').addEventListener('click', function () {
+  // Round 28: plain click, matching the working station Hear buttons (see Hear ES).
   // English gloss only — saying the English must NOT collect the tile.
   if (collectTile) { stopListening(false); speakEn(collectTile.sprite.userData.en, function (speaking) {
     document.getElementById('btn-collect-hear-en').textContent = speaking ? '🔊 Playing…' : '🔊 Hear (EN)';
   }); }
 });
-btnCollectMic.addEventListener('pointerdown', function (e) {
-  e.preventDefault(); e.target.blur(); ensureAudio();
+btnCollectMic.addEventListener('click', function () {
+  // Round 28 sweep: plain click, matching the station Say-it button -
+  // the collect mic was the last speech trigger on the old pointerdown +
+  // preventDefault wiring (see the Hear buttons above).
+  ensureAudio();
   if (recogActive) stopListening(true); else startListening();
 });
 document.getElementById('btn-collect-leave').addEventListener('pointerdown', function (e) {
@@ -3570,6 +3576,9 @@ function toolHear(lang) {
   const gated = lang === 'es' ? toolAudio.esGated : toolAudio.enGated;
   if (gated && !qz.answered) {
     setToolSayFeedback('Answer the question first \u2014 then listen.');
+    // Round 28: same message in the main feedback line too - the small
+    // audio-row line alone was easy to miss, so a gated tap read as silent.
+    setToolFeedback('Answer the question first \u2014 then listen.');
     return;
   }
   const text = lang === 'es' ? toolAudio.es : toolAudio.en;
