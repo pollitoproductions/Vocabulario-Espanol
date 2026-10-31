@@ -109,6 +109,13 @@
     border-radius: 14px; font-family: monospace; font-size: 14px; letter-spacing: 1px; cursor: pointer;
   }
   #menuSaveMsg { color: #7fe3ff; font-size: 12px; min-height: 16px; text-align: center; }
+  #menuPanel .subHead {
+    margin-top: 10px; width: 100%; padding: 9px 10px; text-align: left;
+    background: rgba(8, 24, 44, 0.8); color: #7fe3ff; border: 1px solid rgba(89, 214, 255, 0.5);
+    border-radius: 12px; font-family: monospace; font-size: 12px; letter-spacing: 0.1em; cursor: pointer;
+  }
+  #menuPanel .subBody { display: none; }
+  #menuPanel .subBody.open { display: block; }
   #failOverlay {
     position: fixed; inset: 0; z-index: 30; display: none; flex-direction: column;
     align-items: center; justify-content: center; gap: 12px;
@@ -245,6 +252,7 @@
 <button id="btn-menu" type="button" aria-label="Ship menu">&#9776;</button>
 <div id="menuPanel">
   <h2>SHIP STATUS // GENERATION SHIP</h2>
+  <button class="subHead" data-sub="status" data-label="SHIP STATUS" type="button">▾ SHIP STATUS</button><div class="subBody open" id="sub-status">
   <div class="row"><span>TRANSPONDER</span><b>ARK-7 // BEACON BROADCASTING</b></div>
   <div class="row"><span>DRIVE</span><b id="menuDrive">DOCKED</b></div>
   <div class="row"><span>SPIN GRAVITY</span><b id="menuGrav"></b></div>
@@ -253,17 +261,27 @@
   <div class="row"><span>DIST TO NEAREST PORT</span><b id="menuPort">DOCKED</b></div>
   <div class="row"><span>WATER</span><b id="menuWater">0</b></div>
   <div class="row"><span>METAL</span><b id="menuMetal">0</b></div>
-  <div class="sect">JOURNEY // SAVE</div>
+  </div><button class="subHead" data-sub="journey" data-label="JOURNEY // SAVE" type="button">▸ JOURNEY // SAVE</button><div class="subBody" id="sub-journey">
   <button class="closeBtn" id="btn-menu-save" type="button">SAVE JOURNEY</button>
   <div id="menuSaveMsg"></div>
   <button class="closeBtn" id="btn-menu-home" type="button">HOME &mdash; SAVE &amp; TITLE SCREEN</button>
-  <div class="sect">CREW MANUAL // CONTROLS</div>
+  </div><button class="subHead" data-sub="progress" data-label="PROGRESS" type="button">▸ PROGRESS</button><div class="subBody" id="sub-progress">
+  <div class="row"><span>WORDS COLLECTED</span><b id="progWords">0 / 1000</b></div>
+  <div class="row"><span>COGNATES SPOKEN</span><b id="progCog">0 / 487</b></div>
+  <div class="row"><span>IDIOMS SPOKEN</span><b id="progIdioms">0 / 135</b></div>
+  <div class="row"><span>PRACTICE SPOKEN</span><b id="progPractice">0 / 1000</b></div>
+  <div class="row"><span>CONJUGATION SPOKEN</span><b id="progConj">0 / 1695</b></div>
+  <div class="row"><span>DICTATION SPOKEN</span><b id="progDict">0 / 1000</b></div>
+  <div class="row"><span>SER VS. ESTAR SPOKEN</span><b id="progSer">0 / 100</b></div>
+  <div class="controls">Progress counts spoken Spanish only \u2014 flipping, tapping, and listening don\u2019t count; English practice doesn\u2019t count either.</div>
+  </div><button class="subHead" data-sub="manual" data-label="CREW MANUAL // CONTROLS" type="button">▸ CREW MANUAL // CONTROLS</button><div class="subBody" id="sub-manual">
   <div class="controls">
     Desktop: Click to look &middot; WASD walk &middot; Space jump &middot; F undock (docking is automatic) &middot; nav readout always on while flying &middot; H ship menu &middot; W/S thrust/retro &middot; A/D turn &middot; &uarr;/&darr; pitch &middot; Space brake (undocked) &middot; M mine near an aura asteroid &middot; R retry after crash &middot; fly within 250 m of a floating word to pronounce it and collect +5 WATER / +5 METAL<br>
     Touch: Touch left half for floating stick &middot; Drag right side to look/steer &middot; Button: UNDOCK (docking is automatic within 100 m of any port) &middot; nav readout always on while flying &middot; JUMP (docked only) &middot; MINE (near an aura asteroid) &middot; &#9776; ship menu<br>Cells: walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to enter; EXIT door, EXIT button, or E to leave. Stations: walk up to a glowing-ring tool station and tap Open (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). HOME in this menu saves your journey and returns to the title screen
   </div>
-  <div class="sect">NOTE</div>
+  </div><button class="subHead" data-sub="note" data-label="NOTE" type="button">▸ NOTE</button><div class="subBody" id="sub-note">
   <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; aura asteroids can be mined (hold M) for water from comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. After undocking, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, and a MEDICAL BAY room (Dictation). Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 20 km from the ship; past 30 km you are LOST and the run ends (retry returns you aboard, haul kept). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, the belt stretches to about 20 km, and all 1,000 Spanish vocabulary words float among the rocks — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold word arrow under the port readout points to the nearest uncollected word, and distant words show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, the journey ends.</div>
+  </div>
   <button class="closeBtn" id="btn-menu-close" type="button">CLOSE</button>
 </div>
 <div id="collectPanel">
@@ -812,9 +830,9 @@ function mountTangentialSign(text, colorCss, w, angle, radius, z) {
 }
 // Round 17: walk-up tool station console. A pedestal with a glowing
 // screen carrying the tool's name (fitted text, double-sided so it reads
-// from either side) — the cyber-blue house style of the menu. Cell
-// consoles are added to the cell group in buildCell; open-area consoles
-// are added to the ship group in the stations block below.
+// from either side) — the cyber-blue house style of the menu. All six
+// consoles are added to the ship group in the stations blocks below
+// (round 23: the four cell stations moved outside their buildings).
 const stationBeacons = []; // beacon-pillar materials (open-area stations only)
 // Round 20 (wayfinding): shared station-aura geometry/materials — the
 // docking-port language (cyan ring + faint halo) at console scale, one
@@ -843,15 +861,14 @@ function makeStationConsole(labelText, colorCss, beaconH) {
   // glow means "walk up here, something happens". Ring radius 2.6
   // clears the 2.2-wide pedestal; halo radius 4.0 reads from across
   // the room or area. Visual only — trigger radius, station
-  // positions, and tool behavior untouched. Cell consoles inherit
-  // their cell group's visibility, so a cell aura shows only while
-  // the player is inside that cell.
+  // positions, and tool behavior untouched. All consoles live on the
+  // ship group, so every aura shows in the open.
   const auraRing = new THREE.Mesh(stationAuraRingGeo, stationAuraRingMat);
   auraRing.rotation.x = Math.PI / 2; auraRing.position.set(0, 0.15, 0); grp.add(auraRing);
   const auraHalo = new THREE.Mesh(stationAuraHaloGeo, stationAuraHaloMat);
   auraHalo.rotation.x = Math.PI / 2; auraHalo.position.set(0, 0.12, 0); grp.add(auraHalo);
   if (beaconH) {
-    // Tall, subtle glowing pillar above the console (open areas only):
+    // Tall, subtle glowing pillar above the console (all six stations):
     // local +Y points toward the ship axis, so the pillar rises off the
     // deck and reads across the area. Visual only — triggers untouched.
     const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, beaconH, 12),
@@ -859,6 +876,19 @@ function makeStationConsole(labelText, colorCss, beaconH) {
     beam.position.set(0, 2.7 + beaconH / 2, 0); grp.add(beam);
     stationBeacons.push(beam.material);
   }
+  // Round 23: big fitted sign above the activity itself, so the station
+  // reads from across the section. Same fitted-sign system as the
+  // doorway labels (dark plate, fitted text, double-sided coincident
+  // planes — readable from either axial approach, never mirrored).
+  // Offset tangentially (local -X, toward the doorway side) so the
+  // beacon pillar on the console axis (radius 0.45) never crosses it:
+  // the plate spans local x -6.5..-0.7, clear of the pillar, while its
+  // height (centre 4.6, top 5.44) clears the console top (2.65) and
+  // stays below every ceiling (industrial shell at 20 m, gallery
+  // upper-deck headroom at 10 m).
+  const bigSign = makeMountedSign(labelText, colorCss, 5.5);
+  bigSign.position.set(-3.6, 4.6, 0);
+  grp.add(bigSign);
   return grp;
 }
 // (No tint bands: section identity comes from the solid floors + signs.)
@@ -907,15 +937,9 @@ for (const eb of ENTERABLES) {
   const sign = makeMountedSign(eb.label + ' - ENTER', eb.css, 4);
   sign.position.set(0, 2.8, eb.doorDir * (EB_DEPTH / 2 + 0.2));
   grp.add(sign);
-  // Round 17: the learning tool that lives inside, on the outside above
-  // the doorway — same fitted-sign system (w 2.5, plate 3.49..4.41 local,
-  // clear of the ENTER plate below and of the building top edge).
-  const toolForZone = { agri: ['COGNATES', '#39d97a'], tech: ['CONJUGATION', '#59d6ff'], edu: ['PRACTICE', '#e8a33d'], med: ['DICTATION', '#9fd8ef'] }[eb.zone];
-  if (toolForZone) {
-    const tsign = makeMountedSign(toolForZone[0], toolForZone[1], 2.5);
-    tsign.position.set(0, 3.95, eb.doorDir * (EB_DEPTH / 2 + 0.2));
-    grp.add(tsign);
-  }
+  // Round 24: the doorway tool labels are GONE (sign dedup: exactly one
+  // tool-name sign per station — the big console sign above the console).
+  // The ENTER sign above stays; it names the building, not the tool.
 }
 
 // ---------- Round 9: bulkhead, industrial enclosure, gallery ----------
@@ -1370,9 +1394,9 @@ for (const eb of ENTERABLES) {
 // cells, so their stations stand in the open: the mess console between
 // the table columns at angle 2.05, z 110; the gallery console on the
 // upper deck at angle 4.7, z 90 (clear of the upper-deck tables at z 80 /
-// 100 / 120). Each open area also gets an entrance arch — two posts +
-// a double-faced fitted tool sign — so the location reads as a labelled
-// entrance from either approach side.
+// 100 / 120). Each open area also gets an entrance arch — two posts only
+// (round 24 sign dedup: the arch tool signs are removed, so the console
+// sign above each console is the one tool-name sign for that station).
 {
   const messRad = new THREE.Vector3(Math.cos(2.05), Math.sin(2.05), 0);
   const messCon = makeStationConsole('IDIOMS', '#ffc27a', 14);
@@ -1391,7 +1415,9 @@ for (const eb of ENTERABLES) {
   galLight.position.copy(galRad).multiplyScalar(147);
   galLight.position.z = 90;
   ship.add(galLight);
-  function makeEntranceArch(angle, z, label, colorCss) {
+  // Round 24 sign dedup: arches are posts only, no tool text — the
+  // console sign above each console is that station's one tool-name sign.
+  function makeEntranceArch(angle, z) {
     const radial = new THREE.Vector3(Math.cos(angle), Math.sin(angle), 0);
     const tang = new THREE.Vector3(-Math.sin(angle), Math.cos(angle), 0);
     const postMat = new THREE.MeshStandardMaterial({ color: 0x4a5560, roughness: 0.85 });
@@ -1402,17 +1428,47 @@ for (const eb of ENTERABLES) {
       post.quaternion.copy(basisQuat(radial));
       ship.add(post);
     }
-    mountAxialSign(label, colorCss, 4, angle, 154.5, z, 1);
   }
-  makeEntranceArch(2.05, 84, 'IDIOMS', '#ffc27a');
-  makeEntranceArch(4.7, 38, 'SER VS. ESTAR', '#d0a0ff');
+  makeEntranceArch(2.05, 84);
+  makeEntranceArch(4.7, 38);
+}
+// ---------- Round 23: cell stations move OUTSIDE ----------
+// Brant: the activity belongs out in the open, not in the corner of a
+// room. The four cell consoles now stand just outside their buildings'
+// doorways, in open walk space, so a player sees them without entering
+// any room. Placement, per console: 12 m beyond the doorway face
+// (faceZ = eb.z + doorDir * 7; the entry trigger band extends only 7 m
+// beyond the face, and the station trigger radius is 4 m, so even a
+// player standing on the console's near edge is 8 m out — the band can
+// never refire while using the station), and 7 m tangentially off the
+// doorway angle (beside the door, clear of the exit landing, which
+// drops the player 10 m beyond the face at the door angle). The rooms
+// stay enterable and unchanged; the doorway tool labels were removed
+// in round 24 (sign dedup: the console sign is each station's one sign).
+// Beacon heights: 14 in open agriculture (like the mess), 12 under the
+// industrial ceiling shell (shell at 20 m headroom; pillar top 14.7 m).
+{
+  const extStations = [
+    { label: 'COGNATES', css: '#39d97a', angle: 0.644, z: -151, beacon: 14 },
+    { label: 'CONJUGATION', css: '#59d6ff', angle: 2.844, z: 151, beacon: 12 },
+    { label: 'PRACTICE', css: '#e8a33d', angle: 4.544, z: 241, beacon: 12 },
+    { label: 'DICTATION', css: '#9fd8ef', angle: 5.544, z: 81, beacon: 12 },
+  ];
+  for (const s of extStations) {
+    const rad = new THREE.Vector3(Math.cos(s.angle), Math.sin(s.angle), 0);
+    const con = makeStationConsole(s.label, s.css, s.beacon);
+    con.position.copy(rad).multiplyScalar(RADIUS);
+    con.position.z = s.z;
+    con.quaternion.copy(basisQuat(rad));
+    ship.add(con);
+  }
 }
 // Medical bay (round 17): the reserved slot is now a real enterable
 // room — its exterior building, glowing doorway and ENTER sign come
 // from the ENTERABLES loop above (zone 'med'), and its interior cell
 // is built by buildCell('med') below. The old taped outline and
-// 'RESERVED' sign are gone; the bay's tool label (DICTATION) rides
-// above its doorway with the other tool signs.
+// 'RESERVED' sign are gone; the bay's tool sign is the DICTATION
+// console sign outside its doorway (round 24 sign dedup).
 // Interior cells: enclosed rooms built far from the station (x = 5000 /
 // 5600, clear of the belt's 2600 m reach), so the camera can step into
 // one without the ship's spin or the belt interfering.
@@ -1523,14 +1579,9 @@ function buildCell(theme) {
       }
     }
   }
-  // Round 17: the walk-up station console for this cell's tool.
-  // Positions are clear of each cell's furniture and of the entry path.
-  const cellStation = { agri: ['COGNATES', '#39d97a', 12, 6], tech: ['CONJUGATION', '#59d6ff', 6, 0], edu: ['PRACTICE', '#e8a33d', -12, -6], med: ['DICTATION', '#9fd8ef', 0, -6] }[theme];
-  if (cellStation) {
-    const con = makeStationConsole(cellStation[0], cellStation[1]);
-    con.position.set(cellStation[2], 0, cellStation[3]);
-    grp.add(con);
-  }
+  // Round 23: the cell consoles moved OUTSIDE (see the exterior stations
+  // block after the open-area stations): the rooms stay enterable and
+  // unchanged, but no console hides inside one any more.
   // Exit doorway on the +z wall + EXIT sign.
   const exitFrame = new THREE.Mesh(new THREE.PlaneGeometry(6, 6.5), new THREE.MeshBasicMaterial({ color: 0xffd94d }));
   exitFrame.position.set(0, 3.25, 10.94); exitFrame.rotation.y = Math.PI;
@@ -2183,6 +2234,22 @@ function updateMenu() {
     menuSpeed.textContent = 'DOCKED';
     menuPort.textContent = 'DOCKED';
   }
+  updateProgressUI();
+}
+// PROGRESS submenu counts. Words come from the live collected tiles;
+// the six spoken sets live in prog (see save section) and are restored
+// from the save on Resume. Totals come from the data arrays, never typed
+// twice, so they cannot drift from the content.
+function updateProgressUI() {
+  const setTxt = function (id, n, total) { const el = document.getElementById(id); if (el) el.textContent = n + ' / ' + total; };
+  let wc = 0; for (const w of wordTiles) if (w.collected) wc++;
+  setTxt('progWords', wc, wordTiles.length);
+  setTxt('progCog', prog.cognates.size, TOOL_COG.length);
+  setTxt('progIdioms', prog.idioms.size, TOOL_IDIOMS.length);
+  setTxt('progPractice', prog.practice.size, WORDS.length);
+  setTxt('progConj', prog.conjugation.size, TOOL_VERBS.length * 5 * 3);
+  setTxt('progDict', prog.dictation.size, WORDS.length);
+  setTxt('progSer', prog.serestar.size, TOOL_SER.length);
 }
 updateHint();
 
@@ -2350,6 +2417,23 @@ document.getElementById('btn-menu').addEventListener('pointerdown', function (e)
 });
 document.getElementById('btn-menu-close').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur(); toggleMenu();
+});
+// Round 24: menu submenus. One open at a time (phone panel stays usable).
+// The open section persists across menu opens; SHIP STATUS is the default.
+let menuSub = 'status';
+function setSub(name) {
+  menuSub = name;
+  ['status', 'journey', 'progress', 'manual', 'note'].forEach(function (n) {
+    const b = document.getElementById('sub-' + n);
+    if (b) b.classList.toggle('open', n === name);
+  });
+  document.querySelectorAll('#menuPanel .subHead').forEach(function (h) {
+    const n = h.getAttribute('data-sub');
+    h.textContent = (n === name ? '\u25be ' : '\u25b8 ') + h.getAttribute('data-label');
+  });
+}
+document.querySelectorAll('#menuPanel .subHead').forEach(function (h) {
+  h.addEventListener('click', function () { setSub(h.getAttribute('data-sub')); });
 });
 document.getElementById('btn-retry').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur(); failPrimaryAction();
@@ -2739,21 +2823,59 @@ function playDing() {
 // Speech output: full Spanish form with article, rate 0.85, es-MX voice
 // preferred, then es-US, then any Spanish voice. NEVER sets volume
 // (iOS Safari bug: setting it silences synthesis).
-function speakWord(text) {
+// Round 23: hardened speech output. Audit finding: the old helpers called
+// speechSynthesis.cancel() unconditionally and then speak() in the same
+// task, and read getVoices() with no voiceschanged handling — on iOS
+// Safari both patterns can silently swallow an utterance (a cancel is
+// flushed asynchronously onto the just-queued utterance; the voices list
+// can still be empty at tap time). New rules: cancel only when something
+// is actually queued or speaking, and defer speak past a cancel; if the
+// voices list is still empty, wait one-shot for voiceschanged (300 ms
+// fallback) before speaking. onState, when given, reports actual
+// utterance start/end so a Hear button can show a speaking state.
+function speakUtterance(text, chain, fallbackLang, onState) {
   try {
     if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    stopListening(false);
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.85;
-    const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
-    u.voice = voices.find(function (v) { return v.lang && v.lang.toLowerCase().startsWith('es-mx'); })
-      || voices.find(function (v) { return v.lang && v.lang.toLowerCase().startsWith('es-us'); })
-      || voices.find(function (v) { return v.lang && v.lang.toLowerCase().startsWith('es'); })
-      || null;
-    if (!u.voice) u.lang = 'es-MX';
-    window.speechSynthesis.speak(u);
-  } catch (e) {}
+    const synth = window.speechSynthesis;
+    let hadQueue = false;
+    try { hadQueue = synth.speaking || synth.pending; } catch (e) {}
+    if (hadQueue) synth.cancel();
+    const doSpeak = function () {
+      try {
+        const u = new SpeechSynthesisUtterance(text);
+        u.rate = 0.85;
+        const voices = synth.getVoices ? synth.getVoices() : [];
+        u.voice = null;
+        for (let i = 0; i < chain.length; i++) {
+          const v = voices.find(function (vv) { return vv.lang && vv.lang.toLowerCase().startsWith(chain[i]); });
+          if (v) { u.voice = v; break; }
+        }
+        if (!u.voice) u.lang = fallbackLang;
+        if (onState) {
+          u.onstart = function () { onState(true); };
+          u.onend = function () { onState(false); };
+          u.onerror = function () { onState(false); };
+        }
+        synth.speak(u);
+      } catch (e) { if (onState) onState(false); }
+    };
+    let voicesNow = [];
+    try { voicesNow = synth.getVoices ? synth.getVoices() : []; } catch (e) {}
+    if (voicesNow.length === 0 && 'onvoiceschanged' in synth) {
+      let fired = false;
+      const fire = function () { if (!fired) { fired = true; doSpeak(); } };
+      synth.onvoiceschanged = fire;
+      setTimeout(fire, 300);
+    } else if (hadQueue) {
+      setTimeout(doSpeak, 60);
+    } else {
+      doSpeak();
+    }
+  } catch (e) { if (onState) onState(false); }
+}
+function speakWord(text, onState) {
+  try { stopListening(false); } catch (e) {}
+  speakUtterance(text, ['es-mx', 'es-us', 'es'], 'es-MX', onState);
 }
 // Speech matching, same rules as the vocabulary list's Say-it: folds
 // case, strips punctuation and vowel accents, keeps ñ distinct from n,
@@ -2936,12 +3058,19 @@ function onCollectCorrect() {
 }
 document.getElementById('btn-collect-hear').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur();
-  if (collectTile) speakWord(collectTile.sprite.userData.es);
+  // Round 23 diagnostic: while the utterance is actually speaking, the
+  // button reads Playing — so a tap with no sound is distinguishable
+  // from a tap that never registered.
+  if (collectTile) speakWord(collectTile.sprite.userData.es, function (speaking) {
+    document.getElementById('btn-collect-hear').textContent = speaking ? '🔊 Playing…' : '🔊 Hear (ES)';
+  });
 });
 document.getElementById('btn-collect-hear-en').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur();
   // English gloss only — saying the English must NOT collect the tile.
-  if (collectTile) { stopListening(false); speakEn(collectTile.sprite.userData.en); }
+  if (collectTile) { stopListening(false); speakEn(collectTile.sprite.userData.en, function (speaking) {
+    document.getElementById('btn-collect-hear-en').textContent = speaking ? '🔊 Playing…' : '🔊 Hear (EN)';
+  }); }
 });
 btnCollectMic.addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur(); ensureAudio();
@@ -2986,19 +3115,8 @@ function shuf(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const
 function setToolFeedback(msg, ok) { toolFeedback.textContent = msg; toolFeedback.classList.toggle('ok', !!ok); }
 // English speech output: same pattern as speakWord (rate 0.85, never sets
 // volume), en-US voice preferred.
-function speakEn(text) {
-  try {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.85;
-    const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
-    u.voice = voices.find(function (v) { return v.lang && v.lang.toLowerCase().startsWith('en-us'); })
-      || voices.find(function (v) { return v.lang && v.lang.toLowerCase().startsWith('en'); })
-      || null;
-    if (!u.voice) u.lang = 'en-US';
-    window.speechSynthesis.speak(u);
-  } catch (e) {}
+function speakEn(text, onState) {
+  speakUtterance(text, ['en-us', 'en'], 'en-US', onState);
 }
 // ---------- Round 18: bilingual Hear + Say-it on every station ----------
 // Uniform audio row in the tool panel. Hear ES / Hear EN speak the current
@@ -3070,7 +3188,7 @@ function startToolRecogAttempt() {
       const dir = toolSayDir;
       const target = dir === 'es' ? toolAudio.es : toolAudio.en;
       const ok = dir === 'es' ? spokenMatches(heard, target) : spokenMatchesEn(heard, target);
-      if (ok) { try { playDing(); } catch (e) {} setToolSayFeedback('\u2713 Correct!', true); }
+      if (ok) { try { playDing(); } catch (e) {} setToolSayFeedback('\u2713 Correct!', true); if (dir === 'es') creditSpoken(); }
       else setToolSayFeedback('Heard: "' + heard + '" \u2014 not quite, try again');
     } catch (e) {
       try { toolRecog.stop(); } catch (e2) {}
@@ -3100,6 +3218,43 @@ function startToolRecogAttempt() {
     endToolRecogAttempt("Didn't catch that \u2014 try again");
   };
   try { toolRecog.start(); } catch (e) { endToolRecogAttempt('Try again \u2014 tap \uD83C\uDFA4 when you are ready.'); }
+}
+// Round 24: speak-it-to-count. Returns the progress item for the CURRENT
+// station presentation, or null when the pass must not count. Credit needs
+// BOTH: the Say-it direction is Spanish (dir 'es', so the judged target is
+// the Spanish form) AND the item is presented in Spanish. Flashcards show
+// Spanish on the unflipped face and English once flipped, so a flipped
+// card never counts even when the player speaks Spanish. Quiz prompts are
+// always Spanish-presented: practice shows the Spanish word, conjugation
+// the Spanish infinitive + subject + tense, ser/estar the Spanish sentence,
+// and dictation auto-plays the Spanish item when the question opens, so its
+// heard-Spanish presentation holds. English-direction passes, card flips,
+// tap answers, and Hear never reach this function.
+function currentSpokenKey() {
+  if (toolId === 'cognates' && fc && fc.deck && fc.deck.length) {
+    if (fc.flipped) return null;
+    const idx = TOOL_COG.indexOf(fc.deck[fc.pos]);
+    return idx >= 0 ? { set: 'cognates', key: idx } : null;
+  }
+  if (toolId === 'idioms' && fc && fc.deck && fc.deck.length) {
+    if (fc.flipped) return null;
+    const idx = TOOL_IDIOMS.indexOf(fc.deck[fc.pos]);
+    return idx >= 0 ? { set: 'idioms', key: idx } : null;
+  }
+  if (toolId === 'practice' || toolId === 'conjugation' || toolId === 'dictation' || toolId === 'serestar') {
+    if (!qz.qs || !qz.qs[qz.qi]) return null;
+    const q = qz.qs[qz.qi];
+    if (toolId === 'practice') return (q.wid === undefined) ? null : { set: 'practice', key: q.wid };
+    if (toolId === 'dictation') return (q.wid === undefined) ? null : { set: 'dictation', key: q.wid };
+    if (toolId === 'conjugation') return q.ckey ? { set: 'conjugation', key: q.ckey } : null;
+    return (q.sid === undefined) ? null : { set: 'serestar', key: q.sid };
+  }
+  return null;
+}
+function creditSpoken() {
+  const p = currentSpokenKey(); if (!p) return;
+  const set = prog[p.set]; if (!set || set.has(p.key)) return;
+  set.add(p.key); saveGame(); updateProgressUI();
 }
 function spokenMatchesEn(spoken, target) {
   const strip = function (s) {
@@ -3153,19 +3308,22 @@ btnToolDir.addEventListener('click', function () {
   setToolSayFeedback('');
 });
 const STATIONS = [
-  { id: 'cognates', title: 'COGNATES', logic: 'Words with shared roots — like plants sharing root systems. That is why they live in the Greenhouse.', kind: 'cell', zone: 'agri', x: 12, z: 6 },
-  { id: 'practice', title: 'PRACTICE', logic: 'The main trainer lives where you study: the School.', kind: 'cell', zone: 'edu', x: -12, z: -6 },
-  { id: 'conjugation', title: 'CONJUGATION', logic: 'Verbs are the machinery of the language — so they live in the Workshop.', kind: 'cell', zone: 'tech', x: 6, z: 0 },
-  { id: 'dictation', title: 'DICTATION', logic: 'A quiet room for a listening exercise — the medical bay, finally with a job.', kind: 'cell', zone: 'med', x: 0, z: -6 },
+  { id: 'cognates', title: 'COGNATES', logic: 'Words with shared roots — like plants sharing root systems. That is why they live in the Greenhouse.', kind: 'ext', zone: 'agri', angle: 0.644, z: -151 },
+  { id: 'practice', title: 'PRACTICE', logic: 'The main trainer lives where you study: the School.', kind: 'ext', zone: 'edu', angle: 4.544, z: 241 },
+  { id: 'conjugation', title: 'CONJUGATION', logic: 'Verbs are the machinery of the language — so they live in the Workshop.', kind: 'ext', zone: 'tech', angle: 2.844, z: 151 },
+  { id: 'dictation', title: 'DICTATION', logic: 'A quiet room for a listening exercise — the medical bay, finally with a job.', kind: 'ext', zone: 'med', angle: 5.544, z: 81 },
   { id: 'idioms', title: 'IDIOMS', logic: 'Idioms are everyday speech — the language of the mess hall, where the crew talks over meals.', kind: 'ship', angle: 2.05, z: 110 },
   { id: 'serestar', title: 'SER VS. ESTAR', logic: 'The lookout: the place you stand and judge what things are versus how they seem.', kind: 'ship', zone: 'gallery', angle: 4.7, z: 90 },
 ];
 const STATION_DIST = 4; // metres: walk-up range for every station
 function stationDist2(st) {
-  if (st.kind === 'cell') {
-    if (!inCell || cellZone !== st.zone || transitioning) return Infinity;
-    const dx = cellX - st.x, dz = cellZ - st.z;
-    return dx * dx + dz * dz;
+  if (st.kind === 'ext') {
+    // Round 23: exterior consoles trigger by walk-up proximity alone —
+    // no cell entry required. Same 4 m radius as every other station.
+    if (mode !== 'walk' || inCell || transitioning) return Infinity;
+    const tang = Math.abs(angDiff(playerAngle, st.angle)) * 160;
+    const dz = playerZ - st.z;
+    return tang * tang + dz * dz;
   }
   if (mode !== 'walk' || inCell || transitioning) return Infinity;
   if (st.zone === 'gallery' && galleryFactor(playerAngle, playerZ) < 0.9) return Infinity;
@@ -3316,7 +3474,7 @@ function buildPracticeQs() {
     const es = WORDS[wi][0], en = WORDS[wi][1];
     const pool = shuf(WORDS.map(function (p) { return p[1]; }).filter(function (e) { return e !== en; }));
     const choices = shuf([en].concat(pool.slice(0, 3)));
-    return { prompt: '<div style="font-size:56px;">' + escHtml(WORD_EMOJI[wi]) + '</div><div class="big">' + escHtml(es) + '</div><div class="sub">Pick the English meaning.</div>', choices: choices, answer: choices.indexOf(en), reveal: es + ' = ' + en, audioEs: es, audioEn: en, esGated: false, enGated: true };
+    return { wid: wi, prompt: '<div style="font-size:56px;">' + escHtml(WORD_EMOJI[wi]) + '</div><div class="big">' + escHtml(es) + '</div><div class="sub">Pick the English meaning.</div>', choices: choices, answer: choices.indexOf(en), reveal: es + ' = ' + en, audioEs: es, audioEn: en, esGated: false, enGated: true };
   });
 }
 function buildConjQs() {
@@ -3343,7 +3501,7 @@ function buildConjQs() {
       if (ch.indexOf(f2) < 0) ch.push(f2);
     }
     ch = shuf(ch);
-    qs.push({ prompt: '<div class="big">' + escHtml(v[0]) + '</div><div class="sub">' + escHtml(v[1]) + ' — ' + SUBJ[si] + ' — ' + TENSE[ti] + '</div><div class="sub">Pick the correct form.</div>', choices: ch, answer: ch.indexOf(correct), reveal: v[0] + ' (' + v[1] + '), ' + SUBJ[si] + ' ' + TENSE[ti] + ' = ' + correct, audioEs: correct, audioEn: v[1], esGated: true, enGated: false });
+    qs.push({ ckey: TOOL_VERBS.indexOf(v) + '|' + SUBJ[si] + '|' + TENSE[ti], prompt: '<div class="big">' + escHtml(v[0]) + '</div><div class="sub">' + escHtml(v[1]) + ' — ' + SUBJ[si] + ' — ' + TENSE[ti] + '</div><div class="sub">Pick the correct form.</div>', choices: ch, answer: ch.indexOf(correct), reveal: v[0] + ' (' + v[1] + '), ' + SUBJ[si] + ' ' + TENSE[ti] + ' = ' + correct, audioEs: correct, audioEn: v[1], esGated: true, enGated: false });
   }
   return qs;
 }
@@ -3358,7 +3516,7 @@ function buildDictQs() {
     let pool = shuf(WORDS.map(function (p) { return p[0]; }).filter(function (e) { return e !== es && stripArticle(e).trim().charAt(0).toLowerCase() === first; }));
     if (pool.length < 3) pool = pool.concat(shuf(WORDS.map(function (p) { return p[0]; }).filter(function (e) { return e !== es && pool.indexOf(e) < 0; })));
     const choices = shuf([es].concat(pool.slice(0, 3)));
-    return { prompt: '<div class="big">🎧 Listen</div><div class="sub">Tap Hear (ES) below to listen again, then pick the word you heard.</div>', choices: choices, answer: choices.indexOf(es), reveal: es + ' = ' + en, hear: es, audioEs: es, audioEn: en, esGated: false, enGated: true };
+    return { wid: wi, prompt: '<div class="big">🎧 Listen</div><div class="sub">Tap Hear (ES) below to listen again, then pick the word you heard.</div>', choices: choices, answer: choices.indexOf(es), reveal: es + ' = ' + en, hear: es, audioEs: es, audioEn: en, esGated: false, enGated: true };
   });
 }
 function buildSerQs() {
@@ -3368,10 +3526,10 @@ function buildSerQs() {
   // ES/EN + Say-it in the panel audio row; both Hears are gated until
   // after answering, matching the web tool's reveal-only pattern.)
   const FORM = { yo: ['soy', 'estoy'], tu: ['eres', 'estás'], el: ['es', 'está'], nos: ['somos', 'estamos'], ellos: ['son', 'están'] };
-  return TOOL_SER.map(function (q) {
+  return TOOL_SER.map(function (q, si) {
     const choices = shuf(['ser', 'estar']);
     const completed = q[0].replace('___', FORM[q[1]][q[2] === 'ser' ? 0 : 1]);
-    return { prompt: '<div class="big">' + escHtml(q[0]) + '</div>', choices: choices, answer: choices.indexOf(q[2]), reveal: q[3] + ' — ' + q[4], audioEs: completed, audioEn: q[3], esGated: true, enGated: true };
+    return { sid: si, prompt: '<div class="big">' + escHtml(q[0]) + '</div>', choices: choices, answer: choices.indexOf(q[2]), reveal: q[3] + ' — ' + q[4], audioEs: completed, audioEn: q[3], esGated: true, enGated: true };
   });
 }
 function renderTool(id) {
@@ -3427,14 +3585,39 @@ function animate() {
 // ---------- Home screen + saved journey (localStorage) ----------
 // Save schema (key generationShipSave_v1): { v: 1, water, metal,
 // words: [collected word-tile indices], mined: [mined aura-asteroid indices],
-// freeCrashUsed: bool }. A round-21 save without the flag migrates to false
-// (flag missing/non-boolean never rejects the save, it just means unused).
+// freeCrashUsed: bool, progress: { cognates, idioms, practice, conjugation,
+// dictation, serestar: per-item identifier arrays } }. A round-21 save
+// without the flag migrates to false (flag missing/non-boolean never
+// rejects the save, it just means unused); a save without progress fields
+// migrates to empty progress sets, same pattern, never rejected.
 // Resume restores haul + collections + mined asteroids and ALWAYS starts
 // docked aboard — no shuttle position/velocity or mid-flight state is saved,
 // matching the existing retry semantics (retry returns you aboard, haul kept).
 // Every storage access is wrapped in try/catch: a missing, corrupt, or
 // inaccessible save behaves exactly as no save, and never breaks loading.
 const SAVE_KEY = 'generationShipSave_v1';
+// Round 24: spoken-progress sets. Each holds item identifiers, never just
+// counts, so the submenu can show true totals and nothing is double
+// counted. Credit comes ONLY from a correct spoken Spanish pass (see
+// creditSpoken); taps, flips, choices, and Hear never write here.
+let prog = { cognates: new Set(), idioms: new Set(), practice: new Set(), conjugation: new Set(), dictation: new Set(), serestar: new Set() };
+function progToSave() {
+  return { cognates: Array.from(prog.cognates), idioms: Array.from(prog.idioms), practice: Array.from(prog.practice), conjugation: Array.from(prog.conjugation), dictation: Array.from(prog.dictation), serestar: Array.from(prog.serestar) };
+}
+function progFromSave(p) {
+  const cleanIdx = function (arr, max) { return (Array.isArray(arr) ? arr : []).filter(function (i) { return Number.isInteger(i) && i >= 0 && i < max; }); };
+  const src = (p && typeof p === 'object') ? p : {};
+  prog.cognates = new Set(cleanIdx(src.cognates, TOOL_COG.length));
+  prog.idioms = new Set(cleanIdx(src.idioms, TOOL_IDIOMS.length));
+  prog.practice = new Set(cleanIdx(src.practice, WORDS.length));
+  prog.dictation = new Set(cleanIdx(src.dictation, WORDS.length));
+  prog.serestar = new Set(cleanIdx(src.serestar, TOOL_SER.length));
+  prog.conjugation = new Set((Array.isArray(src.conjugation) ? src.conjugation : []).filter(function (k) {
+    if (typeof k !== 'string') return false;
+    const parts = k.split('|'); if (parts.length !== 3) return false;
+    const vi = parseInt(parts[0], 10); return Number.isInteger(vi) && vi >= 0 && vi < TOOL_VERBS.length;
+  }));
+}
 function readSave() {
   try {
     const raw = window.localStorage.getItem(SAVE_KEY);
@@ -3446,7 +3629,7 @@ function readSave() {
     if (!Array.isArray(s.words) || !Array.isArray(s.mined)) return null;
     const words = s.words.filter(function (i) { return Number.isInteger(i) && i >= 0 && i < wordTiles.length; });
     const mined = s.mined.filter(function (i) { return Number.isInteger(i) && i >= 0 && i < auraAsteroids.length; });
-    return { water: Math.floor(s.water), metal: Math.floor(s.metal), words: words, mined: mined, freeCrashUsed: s.freeCrashUsed === true };
+    return { water: Math.floor(s.water), metal: Math.floor(s.metal), words: words, mined: mined, freeCrashUsed: s.freeCrashUsed === true, progress: (s.progress && typeof s.progress === 'object') ? s.progress : null };
   } catch (e) { return null; }
 }
 function saveGame() {
@@ -3455,11 +3638,11 @@ function saveGame() {
     for (let i = 0; i < wordTiles.length; i++) if (wordTiles[i].collected) words.push(i);
     const mined = [];
     for (let i = 0; i < auraAsteroids.length; i++) if (auraAsteroids[i].mined) mined.push(i);
-    window.localStorage.setItem(SAVE_KEY, JSON.stringify({ v: 1, water: water, metal: metal, words: words, mined: mined, freeCrashUsed: freeCrashUsed }));
+    window.localStorage.setItem(SAVE_KEY, JSON.stringify({ v: 1, water: water, metal: metal, words: words, mined: mined, freeCrashUsed: freeCrashUsed, progress: progToSave() }));
   } catch (e) {}
 }
 function applySave(s) {
-  water = s.water; metal = s.metal; freeCrashUsed = !!s.freeCrashUsed;
+  water = s.water; metal = s.metal; freeCrashUsed = !!s.freeCrashUsed; progFromSave(s.progress);
   for (const i of s.words) {
     const w = wordTiles[i];
     if (!w || w.collected) continue;
@@ -3484,6 +3667,7 @@ function applySave(s) {
 // scene, textures re-stream on approach), every aura asteroid unmined.
 function resetProgress() {
   water = 0; metal = 0; freeCrashUsed = false;
+  for (const k in prog) prog[k].clear();
   for (const w of wordTiles) {
     if (w.live) {
       try { if (w.sprite.material.map) w.sprite.material.map.dispose(); } catch (e) {}
