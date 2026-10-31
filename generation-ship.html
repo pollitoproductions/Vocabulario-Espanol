@@ -66,20 +66,21 @@
     display: flex; flex-direction: column; gap: 8px; width: 208px;
   }
   button.ctl {
-    width: 100%; height: 44px; border-radius: 18px;
+    width: 100%; height: 36px; border-radius: 18px;
     background: linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.07));
     color: #fff; border: 1px solid rgba(255, 255, 255, 0.28);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.30);
-    font-size: 20px;
+    font-size: 17px; padding: 0; box-sizing: border-box;
     touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
   }
   button.ctl:active, button.ctl.on { background: linear-gradient(160deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.20)); }
   button.ctl .lbl { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; line-height: 1.2; }
-  #btn-mode { height: 44px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
-  #btn-mine { height: 44px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
-  #btn-looksteer { height: 44px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
-  #btn-center { height: 44px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
-  #btn-brake { height: 44px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
+  #btn-mode { height: 36px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
+  #btn-mine { height: 36px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
+  #btn-looksteer { height: 36px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
+  #btn-center { height: 36px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
+  #btn-brake { height: 36px; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
+  #btn-terminal { height: 36px; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; }
   /* Mini menu button: small, rounded, cyber-blue synthetic look. */
   #btn-menu {
     position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); z-index: 9;
@@ -277,8 +278,8 @@
   }
   @media (max-width: 520px) {
     #buttons { width: 176px; }
-    button.ctl { height: 44px; }
-    #btn-mode, #btn-mine { height: 44px; }
+    button.ctl { height: 36px; }
+    #btn-mode, #btn-mine { height: 36px; }
     #joy { width: 104px; height: 104px; }
     #hint { bottom: auto; top: calc(208px + env(safe-area-inset-top, 0px)); }
   }
@@ -484,6 +485,7 @@ const SHUTTLE_PITCH_RATE = 0.7; // rad/s
 // instantly. Recentering is the CENTER button (or C) plus idle auto-ease
 // (see the flight camera block in updateFlight).
 let camYaw = 0, camPitch = 0, lastCamInput = 0, lastFlightInput = 0;
+let lastMouseLookInput = 0; // mouse look moves only (touch look uses touchLookSeq)
 const CAM_IDLE_SECS = 3; // no look input AND no flight input this long -> ease back
 const CAM_EASE_RATE = 0.6; // gentle lerp rate (time constant ~1.7 s, never a snap)
 // Round 30 CENTER button (Brant playtest reversal of the no-button rule):
@@ -491,7 +493,13 @@ const CAM_EASE_RATE = 0.6; // gentle lerp rate (time constant ~1.7 s, never a sn
 // responsive but not a hard snap; look input cancels it instantly.
 const CAM_CENTER_RATE = 3;
 let centerEase = false, centerEaseStarted = 0;
-function centerCamera() { centerEase = true; centerEaseStarted = performance.now(); }
+// Touch look-grab generation: incremented on every touch look claim.
+// CENTER records the generation at press time and only a NEW grab after
+// the press cancels the ease — moves from a drag already in progress
+// when CENTER was tapped must not kill it (that was the "won't center"
+// failure in LOOK mode, where every look move refreshed lastCamInput).
+let touchLookSeq = 0, centerTouchSeq = 0;
+function centerCamera() { centerEase = true; centerEaseStarted = performance.now(); centerTouchSeq = touchLookSeq; }
 // Round 30 LOOK/STEER toggle (Brant playtest: on touch the left stick
 // gives yaw + thrust and right-side drag only moves the camera, so
 // there is NO ship-pitch input at all and flight is flat — the top of
@@ -3166,7 +3174,7 @@ document.addEventListener('mousemove', function (e) {
     } else {
       camYaw -= e.movementX * 0.0022;
       camPitch = Math.max(-1.45, Math.min(1.45, camPitch - e.movementY * 0.0022));
-      lastCamInput = performance.now();
+      lastCamInput = performance.now(); lastMouseLookInput = performance.now();
     }
   }
 });
@@ -3206,7 +3214,7 @@ canvas.addEventListener('pointerdown', function (e) {
   if (e.pointerType !== 'touch') return;
   if (e.clientX <= window.innerWidth * 0.5) return; // left half is joystick territory
   if (lookPointerId !== null) return;
-  lookPointerId = e.pointerId; lastLookX = e.clientX; lastLookY = e.clientY;
+  lookPointerId = e.pointerId; lastLookX = e.clientX; lastLookY = e.clientY; touchLookSeq++;
 });
 window.addEventListener('pointermove', function (e) {
   if (e.pointerId === lookPointerId) {
@@ -3307,22 +3315,34 @@ document.getElementById('btn-fail-title').addEventListener('pointerdown', functi
 document.getElementById('btn-jump').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur(); doJump();
 });
+// Multi-touch: MINE is a hold tracked by pointerId — lifting any OTHER
+// finger (e.g. the steering finger) must not release it.
+let minePointerId = null;
 document.getElementById('btn-mine').addEventListener('pointerdown', function (e) {
-  e.preventDefault(); e.target.blur(); mineHeld = true;
+  e.preventDefault(); e.target.blur(); mineHeld = true; minePointerId = e.pointerId;
 });
-window.addEventListener('pointerup', function () { mineHeld = false; });
-window.addEventListener('pointercancel', function () { mineHeld = false; });
+function releaseMine(e) { if (e.pointerId === minePointerId) { mineHeld = false; minePointerId = null; } }
+document.getElementById('btn-mine').addEventListener('pointerup', releaseMine);
+document.getElementById('btn-mine').addEventListener('pointercancel', releaseMine);
+document.getElementById('btn-mine').addEventListener('pointerleave', releaseMine);
+window.addEventListener('pointerup', releaseMine);
+window.addEventListener('pointercancel', releaseMine);
 // Round 30 BRAKE button: HOLD to brake (touch + desktop) — exactly the
 // Space brake decay, no new physics constant. pointerup/leave/cancel
-// all release, so a slide-off the button can never stick the brake on.
+// release only the pointer that pressed BRAKE (multi-touch safe), so a
+// slide-off the button can never stick the brake on.
+// Multi-touch: BRAKE is a hold tracked by pointerId — lifting any OTHER
+// finger (e.g. the steering finger) must not release it.
+let brakePointerId = null;
 document.getElementById('btn-brake').addEventListener('pointerdown', function (e) {
-  e.preventDefault(); e.target.blur(); brakeHeld = true;
+  e.preventDefault(); e.target.blur(); brakeHeld = true; brakePointerId = e.pointerId;
 });
-document.getElementById('btn-brake').addEventListener('pointerup', function () { brakeHeld = false; });
-document.getElementById('btn-brake').addEventListener('pointerleave', function () { brakeHeld = false; });
-document.getElementById('btn-brake').addEventListener('pointercancel', function () { brakeHeld = false; });
-window.addEventListener('pointerup', function () { brakeHeld = false; });
-window.addEventListener('pointercancel', function () { brakeHeld = false; });
+function releaseBrake(e) { if (e.pointerId === brakePointerId) { brakeHeld = false; brakePointerId = null; } }
+document.getElementById('btn-brake').addEventListener('pointerup', releaseBrake);
+document.getElementById('btn-brake').addEventListener('pointerleave', releaseBrake);
+document.getElementById('btn-brake').addEventListener('pointercancel', releaseBrake);
+window.addEventListener('pointerup', releaseBrake);
+window.addEventListener('pointercancel', releaseBrake);
 
 // Gallery walk level: smooth factor 0 (main deck) ... 1 (upper deck).
 // Stair ramps run z 40...60 and 140...160; the side edges are a HARD
@@ -3599,16 +3619,19 @@ function updateFlight(dt) {
   // the view 180° on thrust reversal). Idle auto-ease ONLY: with no look input AND no flight input
   // for CAM_IDLE_SECS, the offsets ease gently toward zero (slow lerp,
   // never a snap); any look input cancels instantly by resetting the
-  // timer and setting fresh offsets. CENTER button (or C) fast-eases the offsets to zero; look input cancels that ease instantly.
+  // timer and setting fresh offsets. CENTER button (or C) fast-eases the offsets to zero; a NEW look-grab after the press cancels that ease.
   const nowMs = performance.now();
   if (nowMs - lastCamInput > CAM_IDLE_SECS * 1000 && nowMs - lastFlightInput > CAM_IDLE_SECS * 1000) {
     const k = 1 - Math.exp(-CAM_EASE_RATE * dt);
     camYaw *= (1 - k); camPitch *= (1 - k);
   }
-  // CENTER button ease: fast (~3/s) toward zero, cancelled instantly by
-  // any new look input (lastCamInput moves past the press timestamp).
+  // CENTER button ease: fast (~3/s) toward zero, cancelled only by a NEW
+  // look-grab after the press (touchLookSeq) or a mouse look move after
+  // the press. Moves from a touch drag already in progress at press time
+  // do NOT cancel — otherwise CENTER could never complete in LOOK mode
+  // while the look finger was still moving.
   if (centerEase) {
-    if (lastCamInput > centerEaseStarted) centerEase = false;
+    if (touchLookSeq !== centerTouchSeq || lastMouseLookInput > centerEaseStarted) centerEase = false;
     else {
       const ck = 1 - Math.exp(-CAM_CENTER_RATE * dt);
       camYaw *= (1 - ck); camPitch *= (1 - ck);
@@ -3648,7 +3671,9 @@ function updateFlight(dt) {
     const dist = nearG.dist;
     const camDir = toPort.applyQuaternion(camera.quaternion.clone().invert());
     const sx = camDir.x, sy = -camDir.y;
-    const angleDeg = Math.atan2(sy, sx) * 180 / Math.PI + 90;
+    // Dead-ahead guard: within ~1 deg of dead-ahead, atan2(0, 0) would
+    // swing the arrow right; point it up instead (on target).
+    const angleDeg = Math.hypot(sx, sy) < 0.02 * Math.max(1, dist) ? 0 : Math.atan2(sy, sx) * 180 / Math.PI + 90;
     guideArrow.style.transform = 'rotate(' + angleDeg.toFixed(1) + 'deg)';
     guideDist.textContent = dist >= 1000 ? (dist / 1000).toFixed(2) + ' km to nearest port' : dist.toFixed(0) + ' m to nearest port';
     navSpeed.textContent = shuttleVel.length().toFixed(1) + ' m/s';
@@ -3714,7 +3739,7 @@ function updateFlight(dt) {
       const toWord = guideWord.base.clone().sub(camera.position);
       const wordDistVal = Math.sqrt(guideWordD2);
       const wCam = toWord.applyQuaternion(camera.quaternion.clone().invert());
-      const wAngle = Math.atan2(-wCam.y, wCam.x) * 180 / Math.PI + 90;
+      const wAngle = Math.hypot(wCam.x, wCam.y) < 0.02 * Math.max(1, wordDistVal) ? 0 : Math.atan2(-wCam.y, wCam.x) * 180 / Math.PI + 90;
       wordArrow.style.display = '';
       wordArrow.style.transform = 'rotate(' + wAngle.toFixed(1) + 'deg)';
       wordDist.textContent = wordDistVal >= 1000 ? (wordDistVal / 1000).toFixed(2) + ' km to nearest ' + guideTag : wordDistVal.toFixed(0) + ' m to nearest ' + guideTag;
@@ -4129,14 +4154,16 @@ btnCollectMic.addEventListener('click', function () {
 document.getElementById('btn-collect-leave').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur(); closeCollect(false);
 });
-// Round 30 CENTER button: plain click (iOS-safe, same as station Hear).
+// CENTER button: pointerdown (not click) so it fires mid-steer while
+// another finger steers — the same pattern as the other flight buttons.
 // Puts the flight camera directly behind the spacecraft (nose-trailing)
-// with the fast ease; look input cancels.
-document.getElementById('btn-center').addEventListener('click', function () { centerCamera(); });
-// Round 30 LOOK/STEER toggle: plain click (iOS-safe). Switches drag
-// between looking (camera) and steering (ship) in flight; the label and
-// .on state show the current mode. No key binding.
-document.getElementById('btn-looksteer').addEventListener('click', function () {
+// with the fast ease; a NEW look-grab after the press cancels (see below).
+document.getElementById('btn-center').addEventListener('pointerdown', function (e) { e.preventDefault(); e.target.blur(); centerCamera(); });
+// LOOK/STEER toggle: pointerdown (not click) so it fires mid-steer.
+// Switches drag between looking (camera) and steering (ship) in flight;
+// the label and .on state show the current mode. No key binding.
+document.getElementById('btn-looksteer').addEventListener('pointerdown', function (e) {
+  e.preventDefault(); e.target.blur();
   lookSteerMode = lookSteerMode === 'steer' ? 'look' : 'steer';
   updateLookSteerButton();
 });
