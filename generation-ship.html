@@ -1444,7 +1444,7 @@ for (const eb of ENTERABLES) {
     ship.add(pipe);
   }  // Round 30 ground vegetation: the beds alone read as too sparse, so
   // the open ground across the whole agriculture section gets dense
-  // groves too — 25 clusters x 20 plants (seeded, fixed count) plus 8
+  // groves too — 25 clusters x 40 plants (seeded, fixed count) plus 8
   // more trees. Same shared geometries/materials as the beds; no new
   // materials, no new lights. Clusters keep clear of the beds, the
   // sheds, the Greenhouse doorway path, both agriculture consoles at their pre-move positions, and
@@ -1520,7 +1520,7 @@ for (const eb of ENTERABLES) {
       }
     }
     if (!ok) continue;
-    for (let k = 0; k < 20; k++) {
+    for (let k = 0; k < 40; k++) {
       const dt = (r30rand() * 2 - 1) * 7;
       const dz = (r30rand() * 2 - 1) * 7;
       const pa = ca + dt / RADIUS;
@@ -1553,11 +1553,11 @@ for (const eb of ENTERABLES) {
   }
   // Nov 1 dense planting: the beds and groves alone read as sparse on a
   // deck this big, so six more field strips (same bed + veg-row pattern,
-  // plants every 12.6 m instead of 6.3 m) and three orchards fill the
+  // plants every 6.3 m, like the original beds) and three orchards fill the
   // ring. Strip angles dodge every station console (15+ m), the
   // Greenhouse trees, the existing beds, the sheds, and the Round 30
   // extra trees; orchards dodge the strips, consoles, and extra trees.
-  // All new plants sit at z <= -52, clear of the bulkhead.
+  // All new plants sit at z <= -46, clear of the bulkhead.
   for (const [bi, fa] of [0.85, 1.6, 2.9, 3.85, 4.9, 5.65].entries()) {
     const radial = new THREE.Vector3(Math.cos(fa), Math.sin(fa), 0);
     const tang = new THREE.Vector3(-Math.sin(fa), Math.cos(fa), 0);
@@ -1567,12 +1567,12 @@ for (const eb of ENTERABLES) {
     bed.quaternion.copy(basisQuat(radial));
     ship.add(bed);
     for (const row of vegRows) {
-      for (let k = 0; k < 20; k++) {
+      for (let k = 0; k < 40; k++) {
         const plant = new THREE.Mesh(row.geo, row.mat);
         const s = 0.85 + (((k * 7 + bi * 3) % 5) * 0.1);
         plant.scale.set(s, s * row.squash, s);
         plant.position.copy(radial).multiplyScalar(RADIUS - 1.2).add(tang.clone().multiplyScalar(row.off));
-        plant.position.z = -292 + k * 12.6;
+        plant.position.z = -292 + k * 6.3;
         plant.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), radial.clone().negate());
         ship.add(plant);
       }
@@ -2269,16 +2269,81 @@ for (const eb of ENTERABLES) {
 // gallery arc, arch, quarters strip, mess tables, bulkhead approaches)
 // before it was written; the checker is /tmp/gen-fill.py.
 {
+  // Code-drawn textures for the neighborhood pass (no new image files):
+  // bark for tree trunks, wood grain for doors/benches/fences/stall
+  // posts, leaf clusters for tree canopies, stripes for awnings.
+  function makeBarkTexture() {
+    const c = document.createElement('canvas'); c.width = 256; c.height = 256;
+    const g = c.getContext('2d');
+    g.fillStyle = '#5d4037'; g.fillRect(0, 0, 256, 256);
+    const browns = ['#4a3b28', '#6d4c41', '#3e2723', '#795548'];
+    let seed = 987654;
+    function lrnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    for (let i = 0; i < 90; i++) {
+      g.fillStyle = browns[(lrnd() * browns.length) | 0];
+      g.fillRect(lrnd() * 256, 0, 3 + lrnd() * 10, 256);
+    }
+    const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; return tx;
+  }
+  function makeWoodTexture() {
+    const c = document.createElement('canvas'); c.width = 256; c.height = 256;
+    const g = c.getContext('2d');
+    g.fillStyle = '#8a6a44'; g.fillRect(0, 0, 256, 256);
+    let seed = 13579;
+    function lrnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    for (let i = 0; i < 60; i++) {
+      const x = lrnd() * 256;
+      g.strokeStyle = 'rgba(60,40,20,' + (0.15 + lrnd() * 0.25) + ')';
+      g.lineWidth = 1 + lrnd() * 2;
+      g.beginPath(); g.moveTo(x, 0);
+      g.bezierCurveTo(x + (lrnd() * 8 - 4), 85, x + (lrnd() * 8 - 4), 170, x, 256);
+      g.stroke();
+    }
+    const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; return tx;
+  }
+  function makeLeafClusterTexture() {
+    const c = document.createElement('canvas'); c.width = 256; c.height = 256;
+    const g = c.getContext('2d');
+    const greens = ['#2e7d32', '#43a047', '#66bb6a', '#81c784', '#1b5e20', '#388e3c', '#a5d6a7'];
+    let seed = 24680;
+    function lrnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    for (let i = 0; i < 44; i++) {
+      const x = 8 + lrnd() * 240, y = 8 + lrnd() * 240;
+      const w = 22 + lrnd() * 34, h = 12 + lrnd() * 20, a = lrnd() * Math.PI;
+      g.save();
+      g.translate(x, y); g.rotate(a);
+      g.fillStyle = greens[(lrnd() * greens.length) | 0];
+      g.beginPath();
+      g.moveTo(-w / 2, 0);
+      g.quadraticCurveTo(0, -h, w / 2, 0);
+      g.quadraticCurveTo(0, h, -w / 2, 0);
+      g.fill();
+      g.strokeStyle = 'rgba(220,255,220,0.35)'; g.lineWidth = 1;
+      g.beginPath(); g.moveTo(-w / 2, 0); g.lineTo(w / 2, 0); g.stroke();
+      g.restore();
+    }
+    const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; return tx;
+  }
+  function makeStripeTexture(hex) {
+    const c = document.createElement('canvas'); c.width = 256; c.height = 64;
+    const g = c.getContext('2d');
+    g.fillStyle = '#f5ead0'; g.fillRect(0, 0, 256, 64);
+    g.fillStyle = hex;
+    for (let x = 0; x < 256; x += 32) g.fillRect(x, 0, 16, 64);
+    const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; return tx;
+  }
+  const fillWoodTx = makeWoodTexture();
   const fillStreetMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 });
   applyGameTexture(fillStreetMat, 'deck-floor.jpg', 1, 30);
   const fillPlazaMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 });
   applyGameTexture(fillPlazaMat, 'deck-floor.jpg', 6, 6);
-  const fillLeafMat = new THREE.MeshStandardMaterial({ color: 0x3fae5a, roughness: 0.9 });
-  const fillTrunkMat = new THREE.MeshStandardMaterial({ color: 0x4a3b28, roughness: 1 });
-  const fillBenchMat = new THREE.MeshStandardMaterial({ color: 0x6b5a3a, roughness: 0.9 });
+  const fillLeafMat = new THREE.MeshStandardMaterial({ map: makeLeafClusterTexture(), alphaTest: 0.45, side: THREE.DoubleSide, roughness: 0.9 });
+  const fillTrunkMat = new THREE.MeshStandardMaterial({ map: makeBarkTexture(), roughness: 1 });
+  const fillBenchMat = new THREE.MeshStandardMaterial({ map: fillWoodTx, roughness: 0.9 });
   const fillPostMat = new THREE.MeshStandardMaterial({ color: 0x4a5560, roughness: 0.85 });
+  const fillStallPostMat = new THREE.MeshStandardMaterial({ map: fillWoodTx, roughness: 0.9 });
   const fillLampMat = new THREE.MeshBasicMaterial({ color: 0xffc27a });
-  const fillStallMats = [0xd94f30, 0x3fae5a, 0xe8a33d, 0x59d6ff].map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.85 }));
+  const fillStallMats = [0xd94f30, 0x3fae5a, 0xe8a33d, 0x59d6ff].map(c => new THREE.MeshStandardMaterial({ map: makeStripeTexture('#' + c.toString(16).padStart(6, '0')), roughness: 0.85 }));
   const fillHouseWallMats = [0xd8c9a8, 0xc9b8a0, 0xb8c4c9, 0xd0b8a0, 0xa8b8a0, 0xcbb89a].map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.9 }));
   fillHouseWallMats.forEach(m => applyGameTexture(m, 'habitat.jpg', 2, 1));
   const fillRoofMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6, metalness: 0.3 });
@@ -2287,7 +2352,7 @@ for (const eb of ENTERABLES) {
   applyGameTexture(fillShopWallMat, 'tech-interior.jpg', 2, 1);
   const fillCropMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 });
   applyGameTexture(fillCropMat, 'crops.jpg', 2, 1);
-  const fillDoorMat = new THREE.MeshStandardMaterial({ color: 0x3a2e22, roughness: 1 });
+  const fillDoorMat = new THREE.MeshStandardMaterial({ map: fillWoodTx, roughness: 1 });
   const fillWinMat = new THREE.MeshBasicMaterial({ color: 0xffc27a });
   function fillGroup(angle, z, rOff) {
     const radial = new THREE.Vector3(Math.cos(angle), Math.sin(angle), 0);
@@ -2330,9 +2395,9 @@ for (const eb of ENTERABLES) {
   for (const [la, lz] of [[0.2437, 211], [0.2437, 229], [0.3563, 211], [0.3563, 229], [1.2562, 171], [1.2562, 189], [2.0337, 171], [2.0337, 189], [2.1462, 171], [2.1462, 189], [2.9338, 291], [2.9338, 309], [3.0463, 291], [3.0463, 309], [3.8338, 91], [3.9463, 91], [4.7337, 191], [4.7337, 209], [4.8463, 191], [4.8463, 209], [5.6237, 271], [5.6237, 289], [5.7363, 271], [5.7363, 289]]) fillLamp(la, lz);
   [[0.225, 220], [0.375, 220], [1.275, 180], [2.015, 180], [2.165, 180], [2.915, 300], [3.065, 300], [3.815, 100], [4.715, 200], [4.865, 200], [5.605, 280], [5.755, 280]].forEach(([sa, sz], si) => {
     const g = fillGroup(sa, sz, 0.4);
-    fillBox(g, 0.25, 2.2, 0.25, fillPostMat, -1.5, 0.7, 0);
-    fillBox(g, 0.25, 2.2, 0.25, fillPostMat, 1.5, 0.7, 0);
-    fillBox(g, 3.6, 0.15, 3, fillPostMat, 0, 1.9, 0);
+    fillBox(g, 0.25, 2.2, 0.25, fillStallPostMat, -1.5, 0.7, 0);
+    fillBox(g, 0.25, 2.2, 0.25, fillStallPostMat, 1.5, 0.7, 0);
+    fillBox(g, 3.6, 0.15, 3, fillStallPostMat, 0, 1.9, 0);
     fillBox(g, 3, 1, 0.6, fillBenchMat, 0, 0.1, 0.9);
     fillBox(g, 3.6, 0.1, 1.0, fillStallMats[si % fillStallMats.length], 0, 1.6, 1.4);
   });
@@ -2373,11 +2438,14 @@ for (const eb of ENTERABLES) {
     const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 3, 8), fillTrunkMat);
     trunk.position.set(0, 1.1, 0);
     g.add(trunk);
-    [[1.2, 2.6], [0.9, 3.6], [0.6, 4.4]].forEach(([cr, cy]) => {
-      const cone = new THREE.Mesh(new THREE.ConeGeometry(cr, 2.0, 8), fillLeafMat);
-      cone.position.set(0, cy, 0);
-      g.add(cone);
-    });
+    // Leafy crossed-plane canopy (same look as the farm trees) instead
+    // of flat green cones — same mesh count per tree as before.
+    for (const a of [0, Math.PI / 3, 2 * Math.PI / 3]) {
+      const pl = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 3.2), fillLeafMat);
+      pl.rotation.y = a;
+      pl.position.set(0, 3.4, 0);
+      g.add(pl);
+    }
   }
   for (const [ha, hz, face] of [[0.4938, 130, 1], [0.4938, 143, 1], [0.4938, 157, 1], [0.4938, 170, 1], [0.6063, 130, -1], [0.6063, 143, -1], [0.6063, 157, -1], [0.6063, 170, -1], [0.5687, 230, 1], [0.5687, 243, 1], [0.5687, 257, 1], [0.5687, 270, 1], [0.6813, 230, -1], [0.6813, 243, -1], [0.6813, 257, -1], [0.6813, 270, -1], [2.6688, 90, 1], [2.6688, 103, 1], [2.6688, 117, 1], [2.6688, 130, 1], [2.7812, 90, -1], [2.7812, 103, -1], [2.7812, 117, -1], [2.7812, 130, -1], [2.3188, 230, 1], [2.3188, 243, 1], [2.3188, 257, 1], [2.3188, 270, 1], [2.4312, 230, -1], [2.4312, 243, -1], [2.4312, 257, -1], [2.4312, 270, -1], [3.3687, 130, 1], [3.3687, 143, 1], [3.3687, 157, 1], [3.3687, 170, 1], [3.4812, 130, -1], [3.4812, 143, -1], [3.4812, 157, -1], [3.4812, 170, -1], [3.7188, 240, 1], [3.7188, 253, 1], [3.7188, 267, 1], [3.7188, 280, 1], [3.8312, 240, -1], [3.8312, 253, -1], [3.8312, 267, -1], [3.8312, 280, -1], [5.1187, 180, 1], [5.1187, 193, 1], [5.1187, 207, 1], [5.1187, 220, 1], [5.2313, 180, -1], [5.2313, 193, -1], [5.2313, 207, -1], [5.2313, 220, -1], [5.4688, 180, 1], [5.4688, 193, 1], [5.4688, 207, 1], [5.4688, 220, 1], [5.5813, 180, -1], [5.5813, 193, -1], [5.5813, 207, -1], [5.5813, 220, -1]]) fillHouse(ha, hz, face);
   [[0.55, 122, 1], [0.55, 178, -1], [0.625, 222, 1], [0.625, 278, -1], [2.725, 82, 1], [2.725, 138, -1], [2.375, 222, 1], [2.375, 278, -1], [3.425, 122, 1], [3.425, 178, -1], [3.775, 232, 1], [3.775, 288, -1], [5.175, 172, 1], [5.175, 228, -1], [5.525, 172, 1], [5.525, 228, -1]].forEach(([sa, sz, faceZ], si) => fillShop(sa, sz, faceZ, fillStallMats[si % fillStallMats.length]));
