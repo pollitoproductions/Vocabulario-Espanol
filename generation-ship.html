@@ -342,7 +342,7 @@
   <div class="row"><span>VIBRATION</span><span><input id="vibeChk" type="checkbox" checked> <span class="controls">On</span></span></div>
   <div class="controls">The slider controls game sounds (hum, thrust, footsteps, ding) — 0 is mute. Spoken words follow the device volume. Vibration works on Android; iPhones don’t let web pages vibrate, so it stays silent there.</div>
   </div><button class="subHead" data-sub="status" data-label="SHIP STATUS" type="button">▸ SHIP STATUS</button><div class="subBody" id="sub-status">
-  <div class="row"><span>TRANSPONDER</span><b>BEACON 7 // BROADCASTING</b></div>
+  <div class="row"><span>TRANSPONDER</span><b>ARK-7 // BROADCASTING</b></div>
   <div class="row"><span>DRIVE</span><b id="menuDrive">DOCKED</b></div>
   <div class="row"><span>SPIN GRAVITY</span><b id="menuGrav"></b></div>
   <div class="row"><span>SPIN RATE</span><b id="menuRpm"></b></div>
@@ -434,8 +434,8 @@
 </div>
 <div id="titlePanel">
   <div id="titleCard">
-    <h1>GENERATION SHIP &mdash; BEACON 7</h1>
-    <p id="titleStory">The BEACON 7 was on its way to a new star when it stopped to mine in an asteroid field &mdash; and in the accident, it lost its Spanish repositories. The second language it carried for the next generation is scattered among the rocks. Now the crew must anchor to regroup: fly out, recover every word, speak it aloud, and rebuild what was lost &mdash; so the knowledge is not lost to the next generation.</p>
+    <h1>GENERATION SHIP &mdash; ARK-7</h1>
+    <p id="titleStory">The ARK-7 was on its way to a new star when it stopped to mine in an asteroid field &mdash; and in the accident, it lost its Spanish repositories. The second language it carried for the next generation is scattered among the rocks. Now the crew must anchor to regroup: fly out, recover every word, speak it aloud, and rebuild what was lost &mdash; so the knowledge is not lost to the next generation.</p>
     <div id="title-main-btns" style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap;">
       <button class="ctl2 primary" id="btn-title-resume" type="button" style="display:none">RESUME JOURNEY</button>
       <button class="ctl2" id="btn-title-begin" type="button">BEGIN NEW JOURNEY</button>
@@ -3593,7 +3593,7 @@ function crashMission(cause) {
   const canPay = water >= 10 && metal >= 10;
   failKind = !isCrash ? 'lost' : (!freeCrashUsed ? 'free' : (canPay ? 'pay' : 'over'));
   failTitle.textContent = failKind === 'over' ? 'GAME OVER' : 'MISSION FAILED';
-  failText.textContent = cause === 'asteroid' ? 'You crashed into an asteroid.' : cause === 'lost' ? 'LOST — you flew past the 50 km beacon limit. The BEACON 7 cannot reach you here.' : 'You crashed into the mothership.';
+  failText.textContent = cause === 'asteroid' ? 'You crashed into an asteroid.' : cause === 'lost' ? 'LOST — you flew past the 50 km beacon limit. The ARK-7 cannot reach you here.' : 'You crashed into the mothership.';
   if (failKind === 'free') {
     failWarn.textContent = 'FIRST CRASH — FREE REPAIR. From now on, repairing your ship costs 10 WATER + 10 METAL. If you can\'t pay but have a save, you return to your last save; with no save, the journey ends. Mine asteroids and collect words to stay stocked.';
     failWarn.style.display = '';
@@ -3619,7 +3619,7 @@ function crashMission(cause) {
       btnRetry.style.display = '';
       btnFailTitle.style.display = 'none';
     } else {
-      failText.textContent = 'The journey ends — the BEACON 7 could not be repaired.';
+      failText.textContent = 'The journey ends — the ARK-7 could not be repaired.';
       failWarn.textContent = 'Repair costs 10 WATER + 10 METAL, but you have only ' + water + ' WATER and ' + metal + ' METAL.';
       failWarn.style.display = '';
       failHint.textContent = 'Press R or tap the button to return to the title screen.';
@@ -5080,16 +5080,16 @@ function setToolFeedback(msg, ok) { toolFeedback.textContent = msg; toolFeedback
 function speakEn(text, onState) {
   speakUtterance(text, ['en-us', 'en'], 'en-US', onState);
 }
-// Ship's-voice announcements: the BEACON 7 greets every boarding and
+// Ship's-voice announcements: the ARK-7 greets every boarding and
 // farewells every departure, English first, then the Spanish translation
 // (the ship carries a second language, so its computer speaks both).
 // Chained on the English line's end event, with a timed fallback in case
 // a browser never fires it, and a generation guard so a newer
 // announcement (e.g. a quick dock-then-depart) never gets talked over by
 // the older one's Spanish line. The voice is deliberately calmer than
-// the tools' speech (rate 0.8, pitch 0.9, half-second settle delay) and
-// quieter on desktop (volume 0.75, non-iOS only — iOS keeps full volume
-// because setting it silences speech there).
+// the tools' speech (rate 0.8, pitch 0.9, desktop-only half-second
+// settle delay and volume 0.75 — iOS speaks in the tap's own turn with
+// full volume, because setting it silences speech there).
 let announceGen = 0;
 // iOS Safari silences speech if utterance.volume is set, so announcements
 // only turn the volume down on non-iOS devices (desktops included) and
@@ -5098,29 +5098,43 @@ const announceIsIOS = typeof navigator !== 'undefined' && (/iPad|iPhone|iPod/.te
 // Announcement voice: its own utterance settings, separate from the
 // tools' speakWord/speakEn — slower and lower-pitched so the ship's
 // computer sounds calm rather than harsh, and quieter on desktop.
+// iPhone rules baked in here: a greeting spoken from a timer (or in the
+// same breath as a cancel) gets silently dropped, while tap-driven
+// exercise speech works — so this never cancels-and-speaks at once.
 function speakAnnouncement(text, lang, onState) {
   try {
     if (!('speechSynthesis' in window)) return;
     const synth = window.speechSynthesis;
-    try { if (synth.speaking || synth.pending) synth.cancel(); } catch (e) {}
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.8;
-    u.pitch = 0.9;
-    if (!announceIsIOS) u.volume = 0.75;
-    const chain = lang === 'es' ? ['es-mx', 'es-us', 'es'] : ['en-us', 'en'];
-    const voices = synth.getVoices ? synth.getVoices() : [];
-    u.voice = null;
-    for (let i = 0; i < chain.length; i++) {
-      const v = voices.find(function (vv) { return vv.lang && vv.lang.toLowerCase().startsWith(chain[i]); });
-      if (v) { u.voice = v; break; }
-    }
-    if (!u.voice) u.lang = lang === 'es' ? 'es-MX' : 'en-US';
-    if (onState) {
-      u.onstart = function () { onState(true); };
-      u.onend = function () { onState(false); };
-      u.onerror = function () { onState(false); };
-    }
-    synth.speak(u);
+    const say = function () {
+      try {
+        const u = new SpeechSynthesisUtterance(text);
+        u.rate = 0.8;
+        u.pitch = 0.9;
+        if (!announceIsIOS) u.volume = 0.75;
+        const chain = lang === 'es' ? ['es-mx', 'es-us', 'es'] : ['en-us', 'en'];
+        const voices = synth.getVoices ? synth.getVoices() : [];
+        u.voice = null;
+        for (let i = 0; i < chain.length; i++) {
+          const v = voices.find(function (vv) { return vv.lang && vv.lang.toLowerCase().startsWith(chain[i]); });
+          if (v) { u.voice = v; break; }
+        }
+        if (!u.voice) u.lang = lang === 'es' ? 'es-MX' : 'en-US';
+        if (onState) {
+          u.onstart = function () { onState(true); };
+          u.onend = function () { onState(false); };
+          u.onerror = function () { onState(false); };
+        }
+        synth.speak(u);
+      } catch (e) { if (onState) onState(false); }
+    };
+    try {
+      if (synth.speaking || synth.pending) {
+        synth.cancel();
+        setTimeout(say, 100); // cancelled speech needs a beat before the next line
+      } else {
+        say();
+      }
+    } catch (e) { say(); }
   } catch (e) { if (onState) onState(false); }
 }
 function announcePair(en, es) {
@@ -5133,17 +5147,26 @@ function announcePair(en, es) {
       done = true;
       speakAnnouncement(es, 'es');
     };
-    // Half a second for the dock/departure sound to settle first, so the
-    // voice never blasts on top of the clunk — part of why it startled.
-    setTimeout(function () {
+    const sayEnglish = function () {
       if (gen !== announceGen) return;
       speakAnnouncement(en, 'en', function (playing) { if (!playing) saySpanish(); });
       setTimeout(saySpanish, 8000);
-    }, 500);
+    };
+    if (announceIsIOS) {
+      // iPhones drop speech that waits on a timer after a tap, so the
+      // greeting speaks in the tap's own turn; the half-second settle
+      // delay is desktop-only. Once this first line speaks, the
+      // follow-up lines (Spanish, later dockings) can use timers.
+      sayEnglish();
+    } else {
+      // Half a second for the dock/departure sound to settle first, so
+      // the voice never blasts on top of the clunk.
+      setTimeout(sayEnglish, 500);
+    }
   } catch (e) {}
 }
 function announceBoarding() {
-  announcePair('Welcome back to the Beacon Seven', 'Bienvenido de nuevo a Beacon Seven');
+  announcePair('Welcome back to the Ark Seven', 'Bienvenido de nuevo a Ark Seven');
 }
 function announceDeparting() {
   announcePair('Enjoy your flight and watch out for space rocks', 'Disfruta tu vuelo y ten cuidado con las rocas espaciales');
@@ -6533,7 +6556,7 @@ function showTitle(journeyEnded) {
     titleResumeSummary.textContent = 'Saved journey \u2014 WATER ' + s.water + ' \u00b7 METAL ' + s.metal + ' \u00b7 Words ' + s.words.length + '/' + wordTiles.length + ' collected';
   } else {
     btnTitleResume.style.display = 'none';
-    titleResumeSummary.textContent = journeyEnded ? 'The journey ended — the BEACON 7 could not be repaired.' : '';
+    titleResumeSummary.textContent = journeyEnded ? 'The journey ended — the ARK-7 could not be repaired.' : '';
   }
   titleMainBtns.style.display = 'flex';
   titleConfirm.style.display = 'none';
