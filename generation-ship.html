@@ -363,7 +363,7 @@
   </div><button class="subHead" data-sub="manual" data-label="CREW MANUAL // CONTROLS" type="button">▸ CREW MANUAL // CONTROLS</button><div class="subBody" id="sub-manual">
   <div class="controls">
 <div class="mHead">DESKTOP</div>
-    <div class="mBody">Click to look &middot; WASD walk &middot; Shift run &middot; Q auto-walk &middot; Space jump &middot; F depart at an Exploration Terminal — one stands inside each hull port, eight in all (docking is automatic) &middot; H ship menu &middot; W/S thrust / retro &middot; A/D turn &middot; &uarr;/&darr; pitch &middot; Space or the BRAKE button to brake in flight &middot; hold M within 100 m of any asteroid to mine (about 3 seconds) &middot; R takes the fail screen&rsquo;s action after a crash &middot; in flight, the mouse looks around in LOOK mode or steers the ship in STEER mode (the LOOK/STEER button switches; A/D + &uarr;/&darr; steer in both modes; the camera stays where you leave it — drag to look around) &middot; the nav readout is always on while flying</div>
+    <div class="mBody">Click to look &middot; WASD walk &middot; Shift run &middot; Q auto-walk &middot; Space jump &middot; F depart at an Exploration Terminal — one stands inside each hull port, eight in all (docking is automatic) &middot; H ship menu &middot; W/S thrust / retro &middot; A/D turn &middot; &uarr;/&darr; pitch &middot; Space, B, or the BRAKE button to brake in flight &middot; hold M within 100 m of any asteroid to mine (about 3 seconds) &middot; R takes the fail screen&rsquo;s action after a crash &middot; in flight, the mouse looks around in LOOK mode or steers the ship in STEER mode (the LOOK/STEER button switches; A/D + &uarr;/&darr; steer in both modes; the camera stays where you leave it — drag to look around) &middot; the nav readout is always on while flying</div>
     <div class="mHead">TOUCH</div>
     <div class="mBody">Left half: floating stick (push to its edge to run) &middot; drag the right side: starts on STEER (drag steers the ship, drag up to climb; the LOOK/STEER button switches to LOOK mode, which looks around; the left stick steers in both modes; the camera stays where you leave it) &middot; DEPART at an Exploration Terminal — one inside each hull port, eight in all (docking is automatic within 100 m of any port) &middot; JUMP while walking aboard &middot; hold MINE within 100 m of any asteroid (about 3 seconds) &middot; hold BRAKE to stop in flight &middot; &#9776; ship menu &middot; the nav readout is always on while flying</div>
     <div class="mHead">LEARNING STATIONS</div>
@@ -3567,7 +3567,7 @@ const menuMetal = document.getElementById('menuMetal');
 const btnMine = document.getElementById('btn-mine');
 const btnLookSteer = document.getElementById('btn-looksteer');
 const btnBrake = document.getElementById('btn-brake');
-let brakeHeld = false; // hold-to-brake (BRAKE button; same decay as Space)
+let brakeHeld = false; // hold-to-brake (BRAKE button, Space, or B; same decay)
 // Round 25: Backrooms-style auto-walk (ship walk mode only). Toggle with
 // Q; stops on tool/collect open, cell entry,
 // dock/undock, menu/title open, or crash (see stopAutoWalk call sites
@@ -4314,12 +4314,12 @@ function updateFlight(dt) {
   pitchIn = Math.max(-1, Math.min(1, pitchIn)); // keys alone are already ±1; this only bounds keys+drag combined
   thrust = Math.max(-1, Math.min(1, thrust));
   lastThrust = thrust; // burn sound reads this in animate()
-  if (yawIn !== 0 || pitchIn !== 0 || thrust !== 0 || keys.Space || brakeHeld) lastFlightInput = performance.now();
+  if (yawIn !== 0 || pitchIn !== 0 || thrust !== 0 || keys.Space || keys.KeyB || brakeHeld) lastFlightInput = performance.now();
 
   rotateShuttle(yawIn * SHUTTLE_YAW_RATE * dt, pitchIn * SHUTTLE_PITCH_RATE * dt);
   const fwd = new THREE.Vector3(0, 0, 1).applyQuaternion(shuttle.quaternion);
   shuttleVel.addScaledVector(fwd, thrust * SHUTTLE_THRUST * dt);
-  if (keys.Space || brakeHeld) shuttleVel.multiplyScalar(Math.max(0, 1 - 2.5 * dt)); // brake assist only (Space or BRAKE button); no ambient drag
+  if (keys.Space || keys.KeyB || brakeHeld) shuttleVel.multiplyScalar(Math.max(0, 1 - 2.5 * dt)); // brake assist only (Space, B, or BRAKE button); no ambient drag
   shuttle.position.addScaledVector(shuttleVel, dt);
   flame.visible = thrust > 0.05;
   retroL.visible = retroR.visible = thrust < -0.05; // reverse thrust only, never the Space brake
@@ -4329,7 +4329,7 @@ function updateFlight(dt) {
   // Drive state for the ship-status menu (real thrust state, never faked).
   if (thrust > 0.05) driveState = 'BURNING — MAIN DRIVE';
   else if (thrust < -0.05) driveState = 'RETRO BURN';
-  else if (keys.Space || brakeHeld) driveState = 'BRAKING';
+  else if (keys.Space || keys.KeyB || brakeHeld) driveState = 'BRAKING';
   else driveState = 'COAST';
 
   // Beacon range (round 14, thresholds round 32): distance is measured from the ship centre
