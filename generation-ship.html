@@ -508,7 +508,7 @@ const SHUTTLE_PITCH_RATE = 0.7; // rad/s
 // (see the flight camera block in updateFlight).
 let camYaw = 0, camPitch = 0, lastCamInput = 0, lastFlightInput = 0;
 let lastMouseLookInput = 0; // mouse look moves only (touch look uses touchLookSeq)
-const CAM_IDLE_SECS = 3; // no look input AND no flight input this long -> ease back
+const CAM_IDLE_SECS = 3; // no look input this long -> ease back, even while flying (flight input does NOT block it — see flight camera block)
 const CAM_EASE_RATE = 0.6; // gentle lerp rate (time constant ~1.7 s, never a snap)
 // Round 30 CENTER button (Brant playtest reversal of the no-button rule):
 // the free camera needs an explicit recenter. Fast-ease rate ~3/s —
@@ -3916,12 +3916,19 @@ function updateFlight(dt) {
   // heading — mouse drag / touch drag looks around, A/D + arrows +
   // joystick steer. Neutral (offsets zero) trails the shuttle directly
   // behind its NOSE (never the velocity — the old velocity blend swung
-  // the view 180° on thrust reversal). Idle auto-ease ONLY: with no look input AND no flight input
-  // for CAM_IDLE_SECS, the offsets ease gently toward zero (slow lerp,
-  // never a snap); any look input cancels instantly by resetting the
+  // the view 180° on thrust reversal). Idle auto-ease ONLY: with no
+  // look input for CAM_IDLE_SECS, the offsets ease gently toward zero
+  // (slow lerp, never a snap) — EVEN WHILE FLYING. Flight input used
+  // to block this too, which meant a look angle set once would stick
+  // around through every maneuver: pitching or yawing then rotated
+  // that stale offset with the ship frame until the camera could end
+  // up in front of the shuttle, and with the camera flipped the
+  // ship-relative joystick felt reversed on screen. Steering never
+  // touches the look offsets, so easing them while steering fights
+  // nothing; any fresh look input cancels instantly by resetting the
   // timer and setting fresh offsets. CENTER button (or C) fast-eases the offsets to zero; a NEW look-grab after the press cancels that ease.
   const nowMs = performance.now();
-  if (nowMs - lastCamInput > CAM_IDLE_SECS * 1000 && nowMs - lastFlightInput > CAM_IDLE_SECS * 1000) {
+  if (nowMs - lastCamInput > CAM_IDLE_SECS * 1000) {
     const k = 1 - Math.exp(-CAM_EASE_RATE * dt);
     camYaw *= (1 - k); camPitch *= (1 - k);
   }
@@ -3956,7 +3963,7 @@ function updateFlight(dt) {
   // view ahead stays essentially level. Fresh look input eases it back
   // to 7 m. Eased, never snapped (the camera position itself is
   // additionally lerped at 8/s below).
-  const idleSettling = (nowMs - lastCamInput > CAM_IDLE_SECS * 1000 && nowMs - lastFlightInput > CAM_IDLE_SECS * 1000);
+  const idleSettling = (nowMs - lastCamInput > CAM_IDLE_SECS * 1000); // look-idle only: flight input does not block settling back behind
   const wantCentered = centerEase || idleSettling || (Math.abs(camYaw) < 0.005 && Math.abs(camPitch) < 0.005);
   const heightRate = centerEase ? CAM_CENTER_RATE : CAM_EASE_RATE;
   camHeight += ((wantCentered ? 2 : 7) - camHeight) * (1 - Math.exp(-heightRate * dt));
