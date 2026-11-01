@@ -1884,6 +1884,15 @@ for (const eb of ENTERABLES) {
 // RESIDENTIAL ZONE sign in the existing fitted-sign style stands over
 // the main approach: the bulkhead doorway at angle 1.5708, facing
 // arrivals from the bulkhead.
+// Nov 1 expansion: the city proper gains houses — four rows flanking
+// the main street and two side lanes, plus a second pair of cross
+// streets, a trades row (smithy, carpenter, tailor, baker), a
+// schoolhouse closing the street's north end, fenced garden plots, a
+// water tower and street main, laundry lines, a playground, and a plaza
+// fountain — so the zone reads as neighborhoods where generations live,
+// not one row of houses. Same rules: decorative only, no new real
+// lights, every prop 15+ m from both moved review terminals, clear of
+// the education arch (angle 1.90..2.20, z 195..215) and all doorways.
 {
   const streetMat = new THREE.MeshStandardMaterial({ color: 0x2a2e33, roughness: 1 });
   const plazaMat = new THREE.MeshStandardMaterial({ color: 0x3a3f45, roughness: 1 });
@@ -1983,6 +1992,185 @@ for (const eb of ENTERABLES) {
     const g = cityGroup(sa, sz, 0.4);
     cityBox(g, 0.3, 2.6, 0.3, cityPostMat, 0, 0.9, 0);
     cityBox(g, 2.2, 1.0, 0.15, cityBoardMat, 0, 2.0, 0);
+  }
+  // ---- Nov 1 expansion: houses, neighborhoods, trades, infrastructure ----
+  // Four house rows flank the main street (1.5) and two side lanes
+  // (1.39, 1.61): west rows face east, east rows face west, so every
+  // door opens onto a street or lane. Slots dodge the existing lamps,
+  // benches, stalls, trees and crates; the z 165..195 gap keeps the
+  // cross street and plaza clear.
+  const houseWallMats = [0xd8c9a8, 0xc9b8a0, 0xb8c4c9, 0xd0b8a0, 0xa8b8a0, 0xcbb89a].map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.9 }));
+  const houseRoofMats = [0x8a4a3a, 0x5a6a7a, 0x7a5a3a, 0x6a7a8a].map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.9 }));
+  const houseDoorMat = new THREE.MeshStandardMaterial({ color: 0x3a2e22, roughness: 1 });
+  const warmWinMat = new THREE.MeshBasicMaterial({ color: 0xffc27a });
+  const houseRoofGeo = new THREE.ConeGeometry(5.7, 2.5, 4);
+  let houseIdx = 0;
+  function house(angle, z, face) {
+    const g = cityGroup(angle, z, 0.4);
+    const wall = houseWallMats[houseIdx % houseWallMats.length];
+    const roof = houseRoofMats[houseIdx % houseRoofMats.length];
+    houseIdx++;
+    cityBox(g, 8, 6, 8, wall, 0, 2.6, 0);
+    const roofMesh = new THREE.Mesh(houseRoofGeo, roof);
+    roofMesh.position.set(0, 6.85, 0);
+    roofMesh.rotation.y = Math.PI / 4;
+    g.add(roofMesh);
+    cityBox(g, 0.15, 2.2, 1.2, houseDoorMat, face * 4.08, 0.7, 0);
+    cityBox(g, 0.12, 1.0, 2.6, warmWinMat, face * 4.06, 2.6, 0);
+    cityBox(g, 0.2, 0.2, 0.2, cityLampMat, face * 4.1, 2.2, 0);
+  }
+  for (const z of [70, 90, 130, 150, 220, 240, 270]) {
+    house(1.34, z, 1);
+    house(1.44, z, 1);
+    house(1.56, z, -1);
+    house(1.66, z, -1);
+  }
+  // Side lanes between the house rows, and two more cross streets.
+  for (const la of [1.39, 1.61]) {
+    const g = cityGroup(la, 170, 0.12);
+    cityBox(g, 4, 0.15, 220, streetMat, 0, 0, 0);
+  }
+  for (const cz of [110, 250]) {
+    for (let i = 0; i < 4; i++) {
+      const g = cityGroup(1.325 + i * 0.1, cz, 0.12);
+      cityBox(g, 16, 0.15, 6, streetMat, 0, 0, 0);
+    }
+  }
+  // Lane lamps (emissive heads, no real lights).
+  for (const [la, lz] of [[1.39, 100], [1.39, 200], [1.39, 280], [1.61, 100], [1.61, 200], [1.61, 280]]) {
+    const g = cityGroup(la, lz, 0.4);
+    cityBox(g, 0.25, 3, 0.25, cityPostMat, 0, 1.1, 0);
+    cityBox(g, 0.5, 0.3, 0.5, cityLampMat, 0, 2.7, 0);
+  }
+  // Trades row: four storefronts on the main street, each with a colored
+  // awning and one trade prop. West shops face the street (+x), east
+  // shops face it (-x).
+  const shopWallMat = new THREE.MeshStandardMaterial({ color: 0xc4b49a, roughness: 0.9 });
+  function shop(angle, z, face, awnMat, prop) {
+    const g = cityGroup(angle, z, 0.4);
+    cityBox(g, 6, 4.5, 6, shopWallMat, 0, 1.85, 0);
+    cityBox(g, 1.8, 0.15, 4.5, awnMat, face * 3.9, 3.2, 0);
+    cityBox(g, 0.15, 2.2, 1.2, houseDoorMat, face * 3.08, 0.7, 0);
+    cityBox(g, 0.12, 1.0, 2.0, warmWinMat, face * 3.06, 2.4, 0);
+    prop(g, face);
+  }
+  function smithyProp(g, face) {
+    cityBox(g, 0.8, 3, 0.8, cityPostMat, -1.5, 5.6, -1.5);
+    cityBox(g, 1.2, 0.9, 0.6, cityPostMat, face * 4.2, 0.05, 1.8);
+  }
+  function carpenterProp(g, face) {
+    cityBox(g, 2.5, 0.2, 0.7, cityBenchMat, face * 4.2, -0.3, -1.5);
+    cityBox(g, 2.5, 0.2, 0.7, cityBenchMat, face * 4.2, -0.1, -1.5);
+  }
+  function tailorProp(g, face) {
+    cityBox(g, 1.4, 0.5, 0.8, stallMats[3], face * 4.2, -0.15, 1.5);
+    cityBox(g, 1.4, 0.5, 0.8, stallMats[0], face * 4.2, 0.35, 1.5);
+  }
+  function bakerProp(g, face) {
+    cityBox(g, 1.2, 1.6, 1.6, cityPostMat, face * 4.2, 0.4, -1.5);
+    cityBox(g, 0.12, 0.7, 0.9, warmWinMat, face * 4.86, 0.4, -1.5);
+  }
+  shop(1.42, 208, 1, stallMats[0], smithyProp);
+  shop(1.58, 208, -1, cityBoardMat, carpenterProp);
+  shop(1.42, 255, 1, stallMats[2], bakerProp);
+  shop(1.58, 255, -1, stallMats[3], tailorProp);
+  mountAxialSign('TRADES ROW', '#ffc27a', 4, 1.5, RADIUS - 4.2, 200, -1, true);
+  {
+    const g = cityGroup(1.5, 200, 0.4);
+    cityBox(g, 0.3, 2.6, 0.3, cityPostMat, 0, 0.9, 0);
+    cityBox(g, 2.2, 1.0, 0.15, cityBoardMat, 0, 2.0, 0);
+  }
+  // Schoolhouse closing the main street's north end (door faces the street).
+  {
+    const g = cityGroup(1.5, 297, 0.4);
+    const schoolWall = new THREE.MeshStandardMaterial({ color: 0xd8cfae, roughness: 0.9 });
+    cityBox(g, 12, 7, 10, schoolWall, 0, 3.1, 0);
+    const schoolRoof = new THREE.Mesh(new THREE.ConeGeometry(7.8, 3, 4), houseRoofMats[1]);
+    schoolRoof.position.set(0, 8.1, 0);
+    schoolRoof.rotation.y = Math.PI / 4;
+    g.add(schoolRoof);
+    cityBox(g, 2, 4, 2, schoolWall, 0, 9.6, 0);
+    const bellCap = new THREE.Mesh(new THREE.ConeGeometry(1.6, 1.2, 4), houseRoofMats[0]);
+    bellCap.position.set(0, 12.2, 0);
+    bellCap.rotation.y = Math.PI / 4;
+    g.add(bellCap);
+    cityBox(g, 1.4, 2.4, 0.15, houseDoorMat, 0, 0.8, -5.08);
+    cityBox(g, 2.0, 1.0, 0.12, warmWinMat, -3, 3.1, -5.06);
+    cityBox(g, 2.0, 1.0, 0.12, warmWinMat, 3, 3.1, -5.06);
+  }
+  // Fenced garden plots behind the outer rows.
+  const cropMat = new THREE.MeshStandardMaterial({ color: 0x4a9a4a, roughness: 1 });
+  for (const [ga, gz] of [[1.28, 100], [1.28, 150], [1.28, 235], [1.72, 100], [1.72, 150], [1.72, 235]]) {
+    const g = cityGroup(ga, gz, 0.4);
+    cityBox(g, 6, 0.8, 0.15, cityBenchMat, 0, 0, -3);
+    cityBox(g, 6, 0.8, 0.15, cityBenchMat, 0, 0, 3);
+    cityBox(g, 0.15, 0.8, 6, cityBenchMat, -3, 0, 0);
+    cityBox(g, 0.15, 0.8, 6, cityBenchMat, 3, 0, 0);
+    cityBox(g, 5, 0.5, 1.2, cropMat, 0, -0.15, -1.5);
+    cityBox(g, 5, 0.5, 1.2, cropMat, 0, -0.15, 1.5);
+  }
+  // Water tower at the north end, and a street main along the main street.
+  {
+    const g = cityGroup(1.28, 285, 0.4);
+    for (const [lx, lz] of [[-1.5, -1.5], [1.5, -1.5], [-1.5, 1.5], [1.5, 1.5]])
+      cityBox(g, 0.4, 6, 0.4, cityPostMat, lx, 2.6, lz);
+    const tank = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 4, 12), cityPostMat);
+    tank.position.set(0, 7.6, 0);
+    g.add(tank);
+    const tankRoof = new THREE.Mesh(new THREE.ConeGeometry(2.8, 1.5, 12), houseRoofMats[0]);
+    tankRoof.position.set(0, 10.35, 0);
+    g.add(tankRoof);
+  }
+  {
+    const pipeMat = new THREE.MeshStandardMaterial({ color: 0x6a7a8a, roughness: 0.6, metalness: 0.4 });
+    const g = cityGroup(1.475, 170, 0.4);
+    cityBox(g, 0.35, 0.35, 220, pipeMat, 0, -0.225, 0);
+    for (const jz of [110, 180, 250])
+      cityBox(g, 0.7, 0.7, 0.7, pipeMat, 0, -0.05, jz - 170);
+  }
+  // Laundry lines strung between facing houses.
+  const clothMats = [stallMats[0], stallMats[1], stallMats[2]];
+  for (const [la, lz] of [[1.39, 90], [1.61, 240]]) {
+    const g = cityGroup(la, lz, 0.4);
+    cityBox(g, 7.6, 0.06, 0.06, cityPostMat, 0, 2.6, 0);
+    [-2.5, 0, 2.5].forEach((cx, ci) => {
+      cityBox(g, 1.0, 1.2, 0.08, clothMats[ci], cx, 1.95, 0);
+    });
+  }
+  // Small playground at the north end.
+  {
+    const g = cityGroup(1.72, 285, 0.4);
+    cityBox(g, 0.25, 2.6, 0.25, cityPostMat, -1.5, 0.9, 0);
+    cityBox(g, 0.25, 2.6, 0.25, cityPostMat, 1.5, 0.9, 0);
+    cityBox(g, 3.5, 0.25, 0.25, cityPostMat, 0, 2.2, 0);
+    for (const sx of [-0.8, 0.8]) {
+      cityBox(g, 0.1, 1.1, 0.1, cityPostMat, sx - 0.25, 1.6, 0);
+      cityBox(g, 0.1, 1.1, 0.1, cityPostMat, sx + 0.25, 1.6, 0);
+      cityBox(g, 0.6, 0.1, 0.5, cityBenchMat, sx, 1.0, 0);
+    }
+    const slide = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.15, 4.5), stallMats[2]);
+    slide.position.set(3.2, 1.2, 0);
+    slide.rotation.x = -0.45;
+    g.add(slide);
+    cityBox(g, 0.2, 2.4, 0.2, cityPostMat, 2.7, 0.8, 2.0);
+    cityBox(g, 0.2, 2.4, 0.2, cityPostMat, 3.7, 0.8, 2.0);
+  }
+  // Fountain in the plaza medallion.
+  {
+    const g = cityGroup(1.55, 180, 0.4);
+    const basin = new THREE.Mesh(new THREE.CylinderGeometry(2.6, 2.6, 0.9, 16), plazaMat);
+    basin.position.set(0, 0.05, 0);
+    g.add(basin);
+    const fountWaterMat = new THREE.MeshBasicMaterial({ color: 0x59d6ff, transparent: true, opacity: 0.8 });
+    const fountWater = new THREE.Mesh(new THREE.CylinderGeometry(2.3, 2.3, 0.1, 16), fountWaterMat);
+    fountWater.position.set(0, 0.45, 0);
+    g.add(fountWater);
+    const fountPost = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 1.6, 10), plazaMat);
+    fountPost.position.set(0, 1.3, 0);
+    g.add(fountPost);
+    const fountBowl = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 0.6, 0.4, 12), plazaMat);
+    fountBowl.position.set(0, 2.2, 0);
+    g.add(fountBowl);
   }
 }
 
