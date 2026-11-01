@@ -329,11 +329,11 @@
   <div class="row"><span>WORDS COLLECTED</span><b id="progWords">0 / 1000</b></div>
   <div class="row"><span>COGNATES SPOKEN</span><b id="progCog">0 / 487</b></div>
   <div class="row"><span>IDIOMS SPOKEN</span><b id="progIdioms">0 / 135</b></div>
-  <div class="row"><span>PRACTICE SPOKEN</span><b id="progPractice">0 / 1000</b></div>
+  <div class="row"><span>WORDS PRACTICED</span><b id="progPractice">0 / 1000</b></div>
   <div class="row"><span>CONJUGATION SPOKEN</span><b id="progConj">0 / 1695</b></div>
   <div class="row"><span>DICTATION SPOKEN</span><b id="progDict">0 / 2830</b></div>
   <div class="row"><span>SER VS. ESTAR SPOKEN</span><b id="progSer">0 / 100</b></div>
-  <div class="controls">Progress counts spoken Spanish only \u2014 flipping, tapping, and listening don\u2019t count; English practice doesn\u2019t count either.</div>
+  <div class="controls">Progress counts spoken Spanish only — flipping, tapping, and listening don’t count; English practice doesn’t count either.</div>
   </div><button class="subHead" data-sub="status" data-label="SHIP STATUS" type="button">▸ SHIP STATUS</button><div class="subBody" id="sub-status">
   <div class="row"><span>TRANSPONDER</span><b>BEACON 7 // BROADCASTING</b></div>
   <div class="row"><span>DRIVE</span><b id="menuDrive">DOCKED</b></div>
@@ -356,7 +356,7 @@
     <div class="mHead">COLLECTING IN SPACE</div>
     <div class="mBody">Fly within 250 m of a floating word or exercise question to pause and pronounce it: words ask for the Spanish word; questions ask you to speak the answer (tap Show answer to peek &mdash; peeking never counts, only speaking does). Say it right to collect it for +5 WATER and +5 METAL; Leave (or Escape) flies on, and the item waits until you are 400 m clear. A gold arrow points to the nearest uncollected item &mdash; word or question &mdash; with a tag saying which; distant items show as small glow dots until their plates stream in.</div>
     <div class="mHead">REVIEW TERMINALS</div>
-    <div class="mBody">Eight gold review terminals stand around the industrial side &mdash; one on the mezzanine, seven on the main deck, two of them in the Residential Zone city. Walk up and tap Review (or press Enter) to review everything you have already spoken, by tool, with Hear in both languages. Reviewing never changes progress.</div>
+    <div class="mBody">Eight gold review terminals stand around the industrial side &mdash; one on the mezzanine, seven on the main deck, spread evenly around the hull. Walk up and tap Review (or press Enter) to review everything you have already spoken, by tool, with Hear in both languages. Reviewing never changes progress.</div>
     <div class="mHead">SAVING</div>
     <div class="mBody">SAVE JOURNEY in this menu saves at once; the game also saves after every collect, every mining yield, and every docking. GO TO HOME SCREEN saves, then returns to the title screen. Resuming restores your haul, your collected items, and your position &mdash; aboard, inside a cell, or in flight.</div>
   </div>
@@ -2265,19 +2265,23 @@ for (const eb of ENTERABLES) {
     ship.add(con);
   }
 }
-// Round 30 review terminals (EIGHT): gold consoles spread across the
-// industrial half, not all on one platform — ONE remains on the gallery
-// upper deck (the mezzanine in technology, radius 150) and seven on the
-// industrial main deck (radius 160: five from before plus two moved from
-// the mezzanine into the Residential Zone city). The kept mezzanine
-// terminal is the centre line (z 108, clear of both stair zones
-// 40..60/140..160, the three centre tables at angle 4.70 z 80/100/120,
-// the back wall 4.95 and the railing 4.45).
+// Round 30 review terminals (EIGHT), respread Oct 31 (Brant: the old
+// layout clustered — pairs shared angles with big empty arcs between):
+// ONE remains on the gallery upper deck (the mezzanine in technology,
+// radius 150) and seven on the industrial main deck (radius 160),
+// spread EVENLY around the hull at 51.4° (0.8976 rad) steps, so
+// neighbours sit ~143 m apart with no pairs and no empty arcs.
+// The kept mezzanine terminal is the centre line (z 108, clear of
+// both stair zones 40..60/140..160, the three centre tables at angle
+// 4.70 z 80/100/120, the back wall 4.95 and the railing 4.45).
 // Main-deck seven sit outside the promenade band and the gallery arc,
 // clear of crates, gantries, cabinets, cell doorways, bulkhead
-// doorways, houses, mess tables and city props (clearances computed
-// against the real prop list); nearest same-deck pair is ~150 m apart
-// (the two city terminals). Same
+// doorways, houses, mess tables and city props (clearances checked
+// against the blocked zones: quarters rows, mess/lounge, promenade
+// walls, education arch, gallery arc, and the three industrial cell
+// doorways; the 4.79 terminal sits at z 200, past the gallery's
+// z 40..160 span, so it is not under the gallery floor); nearest
+// same-deck pair is ~143 m apart. Same
 // pedestal/screen/sign pattern as station consoles, but gold, and each
 // beacon pillar is 6 m (not 14): from the 150 deck a 14 m pillar would poke
 // through the industrial ceiling shell at radius 140, while 6 m tops out at
@@ -2289,16 +2293,20 @@ for (const eb of ENTERABLES) {
 const REVIEW_TERMINALS_POS = [
   // Mezzanine upper deck (radius 150): ONE kept (centre line).
   { deck: 'mezz', angle: 4.70, z: 108 },  // centre line, kept (clear of the z 100/120 tables)
-  // Residential Zone main deck (radius 160): two moved off the mezzanine.
-  { deck: 'main', angle: 1.65, z: 100 },  // city, north end (clear of quarters row, mess, walls)
-  { deck: 'main', angle: 1.65, z: 250 },  // city, south end (clear of lounge, arch, classroom)
-  // Technology main deck (radius 160), outside the promenade band + gallery arc.
-  { deck: 'main', angle: 3.5, z: 40 },    // tech, open deck near the bulkhead end
-  { deck: 'main', angle: 5.2, z: 130 },   // tech, far side (overhead light strip only)
-  { deck: 'main', angle: 0.5, z: 180 },   // tech, open deck past the promenade band
-  // Education main deck (radius 160).
-  { deck: 'main', angle: 3.9, z: 300 },   // edu, far side
-  { deck: 'main', angle: 5.5, z: 280 },   // edu, far side
+  // Main deck (radius 160): seven spread EVENLY around the hull at
+  // 0.8976 rad (51.4°) steps — neighbours ~143 m apart, no pairs.
+  // Each z threads clear of the blocked zones (quarters rows, mess /
+  // lounge, promenade walls, education arch, gallery arc) and the
+  // industrial cell doorways (workshop 2.8/z 170, classroom 4.5/z 260,
+  // medical 5.5/z 100); the 4.79 terminal sits at z 200, past the
+  // gallery's z 40..160 span, so it is not under the gallery floor.
+  { deck: 'main', angle: 0.30, z: 220 },  // even step 1 (edu, open deck)
+  { deck: 'main', angle: 1.20, z: 180 },  // even step 2 (gap between the quarters rows)
+  { deck: 'main', angle: 2.09, z: 180 },  // even step 3 (gap between mess hall and education arch)
+  { deck: 'main', angle: 2.99, z: 300 },  // even step 4 (edu, open deck)
+  { deck: 'main', angle: 3.89, z: 100 },  // even step 5 (tech, open deck)
+  { deck: 'main', angle: 4.79, z: 200 },  // even step 6 (past the gallery span; clear of classroom doorway)
+  { deck: 'main', angle: 5.68, z: 280 },  // even step 7 (edu, open deck)
 ];
 for (const tp of REVIEW_TERMINALS_POS) {
   const trad = new THREE.Vector3(Math.cos(tp.angle), Math.sin(tp.angle), 0);
@@ -4823,8 +4831,8 @@ document.getElementById('btn-tool-close').addEventListener('pointerdown', functi
 });
 // ---------- Round 30 review terminals (EIGHT) ----------
 // Gold consoles spread across the industrial half: one on the gallery
-// upper deck (mezzanine), seven on the industrial main deck (two in the
-// Residential Zone city).
+// upper deck (mezzanine), seven on the industrial main deck, spread
+// evenly around the hull.
 // Trigger is LEVEL-GATED per terminal: mezzanine terminals fire only
 // when galleryFactor >= 0.9 (fully on the upper deck; ramps give 0-1,
 // main deck outside the arc gives 0), and main-deck terminals fire only
