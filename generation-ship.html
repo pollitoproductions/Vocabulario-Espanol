@@ -329,7 +329,6 @@
   <div class="row"><span>WORDS COLLECTED</span><b id="progWords">0 / 1000</b></div>
   <div class="row"><span>COGNATES SPOKEN</span><b id="progCog">0 / 487</b></div>
   <div class="row"><span>IDIOMS SPOKEN</span><b id="progIdioms">0 / 135</b></div>
-  <div class="row"><span>WORDS PRACTICED</span><b id="progPractice">0 / 1000</b></div>
   <div class="row"><span>CONJUGATION SPOKEN</span><b id="progConj">0 / 1695</b></div>
   <div class="row"><span>DICTATION SPOKEN</span><b id="progDict">0 / 2830</b></div>
   <div class="row"><span>SER VS. ESTAR SPOKEN</span><b id="progSer">0 / 100</b></div>
@@ -3335,17 +3334,20 @@ function updateMenu() {
   }
   updateProgressUI();
 }
-// PROGRESS submenu counts. Words come from the live collected tiles;
-// the six spoken sets live in prog (see save section) and are restored
-// from the save on Resume. Totals come from the data arrays, never typed
-// twice, so they cannot drift from the content.
+// PROGRESS submenu counts. Words come from the live collected tiles
+// (collecting a tile requires speaking it, so the words line already
+// proves practice — no separate practice line). The five spoken sets
+// live in prog (see save section) and are restored from the save on
+// Resume; station-spoken words are still credited in prog.practice
+// for the station's known-exclusion and the review panel, just not
+// shown as their own line. Totals come from the data arrays, never
+// typed twice, so they cannot drift from the content.
 function updateProgressUI() {
   const setTxt = function (id, n, total) { const el = document.getElementById(id); if (el) el.textContent = n + ' / ' + total; };
   let wc = 0; for (const w of wordTiles) if (w.collected) wc++;
   setTxt('progWords', wc, wordTiles.length);
   setTxt('progCog', prog.cognates.size, TOOL_COG.length);
   setTxt('progIdioms', prog.idioms.size, TOOL_IDIOMS.length);
-  setTxt('progPractice', prog.practice.size, WORDS.length);
   setTxt('progConj', prog.conjugation.size, TOOL_VERBS.length * 5 * 3);
   setTxt('progDict', prog.dictation.size, WORDS.length + TOOL_VERBS.length * 5 * 3 + TOOL_IDIOMS.length);
   setTxt('progSer', prog.serestar.size, TOOL_SER.length);
