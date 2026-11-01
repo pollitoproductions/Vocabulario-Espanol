@@ -4022,17 +4022,15 @@ function updateFlight(dt) {
   // and the mothership no longer slants with port angle.
   camera.up.copy(camUp);
   // CENTER (Brant: centered for navigation): with offsets eased to
-  // zero the look target below is straight ahead along the nose — the camera sits
-  // on the shuttle's tail axis looking forward past it. NO aim
-  // override exists anymore: neither port-aim nor axial-aim may
-  // hijack the view direction. Guidance arrow logic below is
-  // untouched (it reads the camera orientation, so a nose-forward
-  // view reads straight ahead).
-  let lookTarget = new THREE.Vector3(
-    shuttle.position.x + camFwd.x * 12,
-    shuttle.position.y + camFwd.y * 12,
-    shuttle.position.z + camFwd.z * 12
-  );
+  // zero the look target below is the shuttle itself — the camera sits
+  // on the shuttle's tail axis 7 m up, angled down at the craft
+  // (view pitched ~19 deg down instead of ~12 deg when the target was
+  // 12 m ahead), so the top of the craft reads in frame and the craft
+  // sits centered instead of below-center. NO aim override exists
+  // anymore: neither port-aim nor axial-aim may hijack the view
+  // direction. Guidance arrow logic below is untouched (it reads the
+  // camera orientation, so a nose-forward view reads straight ahead).
+  let lookTarget = shuttle.position.clone();
   camera.lookAt(lookTarget);
   // Flight nav readout (navigation aid ONLY — display only, never moves the
   // shuttle): screen-space direction from the camera to the NEAREST of the
