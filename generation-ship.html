@@ -88,13 +88,12 @@
   #btn-jump { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); font-size: 17px; }
   /* Breakout pattern, copied from backrooms-breakout: right-edge columns
      right 16 / right 91 (48px button + 27px gap), rows bottom 26 / bottom 101
-     (48px + 27px gap). All nine buttons live in this bottom-right zone. */
+     (48px + 27px gap). All eight buttons live in this bottom-right zone. */
   /* MINE is 56 px + cyan accent so it stands out at a glance in range;
-     same slot (right 91 / bottom 101): CENTER spans right 16–72, MINE
-     spans right 91–147, so the 19 px gap holds and both row tops sit
-     at 157 — no overlap with CENTER or LOOK. */
+     it sits at right 91 / bottom 101 (row top 157), with no overlap
+     with LOOK. The right 16–72 slot at bottom 101 is empty since
+     CENTER was removed (Oct 31 — camera is fully manual via look). */
   #btn-mine { width: 56px; height: 56px; right: calc(91px + env(safe-area-inset-right, 0px)); bottom: calc(101px + env(safe-area-inset-bottom, 0px)); border: 2px solid rgba(127, 227, 255, 0.9); background: linear-gradient(160deg, rgba(127, 227, 255, 0.35), rgba(127, 227, 255, 0.12)); box-shadow: 0 0 18px rgba(127, 227, 255, 0.55), 0 6px 18px rgba(0, 0, 0, 0.30); }
-  #btn-center { width: 56px; height: 56px; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(101px + env(safe-area-inset-bottom, 0px)); }
   #btn-looksteer { right: calc(91px + env(safe-area-inset-right, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
   #btn-brake { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
   /* EXIT (cells only) shares DEPART's slot at right 92 — the two never
@@ -336,7 +335,7 @@
   <div class="row"><span>SER VS. ESTAR SPOKEN</span><b id="progSer">0 / 100</b></div>
   <div class="controls">Progress counts spoken Spanish only \u2014 flipping, tapping, and listening don\u2019t count; English practice doesn\u2019t count either.</div>
   </div><button class="subHead" data-sub="status" data-label="SHIP STATUS" type="button">▸ SHIP STATUS</button><div class="subBody" id="sub-status">
-  <div class="row"><span>TRANSPONDER</span><b>ARK-7 // BEACON BROADCASTING</b></div>
+  <div class="row"><span>TRANSPONDER</span><b>BEACON 7 // BROADCASTING</b></div>
   <div class="row"><span>DRIVE</span><b id="menuDrive">DOCKED</b></div>
   <div class="row"><span>SPIN GRAVITY</span><b id="menuGrav"></b></div>
   <div class="row"><span>SPIN RATE</span><b id="menuRpm"></b></div>
@@ -347,9 +346,9 @@
   </div><button class="subHead" data-sub="manual" data-label="CREW MANUAL // CONTROLS" type="button">▸ CREW MANUAL // CONTROLS</button><div class="subBody" id="sub-manual">
   <div class="controls">
 <div class="mHead">DESKTOP</div>
-    <div class="mBody">Click to look &middot; WASD walk &middot; Shift run &middot; Q auto-walk &middot; Space jump &middot; F depart at an Exploration Terminal — one stands inside each hull port, eight in all (docking is automatic) &middot; H ship menu &middot; W/S thrust / retro &middot; A/D turn &middot; &uarr;/&darr; pitch &middot; Space or the BRAKE button to brake in flight &middot; hold M within 100 m of any asteroid to mine (about 3 seconds) &middot; R takes the fail screen&rsquo;s action after a crash &middot; in flight, the mouse looks around in LOOK mode or steers the ship in STEER mode (the LOOK/STEER button switches; A/D + &uarr;/&darr; steer in both modes; CENTER or C puts the camera directly behind the spacecraft, and it eases back there on its own when idle) &middot; the nav readout is always on while flying</div>
+    <div class="mBody">Click to look &middot; WASD walk &middot; Shift run &middot; Q auto-walk &middot; Space jump &middot; F depart at an Exploration Terminal — one stands inside each hull port, eight in all (docking is automatic) &middot; H ship menu &middot; W/S thrust / retro &middot; A/D turn &middot; &uarr;/&darr; pitch &middot; Space or the BRAKE button to brake in flight &middot; hold M within 100 m of any asteroid to mine (about 3 seconds) &middot; R takes the fail screen&rsquo;s action after a crash &middot; in flight, the mouse looks around in LOOK mode or steers the ship in STEER mode (the LOOK/STEER button switches; A/D + &uarr;/&darr; steer in both modes; the camera stays where you leave it — drag to look around) &middot; the nav readout is always on while flying</div>
     <div class="mHead">TOUCH</div>
-    <div class="mBody">Left half: floating stick (push to its edge to run) &middot; drag the right side: starts on STEER (drag steers the ship, drag up to climb; the LOOK/STEER button switches to LOOK mode, which looks around; the left stick steers in both modes; the view eases back on its own when idle; CENTER puts the camera directly behind the spacecraft) &middot; DEPART at an Exploration Terminal — one inside each hull port, eight in all (docking is automatic within 100 m of any port) &middot; JUMP while walking aboard &middot; hold MINE within 100 m of any asteroid (about 3 seconds) &middot; hold BRAKE to stop in flight &middot; &#9776; ship menu &middot; the nav readout is always on while flying</div>
+    <div class="mBody">Left half: floating stick (push to its edge to run) &middot; drag the right side: starts on STEER (drag steers the ship, drag up to climb; the LOOK/STEER button switches to LOOK mode, which looks around; the left stick steers in both modes; the camera stays where you leave it) &middot; DEPART at an Exploration Terminal — one inside each hull port, eight in all (docking is automatic within 100 m of any port) &middot; JUMP while walking aboard &middot; hold MINE within 100 m of any asteroid (about 3 seconds) &middot; hold BRAKE to stop in flight &middot; &#9776; ship menu &middot; the nav readout is always on while flying</div>
     <div class="mHead">LEARNING STATIONS</div>
     <div class="mBody">The six tool stations are walk-up consoles in the agriculture ring: walk up to a glowing ring and stand there a moment — it opens on its own (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). A station never blocks you &mdash; speaking is feedback only, except that spoken Spanish earns progress. On Practice, Conjugation, and Ser vs. estar, the audio row stays hidden until you answer &mdash; answer first, then listen.</div>
     <div class="mHead">CELLS</div>
@@ -430,8 +429,8 @@
 </div>
 <div id="titlePanel">
   <div id="titleCard">
-    <h1>GENERATION SHIP &mdash; ARK-7</h1>
-    <p id="titleStory">The ARK-7 carries more than people to the stars &mdash; it carries a second language. Back home, Spanish is fading from daily life. Aboard this ship, it lives: in the words drifting among the asteroids, in the classrooms and workshops, in the voices of the crew. Your journey: collect every word, speak it aloud, and keep the language alive for the next generation.</p>
+    <h1>GENERATION SHIP &mdash; BEACON 7</h1>
+    <p id="titleStory">The BEACON 7 carries more than people to the stars &mdash; it carries a second language. Back home, Spanish is fading from daily life. Aboard this ship, it lives: in the words drifting among the asteroids, in the classrooms and workshops, in the voices of the crew. Your journey: collect every word, speak it aloud, and keep the language alive for the next generation.</p>
     <div id="title-main-btns" style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap;">
       <button class="ctl2 primary" id="btn-title-resume" type="button" style="display:none">RESUME JOURNEY</button>
       <button class="ctl2" id="btn-title-begin" type="button">BEGIN NEW JOURNEY</button>
@@ -463,7 +462,6 @@
   <button class="ctl" id="btn-mode" type="button">DEPART</button>
   <button class="ctl" id="btn-jump" type="button">&#8679;<span class="lbl">JUMP</span></button>
   <button class="ctl" id="btn-mine" type="button" style="display:none">MINE</button>
-  <button class="ctl" id="btn-center" type="button" style="display:none">CENTER</button>
   <button class="ctl on" id="btn-looksteer" type="button" style="display:none">STEER</button>
   <button class="ctl" id="btn-brake" type="button" style="display:none">BRAKE</button>
   <button class="ctl" id="btn-exit" type="button" style="display:none">EXIT</button>
@@ -498,34 +496,21 @@ const SHUTTLE_THRUST = 12;    // m/s^2
 const SHUTTLE_YAW_RATE = 0.9; // rad/s
 const SHUTTLE_PITCH_RATE = 0.7; // rad/s
 // Decoupled flight camera (round 30 shuttle pass + LOOK/STEER toggle):
-// in LOOK mode (default) mouse drag / touch drag in flight looks around
+// in LOOK mode mouse drag / touch drag in flight looks around
 // the shuttle instead of steering it; in STEER mode the same drag steers
 // the ship (horizontal yaws, vertical pitches) and the camera does not
 // move. Steering is otherwise A/D + arrows + joystick. camYaw/camPitch
-// are the look offsets relative to the shuttle frame; any look input
-// sets them and resets the idle timer, cancelling the auto-ease
-// instantly. Recentering is the CENTER button (or C) plus idle auto-ease
-// (see the flight camera block in updateFlight).
-let camYaw = 0, camPitch = 0, lastCamInput = 0, lastFlightInput = 0;
-let lastMouseLookInput = 0; // mouse look moves only (touch look uses touchLookSeq)
-const CAM_IDLE_SECS = 3; // no look input this long -> ease back, even while flying (flight input does NOT block it — see flight camera block)
-const CAM_EASE_RATE = 0.6; // gentle lerp rate (time constant ~1.7 s, never a snap)
-// Round 30 CENTER button (Brant playtest reversal of the no-button rule):
-// the free camera needs an explicit recenter. Fast-ease rate ~3/s —
-// responsive but not a hard snap; look input cancels it instantly.
-const CAM_CENTER_RATE = 3;
-let centerEase = false, centerEaseStarted = 0;
-// Centerline height (round 30, Brant: camera lined up with the center
-// line + shuttle centered in frame): the old fixed +7 m put the camera
-// well above the shuttle, so the shuttle projected ~19 deg below frame
-// center. Brant: sitting a little above the shuttle is actually okay,
-// so the centered height is ~7 m: camHeight eases to 7 in the flight
-// camera block, the same height as looking around, so centering no
-// longer changes height at all — only the look offsets ease. At 7 m the
-// shuttle sits ~19 deg below center at 20 m back, but the camera looks
-// down onto the top of the craft, which is what Brant asked for next
-// (4 m did not show the top well enough).
-// Starts at 7: a fresh flight is the centered view.
+// are the look offsets relative to the shuttle frame; look input sets
+// them, and nothing else moves them: CENTER and the idle auto-ease
+// were removed Oct 31 (Brant: the look drag brings the camera behind
+// on its own and works smoother), so the camera stays exactly where
+// look leaves it until the player drags again.
+let camYaw = 0, camPitch = 0, lastFlightInput = 0;
+const CAM_EASE_RATE = 0.6; // gentle lerp rate for the height blend (time constant ~1.7 s, never a snap)
+// Camera height (round 30): fixed 7 m above the shuttle, looking down
+// at the shuttle itself, so the top of the craft reads in frame and
+// the craft sits centered (4 m did not show the top well enough).
+// Starts at 7: a fresh flight is the trailing view.
 let camHeight = 7;
 // Roll-free shuttle orientation (round 30, Brant: no wonky angles when
 // centered, shuttle flat despite the mothership's orientation):
@@ -538,34 +523,20 @@ let camHeight = 7;
 // shuttle more and more; and undock's shortest-arc +Z-to-tangent mapping
 // baked in a port-dependent bank. Both are gone.
 let shipYaw = 0, shipPitch = 0;
-// Touch look-grab generation: incremented on every touch look claim.
-// CENTER records the generation at press time and only a NEW grab after
-// the press cancels the ease — moves from a drag already in progress
-// when CENTER was tapped must not kill it (that was the "won't center"
-// failure in LOOK mode, where every look move refreshed lastCamInput).
-let touchLookSeq = 0, centerTouchSeq = 0;
-// CENTER (round 30, Brant: centered for navigation): tapping CENTER
-// eases the look offsets to zero, putting the camera straight behind
-// the shuttle on its tail axis, looking forward along the nose — the
-// view the shuttle is flown by. The height offset eases to ~7 m with
-// it, so the camera sits behind and well above the shuttle, looking
-// down onto its top, and the shuttle reads ~19 deg below-center in
-// frame (the old fixed +7 m left it there too — Brant now prefers the
-// top-down view over exact centering).
 // The camera NEVER leaves the shuttle:
-// no port-aim, no axial-aim, no detached viewpoint. Both earlier
-// overrides took the view OFF the shuttle Brant is flying (port-aim
-// stared at the mothership's side; axial-aim stared along the
-// mothership's axis), so both are removed. Cleared on undock.
-function centerCamera() { centerEase = true; centerEaseStarted = performance.now(); centerTouchSeq = touchLookSeq; }
+// no port-aim, no axial-aim, no detached viewpoint, and no CENTER
+// (removed Oct 31 — the look drag brings the camera behind on its
+// own). Both earlier overrides took the view OFF the shuttle Brant is
+// flying (port-aim stared at the mothership's side; axial-aim stared
+// along the mothership's axis), so both are removed. camYaw/camPitch
+// are cleared on undock.
 // Round 30 LOOK/STEER toggle (Brant playtest: on touch the left stick
 // gives yaw + thrust and right-side drag only moves the camera, so
 // there is NO ship-pitch input at all and flight is flat — the top of
 // the tile cloud is unreachable). Default STEER (Brant Oct 31: start on
 // steering — with LOOK default, dragging far left/right to turn only
-// spun the camera, and each new look-grab cancelled the CENTER ease,
-// so CENTER seemed to stop working; in STEER mode drags steer the ship
-// and never cancel CENTER). LOOK = right-side drag looks, ship steers
+// spun the camera; in STEER mode drags steer the ship and never move
+// the camera). LOOK = right-side drag looks, ship steers
 // on keys/joystick only; STEER = right-side drag
 // steers the SHIP instead of the camera: horizontal drag yaws, vertical
 // drag pitches, through the same rotateShuttle path. Drag deltas
@@ -574,9 +545,8 @@ function centerCamera() { centerEase = true; centerEaseStarted = performance.now
 // deflection at ~7 px/frame (~420 px/s swipe); typical drags give
 // partial deflection, so drag speed maps to turn rate, capped at the key
 // rates. Consumed and cleared every updateFlight, so a drag never
-// repeats. Drag-steering counts as flight input (the idle ease never
-// fights steering) but never touches lastCamInput, so a running CENTER
-// ease keeps easing the camera home while steering.
+// repeats. Drag-steering counts as flight input but never touches the
+// look offsets, so steering never fights the camera.
 let lookSteerMode = 'steer';
 let steerDragYaw = 0, steerDragPitch = 0;
 const STEER_DRAG_PER_PX = 0.15;
@@ -3150,7 +3120,6 @@ const failOverlay = document.getElementById('failOverlay');
 const menuWater = document.getElementById('menuWater');
 const menuMetal = document.getElementById('menuMetal');
 const btnMine = document.getElementById('btn-mine');
-const btnCenter = document.getElementById('btn-center');
 const btnLookSteer = document.getElementById('btn-looksteer');
 const btnBrake = document.getElementById('btn-brake');
 let brakeHeld = false; // hold-to-brake (BRAKE button; same decay as Space)
@@ -3189,7 +3158,6 @@ function hideNav() {
   wordLine.style.display = 'none';
   beaconWarn.style.display = 'none';
   beaconBeam.visible = false;
-  btnCenter.style.display = 'none';
   btnLookSteer.style.display = 'none';
   btnBrake.style.display = 'none';
 }
@@ -3225,7 +3193,7 @@ function crashMission(cause) {
   const canPay = water >= 10 && metal >= 10;
   failKind = !isCrash ? 'lost' : (!freeCrashUsed ? 'free' : (canPay ? 'pay' : 'over'));
   failTitle.textContent = failKind === 'over' ? 'GAME OVER' : 'MISSION FAILED';
-  failText.textContent = cause === 'asteroid' ? 'You crashed into an asteroid.' : cause === 'lost' ? 'LOST — you flew past the 50 km beacon limit. The ARK-7\'s beacon cannot reach you here.' : 'You crashed into the mothership.';
+  failText.textContent = cause === 'asteroid' ? 'You crashed into an asteroid.' : cause === 'lost' ? 'LOST — you flew past the 50 km beacon limit. The BEACON 7 cannot reach you here.' : 'You crashed into the mothership.';
   if (failKind === 'free') {
     failWarn.textContent = 'FIRST CRASH — FREE REPAIR. From now on, repairing your ship costs 10 WATER + 10 METAL. If you can\'t pay but have a save, you return to your last save; with no save, the journey ends. Mine asteroids and collect words to stay stocked.';
     failWarn.style.display = '';
@@ -3251,7 +3219,7 @@ function crashMission(cause) {
       btnRetry.style.display = '';
       btnFailTitle.style.display = 'none';
     } else {
-      failText.textContent = 'The journey ends — the ARK-7 could not be repaired.';
+      failText.textContent = 'The journey ends — the BEACON 7 could not be repaired.';
       failWarn.textContent = 'Repair costs 10 WATER + 10 METAL, but you have only ' + water + ' WATER and ' + metal + ' METAL.';
       failWarn.style.display = '';
       failHint.textContent = 'Press R or tap the button to return to the title screen.';
@@ -3403,7 +3371,7 @@ function undock() {
   shuttle.quaternion.setFromEuler(new THREE.Euler(shipPitch, shipYaw, 0, 'YXZ'));
   // Co-rotating start: the shuttle inherits the station's local velocity.
   shuttleVel.copy(tangent).multiplyScalar(OMEGA * rr);
-  camYaw = 0; camPitch = 0; centerEase = false; camHeight = 7; // fresh flight starts on the neutral trailing view (centered: above the craft, looking down on its top)
+  camYaw = 0; camPitch = 0; camHeight = 7; // fresh flight starts on the neutral trailing view (behind and above the craft, looking down on its top)
   shuttle.visible = true;
   btnMode.style.display = 'none';
   modeText.textContent = 'Departed';
@@ -3489,15 +3457,13 @@ document.addEventListener('mousemove', function (e) {
     // NEVER turns the ship. STEER: dragging steers the SHIP instead —
     // horizontal drag yaws, vertical drag pitches — accumulated as pixel
     // deltas for updateFlight; the camera does not move at all.
-    // Steering is A/D + arrows + joystick in both modes. Any look input
-    // resets the idle timer, cancelling the auto-ease instantly.
+    // Steering is A/D + arrows + joystick in both modes.
     if (lookSteerMode === 'steer') {
       steerDragYaw += e.movementX; steerDragPitch += e.movementY;
       lastFlightInput = performance.now();
     } else {
       camYaw -= e.movementX * 0.0022;
       camPitch = Math.max(-1.45, Math.min(1.45, camPitch - e.movementY * 0.0022));
-      lastCamInput = performance.now(); lastMouseLookInput = performance.now();
     }
   }
 });
@@ -3520,7 +3486,6 @@ document.addEventListener('keydown', function (e) {
   if (e.code === 'KeyQ' && !e.repeat) toggleAutoWalk();
   if (e.code === 'KeyR' && !e.repeat) retryMission();
   if (e.code === 'KeyE' && !e.repeat && inCell) exitCell();
-  if (e.code === 'KeyC' && !e.repeat && mode === 'flight' && !crashed && !collectOpen && !toolOpen && !reviewOpen && !menuOn) centerCamera();
   keys[e.code] = true;
 });
 document.addEventListener('keyup', function (e) { keys[e.code] = false; });
@@ -3543,7 +3508,6 @@ canvas.addEventListener('pointerdown', function (e) {
   if (e.clientX <= window.innerWidth * 0.5) return; // left half is joystick territory
   if (lookPointerId !== null) return;
   lookPointerId = e.pointerId; lastLookX = e.clientX; lastLookY = e.clientY;
-  if (!(mode === 'flight' && lookSteerMode === 'steer')) touchLookSeq++; // STEER grabs steer the ship, not the camera: they must not cancel CENTER
 });
 window.addEventListener('pointermove', function (e) {
   if (e.pointerId === lookPointerId) {
@@ -3569,7 +3533,6 @@ window.addEventListener('pointermove', function (e) {
       // the left stick + A/D + arrows.
       camYaw -= dx * 0.005;
       camPitch = Math.max(-1.45, Math.min(1.45, camPitch - dy * 0.005));
-      lastCamInput = performance.now();
     }
   } else if (e.pointerId === joyPointerId) {
     let dx = (e.clientX - joyCX) / joyRad, dy = (e.clientY - joyCY) / joyRad;
@@ -3945,65 +3908,24 @@ function updateFlight(dt) {
   // heading — mouse drag / touch drag looks around, A/D + arrows +
   // joystick steer. Neutral (offsets zero) trails the shuttle directly
   // behind its NOSE (never the velocity — the old velocity blend swung
-  // the view 180° on thrust reversal). Idle auto-ease ONLY: with no
-  // look input for CAM_IDLE_SECS, the offsets ease gently toward zero
-  // (slow lerp, never a snap) — EVEN WHILE FLYING. Flight input used
-  // to block this too, which meant a look angle set once would stick
-  // around through every maneuver: pitching or yawing then rotated
-  // that stale offset with the ship frame until the camera could end
-  // up in front of the shuttle, and with the camera flipped the
-  // ship-relative joystick felt reversed on screen. Steering never
-  // touches the look offsets, so easing them while steering fights
-  // nothing; any fresh look input cancels instantly by resetting the
-  // timer and setting fresh offsets. CENTER button (or C) fast-eases the offsets to zero; a NEW look-grab after the press cancels that ease.
-  const nowMs = performance.now();
-  if (nowMs - lastCamInput > CAM_IDLE_SECS * 1000) {
-    const k = 1 - Math.exp(-CAM_EASE_RATE * dt);
-    camYaw *= (1 - k); camPitch *= (1 - k);
-  }
-  // CENTER button ease: fast (~3/s) toward zero, cancelled only by a NEW
-  // look-grab after the press (touchLookSeq) or a mouse look move after
-  // the press. Moves from a touch drag already in progress at press time
-  // do NOT cancel — otherwise CENTER could never complete in LOOK mode
-  // while the look finger was still moving.
-  if (centerEase) {
-    // CENTER ease: fast (~3/s) toward zero offsets, cancelled only by
-    // a NEW look-grab after the press (touchLookSeq) or a mouse look
-    // move after the press. STEER-mode grabs never cancel it (they
-    // steer the ship, not the camera). Once the offsets hit zero the
-    // view IS the nose-forward chase view, so no separate aim flag is
-    // needed: the chase view persists until fresh look input moves
-    // the offsets again, and the idle ease settles to the same view.
-    if (touchLookSeq !== centerTouchSeq || lastMouseLookInput > centerEaseStarted) { centerEase = false; }
-    else {
-      const ck = 1 - Math.exp(-CAM_CENTER_RATE * dt);
-      camYaw *= (1 - ck); camPitch *= (1 - ck);
-      if (Math.abs(camYaw) < 0.005 && Math.abs(camPitch) < 0.005) { camYaw = 0; camPitch = 0; centerEase = false; }
-    }
-  }
-  // Centerline height (round 30, Brant: camera lined up with the center
-  // line + shuttle centered in frame): the old fixed +7 m sat the camera
-  // well above the shuttle, so the shuttle projected ~19 deg below frame
-  // center. When the view is centered — CENTER armed, idle-settled, or
-  // offsets already at zero — the height offset eases to ~7 m, putting
-  // the camera behind and well above the shuttle, looking straight
-  // forward along the nose and down onto its top: the shuttle sits
-  // ~19 deg below center at 20 m back. That height matches looking
-  // around, so centering no longer moves the height, only the offsets.
-  // Eased, never snapped (the camera position itself is additionally
-  // lerped at 8/s below).
-  const idleSettling = (nowMs - lastCamInput > CAM_IDLE_SECS * 1000); // look-idle only: flight input does not block settling back behind
-  const wantCentered = centerEase || idleSettling || (Math.abs(camYaw) < 0.005 && Math.abs(camPitch) < 0.005);
-  const heightRate = centerEase ? CAM_CENTER_RATE : CAM_EASE_RATE;
-  camHeight += (7 - camHeight) * (1 - Math.exp(-heightRate * dt)); // height is now constant 7 m in every view; only the offsets ease
+  // the view 180° on thrust reversal). There is NO auto-centering:
+  // CENTER and the idle auto-ease were removed Oct 31 (Brant: the look
+  // drag brings the camera behind on its own and works smoother), so
+  // the offsets change only on fresh look input and the camera stays
+  // exactly where look leaves it. Steering never touches the look
+  // offsets, so steering fights nothing.
+  // Camera height is fixed 7 m above the shuttle (look target = the
+  // shuttle itself, so the top reads in frame). Eased, never snapped
+  // (the camera position itself is additionally lerped at 8/s below).
+  camHeight += (7 - camHeight) * (1 - Math.exp(-CAM_EASE_RATE * dt)); // height is constant 7 m; the blend only smooths the undock reset
   // Neutral trailing is NOSE-ONLY (round 30 fix): the camera base trails
   // the spacecraft's nose direction, never the velocity. The old blend
   // toward velocity swung the neutral 180° when velocity passed through
   // zero during a thrust reversal — that was the view-flip Brant saw.
   // Nose-trailing moves only with ship yaw (0.9 rad/s), so it can never
-  // flip on reversal. CENTER / C fast-eases the offsets to zero, which
-  // IS the nose-forward chase view; idle ease settles to that same
-  // view. Neither aims the view anywhere else. No look computation
+  // flip on reversal. With offsets at zero the view IS the
+  // nose-forward chase view. Neither aims the view anywhere else.
+  // No look computation
   // here is origin-relative: the camera sits on shuttle.position plus
   // nose-derived offsets, never on the map centre.
   const neutralFwd = fwd.clone();
@@ -4021,8 +3943,8 @@ function updateFlight(dt) {
   // behind, the horizon reads level (never diagonal, pitched or not),
   // and the mothership no longer slants with port angle.
   camera.up.copy(camUp);
-  // CENTER (Brant: centered for navigation): with offsets eased to
-  // zero the look target below is the shuttle itself — the camera sits
+  // Look target (Brant: angled down at the craft): with no look
+  // offset the look target below is the shuttle itself — the camera sits
   // on the shuttle's tail axis 7 m up, angled down at the craft
   // (view pitched ~19 deg down instead of ~12 deg when the target was
   // 12 m ahead), so the top of the craft reads in frame and the craft
@@ -4081,12 +4003,10 @@ function updateFlight(dt) {
     beaconBeamMat.opacity = 0.4 * Math.max(0, Math.min(1, (dist - 500) / 2500));
     beaconBeam.visible = true;
     navLine.style.display = 'flex';
-    // CENTER button: flight only — hidden docked / crashed / while any
+    // LOOK/STEER toggle: flight only — hidden docked / crashed / while any
     // prompt or panel is open (collect, station, review, menu).
-    btnCenter.style.display = (mode === 'flight' && !crashed && !collectOpen && !toolOpen && !reviewOpen && !menuOn) ? '' : 'none';
-    // LOOK/STEER toggle: same flight-only visibility as CENTER.
     btnLookSteer.style.display = (mode === 'flight' && !crashed && !collectOpen && !toolOpen && !reviewOpen && !menuOn) ? '' : 'none';
-    // BRAKE button: same flight-only visibility as CENTER.
+    // BRAKE button: flight only — same visibility as LOOK/STEER.
     btnBrake.style.display = (mode === 'flight' && !crashed && !collectOpen && !toolOpen && !reviewOpen && !menuOn) ? '' : 'none';
     // Word guidance (guidance round, round 30 correction): gold arrow +
     // distance to the nearest uncollected, unsuppressed item of ANY type
@@ -4525,11 +4445,6 @@ btnCollectMic.addEventListener('click', function () {
 document.getElementById('btn-collect-leave').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur(); closeCollect(false);
 });
-// CENTER button: pointerdown (not click) so it fires mid-steer while
-// another finger steers — the same pattern as the other flight buttons.
-// Puts the flight camera directly behind the spacecraft (nose-trailing)
-// with the fast ease; a NEW look-grab after the press cancels (see below).
-document.getElementById('btn-center').addEventListener('pointerdown', function (e) { e.preventDefault(); e.target.blur(); centerCamera(); });
 // LOOK/STEER toggle: pointerdown (not click) so it fires mid-steer.
 // Switches drag between looking (camera) and steering (ship) in flight;
 // the label and .on state show the current mode. No key binding.
@@ -5955,7 +5870,7 @@ function showTitle(journeyEnded) {
     titleResumeSummary.textContent = 'Saved journey \u2014 WATER ' + s.water + ' \u00b7 METAL ' + s.metal + ' \u00b7 Words ' + s.words.length + '/' + wordTiles.length + ' collected';
   } else {
     btnTitleResume.style.display = 'none';
-    titleResumeSummary.textContent = journeyEnded ? 'The journey ended — the ARK-7 could not be repaired.' : '';
+    titleResumeSummary.textContent = journeyEnded ? 'The journey ended — the BEACON 7 could not be repaired.' : '';
   }
   titleMainBtns.style.display = 'flex';
   titleConfirm.style.display = 'none';
