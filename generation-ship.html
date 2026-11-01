@@ -686,10 +686,10 @@ const slices = 6;
 const sliceLen = LENGTH / slices;
 
 // ---------- ROUND 27 — textures + lived-in dressing ----------
-// Image textures load from the textures/ folder next to this file
+// Image textures load from the image files next to this file (Oct 31: the class repo holds them loose at root, no subfolder)
 // (relative paths, so the hosted Pages copy resolves them). Every
 // material starts life with its flat-color or procedural-canvas look,
-// and a loaded photo only UPGRADES it: if textures/ is missing or a
+// and a loaded photo only UPGRADES it: if an image is missing or a
 // load fails (notably file:// in Safari), onError keeps the fallback
 // and the game runs exactly as before. No external image URLs anywhere.
 const texLoader = new THREE.TextureLoader();
@@ -800,12 +800,12 @@ pipeGeo.rotateX(Math.PI / 2);
 const pipeMat = new THREE.MeshStandardMaterial({ color: 0x4a5560, roughness: 0.8, metalness: 0.3 });
 // Shared habitat materials (photo upgrades, flat fallback).
 const habitatBoxMat = new THREE.MeshStandardMaterial({ color: 0x8a7a5c, roughness: 0.9 });
-applyGameTexture(habitatBoxMat, 'textures/habitat.jpg', 2, 1);
+applyGameTexture(habitatBoxMat, 'habitat.jpg', 2, 1);
 const habitatBandMat = new THREE.MeshStandardMaterial({ color: 0x8a7a5c, roughness: 0.9, side: THREE.BackSide });
-applyGameTexture(habitatBandMat, 'textures/habitat.jpg', 24, 1);
+applyGameTexture(habitatBandMat, 'habitat.jpg', 24, 1);
 const agriHullMat = new THREE.MeshStandardMaterial({ map: makeTerrainTexture(), roughness: 1, metalness: 0, side: THREE.BackSide });
 const chromeHullMat = new THREE.MeshStandardMaterial({ map: makeBrushedMetalTexture(), color: 0xffffff, roughness: 0.35, metalness: 0.85, side: THREE.BackSide });
-applyGameTexture(chromeHullMat, 'textures/tech-interior.jpg', 28, 4); // Round 30: paneled tech interior on the industrial sleeve (brushed chrome stays the fallback)
+applyGameTexture(chromeHullMat, 'tech-interior.jpg', 28, 4); // Round 30: paneled tech interior on the industrial sleeve (brushed chrome stays the fallback)
 for (const [zC, mat] of [[-LENGTH / 4, agriHullMat], [LENGTH / 4, chromeHullMat]]) {
   const geo = new THREE.CylinderGeometry(RADIUS, RADIUS, LENGTH / 2, 48, 1, true);
   geo.rotateX(Math.PI / 2); // cylinder axis (Y) -> Z
@@ -839,7 +839,7 @@ const hullGeo = new THREE.CylinderGeometry(RADIUS + 1, RADIUS + 1, LENGTH, 64, 1
 hullGeo.rotateX(Math.PI / 2);
 const extHullMat = new THREE.MeshStandardMaterial({ color: 0x878f99, roughness: 0.45, metalness: 0.7, side: THREE.FrontSide });
 ship.add(new THREE.Mesh(hullGeo, extHullMat));
-applyGameTexture(extHullMat, 'textures/hull-panels.jpg', 28, 7);
+applyGameTexture(extHullMat, 'hull-panels.jpg', 28, 7);
 const capOutMat = new THREE.MeshStandardMaterial({ color: 0x7d858f, roughness: 0.5, metalness: 0.7 });
 for (const s of [1, -1]) {
   const cap = new THREE.Mesh(new THREE.CircleGeometry(RADIUS + 1, 48), capOutMat);
@@ -1290,7 +1290,7 @@ for (const eb of ENTERABLES) {
 // with crop rows. Nothing agricultural is placed in the industrial half.
 {
   const cropBedMat = new THREE.MeshStandardMaterial({ color: 0x6a7a5a, roughness: 1 });
-  applyGameTexture(cropBedMat, 'textures/crops.jpg', 2, 24);
+  applyGameTexture(cropBedMat, 'crops.jpg', 2, 24);
   // Round 30 realism — plants read as PLANTS, not polygonal blobs:
   // a procedurally canvas-drawn leaf texture (leaf shapes with alpha
   // gaps, no external asset) on crossed leaf planes + a stem, merged
@@ -1616,7 +1616,7 @@ for (const eb of ENTERABLES) {
   const ceilGeo = new THREE.CylinderGeometry(140, 140, 320, 48, 1, true);
   ceilGeo.rotateX(Math.PI / 2);
   const ceilMat = new THREE.MeshStandardMaterial({ color: 0x2b323c, roughness: 0.9, side: THREE.DoubleSide });
-  applyGameTexture(ceilMat, 'textures/ceiling-panels.jpg', 24, 8); // Round 30: paneled ceiling (flat dark stays the fallback)
+  applyGameTexture(ceilMat, 'ceiling-panels.jpg', 24, 8); // Round 30: paneled ceiling (flat dark stays the fallback)
   const ceil = new THREE.Mesh(ceilGeo, ceilMat);
   ceil.position.z = 160;
   ship.add(ceil);
@@ -1667,7 +1667,7 @@ for (const eb of ENTERABLES) {
   const GZ0 = 60, GZ1 = 140, SEG = 10;
   const podiumMat = new THREE.MeshStandardMaterial({ color: 0x39424e, roughness: 0.85 });
   const wallMat = new THREE.MeshStandardMaterial({ color: 0x5a5f66, roughness: 0.85 });
-  applyGameTexture(wallMat, 'textures/tech-interior.jpg', 1, 1); // Round 30: paneled tech interior on the gallery back wall
+  applyGameTexture(wallMat, 'tech-interior.jpg', 1, 1); // Round 30: paneled tech interior on the gallery back wall
   const pillarMat = new THREE.MeshStandardMaterial({ color: 0x4a5560, roughness: 0.8, metalness: 0.3 });
   const railMat2 = new THREE.MeshStandardMaterial({ color: 0x8a97a5, roughness: 0.5, metalness: 0.5 });
   const warmMat = new THREE.MeshBasicMaterial({ color: 0xffc27a });
@@ -2093,7 +2093,7 @@ for (const eb of ENTERABLES) {
   // Round 30: promenade partitions share one material carrying the
   // home-interior texture (flat gray stays the fallback).
   const lowWallMat = new THREE.MeshStandardMaterial({ color: 0x4a5560, roughness: 0.85 });
-  applyGameTexture(lowWallMat, 'textures/home-interior.jpg', 6, 1);
+  applyGameTexture(lowWallMat, 'home-interior.jpg', 6, 1);
   function lowWall(angle, z0, z1, h) {
     const radial = new THREE.Vector3(Math.cos(angle), Math.sin(angle), 0);
     const wall = new THREE.Mesh(new THREE.BoxGeometry(0.5, h, z1 - z0),
@@ -2252,7 +2252,7 @@ for (const eb of ENTERABLES) {
   // areas: thin slabs set slightly into the deck (walk height is
   // analytic, so plates are visual only), one shared material.
   const deckFloorMat = new THREE.MeshStandardMaterial({ color: 0x6b4a2a, roughness: 0.8 });
-  applyGameTexture(deckFloorMat, 'textures/deck-floor.jpg', 4, 12);
+  applyGameTexture(deckFloorMat, 'deck-floor.jpg', 4, 12);
   for (const [fa, zc, w, len] of [[1.6, 115, 24, 110], [2.05, 110, 28, 50], [1.6, 242.5, 24, 55], [2.05, 235, 28, 30]]) {
     const frad = new THREE.Vector3(Math.cos(fa), Math.sin(fa), 0);
     const plate = new THREE.Mesh(new THREE.BoxGeometry(w, 0.3, len), deckFloorMat);
@@ -2684,7 +2684,7 @@ function updateCellWalk(dt) {
 // ---------- Shuttle (undocked) ----------
 const shuttle = new THREE.Group();
 const shuttleBodyMat = new THREE.MeshStandardMaterial({ color: 0xd8dde2, roughness: 0.35, metalness: 0.65 });
-applyGameTexture(shuttleBodyMat, 'textures/hull-panels.jpg', 2, 1); // round 30 shuttle pass: paneled hull; flat light-grey stays the fallback
+applyGameTexture(shuttleBodyMat, 'hull-panels.jpg', 2, 1); // round 30 shuttle pass: paneled hull; flat light-grey stays the fallback
 const fuselageGeo = new THREE.CapsuleGeometry(1.05, 3.0, 6, 18);
 fuselageGeo.rotateX(Math.PI / 2); // capsule axis (Y) -> Z (shuttle forward)
 shuttle.add(new THREE.Mesh(fuselageGeo, shuttleBodyMat));
@@ -2712,7 +2712,7 @@ function makeWingGeometry() {
 }
 const wingGeo = makeWingGeometry();
 const wingMat = new THREE.MeshStandardMaterial({ color: 0xd8dde2, roughness: 0.35, metalness: 0.65, side: THREE.DoubleSide });
-applyGameTexture(wingMat, 'textures/hull-panels.jpg', 2, 1); // round 30 shuttle pass: wings + fin share the hull panels; flat light-grey stays the fallback
+applyGameTexture(wingMat, 'hull-panels.jpg', 2, 1); // round 30 shuttle pass: wings + fin share the hull panels; flat light-grey stays the fallback
 const wingR = new THREE.Mesh(wingGeo, wingMat);
 wingR.position.set(0.6, -0.1, -0.3);
 shuttle.add(wingR);
@@ -2784,7 +2784,7 @@ function makeRockTexture() {
   return t;
 }
 const rockMat = new THREE.MeshStandardMaterial({ map: makeRockTexture(), roughness: 1, metalness: 0.05, flatShading: true });
-applyGameTexture(rockMat, 'textures/rock.jpg', 2, 2);
+applyGameTexture(rockMat, 'rock.jpg', 2, 2);
 const rockGeoVariants = [makeCraggyGeo(0), makeCraggyGeo(13), makeCraggyGeo(29), makeCraggyGeo(47)];
 const asteroids = [];    // belt rocks: { mesh, radius, spinAxis, spinRate }
 const auraAsteroids = []; // mineables: { mesh, ring, halo, coma, type, radius, mined } — the 4 specials first (save-compatible indices 0-3), then the 36 belt rocks appended below (type 'metal'), so the mining loop, yields, save and restore all cover every belt rock unchanged
