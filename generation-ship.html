@@ -1521,8 +1521,51 @@ function basisQuat(radial) {
       }
     }
   }
+  // Doubled fields: eight more crop beds (same bed + veg-row pattern,
+  // 40 plants per row, not denser rows), plus crates and pipes along
+  // them. Angles dodge every station console, the existing beds and
+  // strips, the Greenhouse trees, the sheds, the orchards, and the
+  // extra trees; all plants sit at z <= -46, clear of the bulkhead.
+  for (const [bi, fa] of [0.11, 1.025, 1.45, 2.1, 2.75, 3.55, 4.3, 5.275].entries()) {
+    const radial = new THREE.Vector3(Math.cos(fa), Math.sin(fa), 0);
+    const tang = new THREE.Vector3(-Math.sin(fa), Math.cos(fa), 0);
+    const bed = new THREE.Mesh(new THREE.BoxGeometry(6, 0.8, 240), cropBedMat);
+    bed.position.copy(radial).multiplyScalar(RADIUS - 0.4);
+    bed.position.z = -165;
+    bed.quaternion.copy(basisQuat(radial));
+    ship.add(bed);
+    for (const row of vegRows) {
+      for (let k = 0; k < 40; k++) {
+        const plant = new THREE.Mesh(row.geo, row.mat);
+        const s = 0.85 + (((k * 7 + bi * 3) % 5) * 0.1);
+        plant.scale.set(s, s * row.squash, s);
+        plant.position.copy(radial).multiplyScalar(RADIUS - 1.2).add(tang.clone().multiplyScalar(row.off));
+        plant.position.z = -292 + k * 6.3;
+        plant.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), radial.clone().negate());
+        ship.add(plant);
+      }
+    }
+  }
+  for (let ci = 0; ci < 8; ci++) {
+    const fa = [0.11, 1.025, 1.45, 2.1, 2.75, 3.55, 4.3, 5.275][ci];
+    const radial = new THREE.Vector3(Math.cos(fa), Math.sin(fa), 0);
+    const tang = new THREE.Vector3(-Math.sin(fa), Math.cos(fa), 0);
+    const crate = new THREE.Mesh(crateGeo, crateMat);
+    crate.position.copy(radial).multiplyScalar(RADIUS - 0.6).add(tang.clone().multiplyScalar(ci % 2 === 0 ? 3.6 : -3.6));
+    crate.position.z = -270 + ci * 25;
+    crate.quaternion.copy(basisQuat(radial));
+    ship.add(crate);
+  }
+  for (const fa of [0.11, 1.025, 1.45, 2.1, 2.75, 3.55, 4.3, 5.275]) {
+    const radial = new THREE.Vector3(Math.cos(fa), Math.sin(fa), 0);
+    const pipe = new THREE.Mesh(pipeGeo, pipeMat);
+    pipe.position.copy(radial).multiplyScalar(RADIUS - 0.5);
+    pipe.position.z = -165;
+    pipe.quaternion.copy(basisQuat(radial));
+    ship.add(pipe);
+  }
   // Orchards: 8 trees each (trunk + canopy, same shared geometries).
-  for (const [ca, cz] of [[0.3, -220], [5.1, -120], [3.15, -80]]) {
+  for (const [ca, cz] of [[0.3, -220], [5.1, -120], [3.15, -80], [2.4, -60], [0.45, -150], [4.6, -260]]) {
     const radial = new THREE.Vector3(Math.cos(ca), Math.sin(ca), 0);
     const tang = new THREE.Vector3(-Math.sin(ca), Math.cos(ca), 0);
     const up = radial.clone().negate();
@@ -2203,7 +2246,7 @@ function basisQuat(radial) {
 // The residential pattern spreads across the whole upper half (everything
 // that is not agriculture): axial streets ring the half, seven town
 // squares sit centered on the seven main-deck review terminals (the
-// terminals themselves do not move), and eight neighborhoods fill the
+// terminals themselves do not move), and sixteen neighborhoods fill the
 // gaps between the existing city, the quarters row, the gallery, the
 // cell doorways, and the exploration terminals. The schoolhouse stays
 // the only school. The gallery platform and its stairs are left alone
@@ -2325,19 +2368,19 @@ function basisQuat(radial) {
     fillBox(g, 6, 0.15, 270, fillStreetMat, 0, 0, 0);
   }
   // Town squares: a plaza disc centered on each main-deck review terminal,
-  // with lamps and stalls around it. Two squares are tight: the (1.20,180)
+  // with lamps and stalls around it. One square is tight: the (1.20,180)
   // square sits in the gap between the quarters row and the existing city
   // (its west lamps/stall would land inside a quarters unit, so they are
-  // omitted), and the (3.89,100) square shares ground with an exploration
-  // terminal (its east lamps/stall would crowd the DEPART approach, so
-  // they are omitted). The terminals themselves are untouched.
-  for (const [ta, tz] of [[0.30, 220], [1.20, 180], [2.09, 180], [2.99, 300], [3.89, 100], [4.79, 200], [5.68, 280]]) {
+  // omitted). The (3.89,100) square used to share ground with an exploration
+  // terminal, so its east lamps/stall were omitted; the review terminal has
+  // since moved to (3.89,140), and the full lamp/stall set is restored.
+  for (const [ta, tz] of [[0.30, 220], [1.20, 180], [2.09, 180], [2.99, 300], [3.89, 140], [4.79, 200], [5.68, 280]]) {
     const g = fillGroup(ta, tz, 0.12);
     const disc = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 0.2, 32), fillPlazaMat);
     g.add(disc);
   }
-  for (const [la, lz] of [[0.2437, 211], [0.2437, 229], [0.3563, 211], [0.3563, 229], [1.2562, 171], [1.2562, 189], [2.0337, 171], [2.0337, 189], [2.1462, 171], [2.1462, 189], [2.9338, 291], [2.9338, 309], [3.0463, 291], [3.0463, 309], [3.8338, 91], [3.9463, 91], [4.7337, 191], [4.7337, 209], [4.8463, 191], [4.8463, 209], [5.6237, 271], [5.6237, 289], [5.7363, 271], [5.7363, 289]]) fillLamp(la, lz);
-  [[0.225, 220], [0.375, 220], [1.275, 180], [2.015, 180], [2.165, 180], [2.915, 300], [3.065, 300], [3.815, 100], [4.715, 200], [4.865, 200], [5.605, 280], [5.755, 280]].forEach(([sa, sz], si) => {
+  for (const [la, lz] of [[0.2437, 211], [0.2437, 229], [0.3563, 211], [0.3563, 229], [1.2562, 171], [1.2562, 189], [2.0337, 171], [2.0337, 189], [2.1462, 171], [2.1462, 189], [2.9338, 291], [2.9338, 309], [3.0463, 291], [3.0463, 309], [3.8337, 131], [3.8337, 149], [3.9463, 131], [3.9463, 149], [4.7337, 191], [4.7337, 209], [4.8463, 191], [4.8463, 209], [5.6237, 271], [5.6237, 289], [5.7363, 271], [5.7363, 289]]) fillLamp(la, lz);
+  [[0.225, 220], [0.375, 220], [1.275, 180], [2.015, 180], [2.165, 180], [2.915, 300], [3.065, 300], [3.815, 140], [3.965, 140], [4.715, 200], [4.865, 200], [5.605, 280], [5.755, 280]].forEach(([sa, sz], si) => {
     const g = fillGroup(sa, sz, 0.4);
     fillBox(g, 0.25, 2.2, 0.25, fillStallPostMat, -1.5, 0.7, 0);
     fillBox(g, 0.25, 2.2, 0.25, fillStallPostMat, 1.5, 0.7, 0);
@@ -2345,7 +2388,7 @@ function basisQuat(radial) {
     fillBox(g, 3, 1, 0.6, fillBenchMat, 0, 0.1, 0.9);
     fillBox(g, 3.6, 0.1, 1.0, fillStallMats[si % fillStallMats.length], 0, 1.6, 1.4);
   });
-  // Neighborhoods: eight blocks, each a center lane with two house rows
+  // Neighborhoods: sixteen blocks, each a center lane with two house rows
   // facing it, a shop at each lane end (door toward the lane), gardens
   // and trees at the corners, and lamps along the lane. Houses keep the
   // city's flat roofs and textures; the school is not repeated anywhere.
@@ -2391,19 +2434,19 @@ function basisQuat(radial) {
       g.add(pl);
     }
   }
-  for (const [ha, hz, face] of [[0.4938, 130, 1], [0.4938, 143, 1], [0.4938, 157, 1], [0.4938, 170, 1], [0.6063, 130, -1], [0.6063, 143, -1], [0.6063, 157, -1], [0.6063, 170, -1], [0.5687, 230, 1], [0.5687, 243, 1], [0.5687, 257, 1], [0.5687, 270, 1], [0.6813, 230, -1], [0.6813, 243, -1], [0.6813, 257, -1], [0.6813, 270, -1], [2.6688, 90, 1], [2.6688, 103, 1], [2.6688, 117, 1], [2.6688, 130, 1], [2.7812, 90, -1], [2.7812, 103, -1], [2.7812, 117, -1], [2.7812, 130, -1], [2.3188, 230, 1], [2.3188, 243, 1], [2.3188, 257, 1], [2.3188, 270, 1], [2.4312, 230, -1], [2.4312, 243, -1], [2.4312, 257, -1], [2.4312, 270, -1], [3.3687, 130, 1], [3.3687, 143, 1], [3.3687, 157, 1], [3.3687, 170, 1], [3.4812, 130, -1], [3.4812, 143, -1], [3.4812, 157, -1], [3.4812, 170, -1], [3.7188, 240, 1], [3.7188, 253, 1], [3.7188, 267, 1], [3.7188, 280, 1], [3.8312, 240, -1], [3.8312, 253, -1], [3.8312, 267, -1], [3.8312, 280, -1], [5.1187, 180, 1], [5.1187, 193, 1], [5.1187, 207, 1], [5.1187, 220, 1], [5.2313, 180, -1], [5.2313, 193, -1], [5.2313, 207, -1], [5.2313, 220, -1], [5.4688, 180, 1], [5.4688, 193, 1], [5.4688, 207, 1], [5.4688, 220, 1], [5.5813, 180, -1], [5.5813, 193, -1], [5.5813, 207, -1], [5.5813, 220, -1]]) fillHouse(ha, hz, face);
-  [[0.55, 122, 1], [0.55, 178, -1], [0.625, 222, 1], [0.625, 278, -1], [2.725, 82, 1], [2.725, 138, -1], [2.375, 222, 1], [2.375, 278, -1], [3.425, 122, 1], [3.425, 178, -1], [3.775, 232, 1], [3.775, 288, -1], [5.175, 172, 1], [5.175, 228, -1], [5.525, 172, 1], [5.525, 228, -1]].forEach(([sa, sz, faceZ], si) => fillShop(sa, sz, faceZ, fillStallMats[si % fillStallMats.length]));
-  for (const [ga, gz] of [[0.4438, 150], [0.6562, 150], [0.5188, 250], [0.7312, 250], [2.6187, 110], [2.8313, 110], [2.2687, 250], [2.4813, 250], [3.3187, 150], [3.5312, 150], [3.6687, 260], [3.8813, 260], [5.0687, 200], [5.2812, 200], [5.4188, 200], [5.6313, 200]]) fillGarden(ga, gz);
-  for (const [ta, tz] of [[0.4438, 130], [0.4438, 170], [0.6562, 130], [0.6562, 170], [0.5188, 230], [0.5188, 270], [0.7312, 230], [0.7312, 270], [2.6187, 90], [2.6187, 130], [2.8313, 90], [2.8313, 130], [2.2687, 230], [2.2687, 270], [2.4813, 230], [2.4813, 270], [3.3187, 130], [3.3187, 170], [3.5312, 130], [3.5312, 170], [3.6687, 240], [3.6687, 280], [3.8813, 240], [3.8813, 280], [5.0687, 180], [5.0687, 220], [5.2812, 180], [5.2812, 220], [5.4188, 180], [5.4188, 220], [5.6313, 180], [5.6313, 220]]) fillTree(ta, tz);
-  for (const [la, lz] of [[0.5125, 135], [0.5125, 165], [0.5875, 135], [0.5875, 165], [0.5875, 235], [0.5875, 265], [0.6625, 235], [0.6625, 265], [2.6875, 95], [2.6875, 125], [2.7625, 95], [2.7625, 125], [2.3375, 235], [2.3375, 265], [2.4125, 235], [2.4125, 265], [3.3875, 135], [3.3875, 165], [3.4625, 135], [3.4625, 165], [3.7375, 245], [3.7375, 275], [3.8125, 245], [3.8125, 275], [5.1375, 185], [5.1375, 215], [5.2125, 185], [5.2125, 215], [5.4875, 185], [5.4875, 215], [5.5625, 185], [5.5625, 215]]) fillLamp(la, lz);
-  // Center lanes for the eight neighborhoods.
-  for (const [ca, cz] of [[0.55, 150], [0.625, 250], [2.725, 110], [2.375, 250], [3.425, 150], [3.775, 260], [5.175, 200], [5.525, 200]]) {
+  for (const [ha, hz, face] of [[0.4938, 130, 1], [0.4938, 143, 1], [0.4938, 157, 1], [0.4938, 170, 1], [0.6063, 130, -1], [0.6063, 143, -1], [0.6063, 157, -1], [0.6063, 170, -1], [0.5687, 230, 1], [0.5687, 243, 1], [0.5687, 257, 1], [0.5687, 270, 1], [0.6813, 230, -1], [0.6813, 243, -1], [0.6813, 257, -1], [0.6813, 270, -1], [2.6688, 90, 1], [2.6688, 103, 1], [2.6688, 117, 1], [2.6688, 130, 1], [2.7812, 90, -1], [2.7812, 103, -1], [2.7812, 117, -1], [2.7812, 130, -1], [2.3188, 230, 1], [2.3188, 243, 1], [2.3188, 257, 1], [2.3188, 270, 1], [2.4312, 230, -1], [2.4312, 243, -1], [2.4312, 257, -1], [2.4312, 270, -1], [3.3687, 130, 1], [3.3687, 143, 1], [3.3687, 157, 1], [3.3687, 170, 1], [3.4812, 130, -1], [3.4812, 143, -1], [3.4812, 157, -1], [3.4812, 170, -1], [3.7188, 240, 1], [3.7188, 253, 1], [3.7188, 267, 1], [3.7188, 280, 1], [3.8312, 240, -1], [3.8312, 253, -1], [3.8312, 267, -1], [3.8312, 280, -1], [5.1187, 180, 1], [5.1187, 193, 1], [5.1187, 207, 1], [5.1187, 220, 1], [5.2313, 180, -1], [5.2313, 193, -1], [5.2313, 207, -1], [5.2313, 220, -1], [5.4688, 180, 1], [5.4688, 193, 1], [5.4688, 207, 1], [5.4688, 220, 1], [5.5813, 180, -1], [5.5813, 193, -1], [5.5813, 207, -1], [5.5813, 220, -1], [4.2938, 220, 1], [4.4063, 220, -1], [4.2938, 233, 1], [4.4063, 233, -1], [4.2938, 247, 1], [4.4063, 247, -1], [4.2938, 260, 1], [4.4063, 260, -1], [4.1938, 100, 1], [4.3063, 100, -1], [4.1938, 113, 1], [4.3063, 113, -1], [4.1938, 127, 1], [4.3063, 127, -1], [4.1938, 140, 1], [4.3063, 140, -1], [5.9438, 180, 1], [6.0563, 180, -1], [5.9438, 193, 1], [6.0563, 193, -1], [5.9438, 207, 1], [6.0563, 207, -1], [5.9438, 220, 1], [6.0563, 220, -1], [0.1438, 100, 1], [0.2563, 100, -1], [0.1438, 113, 1], [0.2563, 113, -1], [0.1438, 127, 1], [0.2563, 127, -1], [0.1438, 140, 1], [0.2563, 140, -1], [0.1438, 240, 1], [0.2563, 240, -1], [0.1438, 253, 1], [0.2563, 253, -1], [0.1438, 267, 1], [0.2563, 267, -1], [0.1438, 280, 1], [0.2563, 280, -1], [3.0438, 130, 1], [3.1563, 130, -1], [3.0438, 143, 1], [3.1563, 143, -1], [3.0438, 157, 1], [3.1563, 157, -1], [3.0438, 170, 1], [3.1563, 170, -1], [3.0438, 240, 1], [3.1563, 240, -1], [3.0438, 253, 1], [3.1563, 253, -1], [3.0438, 267, 1], [3.1563, 267, -1], [3.0438, 280, 1], [3.1563, 280, -1], [0.8438, 230, 1], [0.9563, 230, -1], [0.8438, 243, 1], [0.9563, 243, -1], [0.8438, 257, 1], [0.9563, 257, -1], [0.8438, 270, 1], [0.9563, 270, -1]]) fillHouse(ha, hz, face);
+  [[0.55, 122, 1], [0.55, 178, -1], [0.625, 222, 1], [0.625, 278, -1], [2.725, 82, 1], [2.725, 138, -1], [2.375, 222, 1], [2.375, 278, -1], [3.425, 122, 1], [3.425, 178, -1], [3.775, 232, 1], [3.775, 288, -1], [5.175, 172, 1], [5.175, 228, -1], [5.525, 172, 1], [5.525, 228, -1], [4.35, 212, 1], [4.35, 268, -1], [4.25, 92, 1], [4.25, 148, -1], [6.0, 172, 1], [6.0, 228, -1], [0.2, 92, 1], [0.2, 148, -1], [0.2, 232, 1], [0.2, 288, -1], [3.1, 122, 1], [3.1, 178, -1], [3.1, 232, 1], [3.1, 288, -1], [0.9, 222, 1], [0.9, 278, -1]].forEach(([sa, sz, faceZ], si) => fillShop(sa, sz, faceZ, fillStallMats[si % fillStallMats.length]));
+  for (const [ga, gz] of [[0.4438, 150], [0.6562, 150], [0.5188, 250], [0.7312, 250], [2.6187, 110], [2.8313, 110], [2.2687, 250], [2.4813, 250], [3.3187, 150], [3.5312, 150], [3.6687, 260], [3.8813, 260], [5.0687, 200], [5.2812, 200], [5.4188, 200], [5.6313, 200], [4.2438, 240], [4.4563, 240], [4.1438, 120], [4.3563, 120], [5.8938, 200], [6.1063, 200], [0.0938, 120], [0.3063, 120], [0.0938, 260], [0.3063, 260], [2.9938, 150], [3.2063, 150], [2.9938, 260], [3.2063, 260], [0.7938, 250], [1.0063, 250]]) fillGarden(ga, gz);
+  for (const [ta, tz] of [[0.4438, 130], [0.4438, 170], [0.6562, 130], [0.6562, 170], [0.5188, 230], [0.5188, 270], [0.7312, 230], [0.7312, 270], [2.6187, 90], [2.6187, 130], [2.8313, 90], [2.8313, 130], [2.2687, 230], [2.2687, 270], [2.4813, 230], [2.4813, 270], [3.3187, 130], [3.3187, 170], [3.5312, 130], [3.5312, 170], [3.6687, 240], [3.6687, 280], [3.8813, 240], [3.8813, 280], [5.0687, 180], [5.0687, 220], [5.2812, 180], [5.2812, 220], [5.4188, 180], [5.4188, 220], [5.6313, 180], [5.6313, 220], [4.2438, 220], [4.4563, 220], [4.2438, 260], [4.4563, 260], [4.1438, 100], [4.3563, 100], [4.1438, 140], [4.3563, 140], [5.8938, 180], [6.1063, 180], [5.8938, 220], [6.1063, 220], [0.0938, 100], [0.3063, 100], [0.0938, 140], [0.3063, 140], [0.0938, 240], [0.3063, 240], [0.0938, 280], [0.3063, 280], [2.9938, 130], [3.2063, 130], [2.9938, 170], [3.2063, 170], [2.9938, 240], [3.2063, 240], [2.9938, 280], [3.2063, 280], [0.7938, 230], [1.0063, 230], [0.7938, 270], [1.0063, 270]]) fillTree(ta, tz);
+  for (const [la, lz] of [[0.5125, 135], [0.5125, 165], [0.5875, 135], [0.5875, 165], [0.5875, 235], [0.5875, 265], [0.6625, 235], [0.6625, 265], [2.6875, 95], [2.6875, 125], [2.7625, 95], [2.7625, 125], [2.3375, 235], [2.3375, 265], [2.4125, 235], [2.4125, 265], [3.3875, 135], [3.3875, 165], [3.4625, 135], [3.4625, 165], [3.7375, 245], [3.7375, 275], [3.8125, 245], [3.8125, 275], [5.1375, 185], [5.1375, 215], [5.2125, 185], [5.2125, 215], [5.4875, 185], [5.4875, 215], [5.5625, 185], [5.5625, 215], [4.3125, 225], [4.3875, 225], [4.3125, 255], [4.3875, 255], [4.2125, 105], [4.2875, 105], [4.2125, 135], [4.2875, 135], [5.9625, 185], [6.0375, 185], [5.9625, 215], [6.0375, 215], [0.1625, 105], [0.2375, 105], [0.1625, 135], [0.2375, 135], [0.1625, 245], [0.2375, 245], [0.1625, 275], [0.2375, 275], [3.0625, 135], [3.1375, 135], [3.0625, 165], [3.1375, 165], [3.0625, 245], [3.1375, 245], [3.0625, 275], [3.1375, 275], [0.8625, 235], [0.9375, 235], [0.8625, 265], [0.9375, 265]]) fillLamp(la, lz);
+  // Center lanes for the sixteen neighborhoods.
+  for (const [ca, cz] of [[0.55, 150], [0.625, 250], [2.725, 110], [2.375, 250], [3.425, 150], [3.775, 260], [5.175, 200], [5.525, 200], [4.35, 240], [4.25, 120], [6.0, 200], [0.2, 120], [0.2, 260], [3.1, 150], [3.1, 260], [0.9, 250]]) {
     const g = fillGroup(ca, cz, 0.12);
     fillBox(g, 4, 0.15, 50, fillStreetMat, 0, 0, 0);
   }
   // One water tower per neighborhood, same build as the original city
   // tower (four legs, hull-panel tank, flat disc top). Spots sit on
-  // each lane's axis 40 m past a lane end — all eight checked clear of
+  // each lane's axis 40 m past a lane end — all sixteen checked clear of
   // streets, squares, terminals, cell corridors, gallery, arch,
   // quarters, mess tables, and the neighborhood's own furniture. The
   // (2.725, 110) neighborhood takes its south end instead: its north
@@ -2421,7 +2464,7 @@ function basisQuat(radial) {
     tankTop.position.set(0, 9.75, 0);
     g.add(tankTop);
   }
-  for (const [ta, tz] of [[0.55, 190], [0.625, 290], [2.725, 70], [2.375, 290], [3.425, 190], [3.775, 300], [5.175, 240], [5.525, 240]]) fillWaterTower(ta, tz);
+  for (const [ta, tz] of [[0.55, 190], [0.625, 290], [2.725, 70], [2.375, 290], [3.425, 190], [3.775, 300], [5.175, 240], [5.525, 240], [4.35, 280], [4.25, 160], [6.0, 240], [0.2, 160], [0.2, 300], [3.1, 190], [3.1, 220], [0.9, 290]]) fillWaterTower(ta, tz);
 }
 
 // ---------- Round 11: lived-in habitat dressing ----------
@@ -2738,7 +2781,7 @@ const REVIEW_TERMINALS_POS = [
   { deck: 'main', angle: 1.20, z: 180 },  // even step 2 (gap between the quarters rows)
   { deck: 'main', angle: 2.09, z: 180 },  // even step 3 (gap between mess hall and education arch)
   { deck: 'main', angle: 2.99, z: 300 },  // even step 4 (edu, open deck)
-  { deck: 'main', angle: 3.89, z: 100 },  // even step 5 (tech, open deck)
+  { deck: 'main', angle: 3.89, z: 140 },  // even step 5 (tech, open deck; moved 40 m from z 100 — it shared ground with the 5pi/4 exploration terminal, and the REVIEW button could hang on after departing)
   { deck: 'main', angle: 4.79, z: 200 },  // even step 6 (past the gallery span; clear of classroom doorway)
   { deck: 'main', angle: 5.68, z: 280 },  // even step 7 (edu, open deck)
 ];
@@ -3586,6 +3629,10 @@ function undock() {
   camYaw = 0; camPitch = 0; camHeight = 7; // fresh flight starts on the neutral trailing view (behind and above the craft, looking down on its top)
   shuttle.visible = true;
   btnMode.style.display = 'none';
+  btnTerminal.style.display = 'none'; terminalNear = false; // walk-only checks stop in flight, so a REVIEW button left up at departure would otherwise hang on in space
+  btnStation.style.display = 'none'; stationNear = null; // same staleness guard for LEARN
+  if (hint.textContent.indexOf('Near the review terminal') === 0) hint.textContent = '';
+  if (hint.textContent.indexOf('tap LEARN') !== -1) hint.textContent = '';
   btnJump.style.visibility = 'hidden';
   updateHint();
 }
