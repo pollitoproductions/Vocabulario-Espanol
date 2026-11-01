@@ -5087,9 +5087,43 @@ function speakEn(text, onState) {
 // Chained on the English line's end event, with a timed fallback in case
 // a browser never fires it, and a generation guard so a newer
 // announcement (e.g. a quick dock-then-depart) never gets talked over by
-// the older one's Spanish line. Speech follows the device volume like
-// every other spoken line (never sets utterance.volume).
+// the older one's Spanish line. The voice is deliberately calmer than
+// the tools' speech (rate 0.8, pitch 0.9, half-second settle delay) and
+// quieter on desktop (volume 0.75, non-iOS only — iOS keeps full volume
+// because setting it silences speech there).
 let announceGen = 0;
+// iOS Safari silences speech if utterance.volume is set, so announcements
+// only turn the volume down on non-iOS devices (desktops included) and
+// leave iOS at full volume — the calmer rate/pitch below still apply there.
+const announceIsIOS = typeof navigator !== 'undefined' && (/iPad|iPhone|iPod/.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+// Announcement voice: its own utterance settings, separate from the
+// tools' speakWord/speakEn — slower and lower-pitched so the ship's
+// computer sounds calm rather than harsh, and quieter on desktop.
+function speakAnnouncement(text, lang, onState) {
+  try {
+    if (!('speechSynthesis' in window)) return;
+    const synth = window.speechSynthesis;
+    try { if (synth.speaking || synth.pending) synth.cancel(); } catch (e) {}
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.8;
+    u.pitch = 0.9;
+    if (!announceIsIOS) u.volume = 0.75;
+    const chain = lang === 'es' ? ['es-mx', 'es-us', 'es'] : ['en-us', 'en'];
+    const voices = synth.getVoices ? synth.getVoices() : [];
+    u.voice = null;
+    for (let i = 0; i < chain.length; i++) {
+      const v = voices.find(function (vv) { return vv.lang && vv.lang.toLowerCase().startsWith(chain[i]); });
+      if (v) { u.voice = v; break; }
+    }
+    if (!u.voice) u.lang = lang === 'es' ? 'es-MX' : 'en-US';
+    if (onState) {
+      u.onstart = function () { onState(true); };
+      u.onend = function () { onState(false); };
+      u.onerror = function () { onState(false); };
+    }
+    synth.speak(u);
+  } catch (e) { if (onState) onState(false); }
+}
 function announcePair(en, es) {
   try {
     if (!('speechSynthesis' in window)) return;
@@ -5098,10 +5132,15 @@ function announcePair(en, es) {
     const saySpanish = function () {
       if (done || gen !== announceGen) return;
       done = true;
-      speakWord(es);
+      speakAnnouncement(es, 'es');
     };
-    speakEn(en, function (playing) { if (!playing) saySpanish(); });
-    setTimeout(saySpanish, 8000);
+    // Half a second for the dock/departure sound to settle first, so the
+    // voice never blasts on top of the clunk — part of why it startled.
+    setTimeout(function () {
+      if (gen !== announceGen) return;
+      speakAnnouncement(en, 'en', function (playing) { if (!playing) saySpanish(); });
+      setTimeout(saySpanish, 8000);
+    }, 500);
   } catch (e) {}
 }
 function announceBoarding() {
