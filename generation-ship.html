@@ -519,11 +519,11 @@ let centerEase = false, centerEaseStarted = 0;
 // line + shuttle centered in frame): the old fixed +7 m put the camera
 // well above the shuttle, so the shuttle projected ~19 deg below frame
 // center. Brant: sitting a little above the shuttle is actually okay,
-// so the centered height is ~2 m, not the exact centerline: camHeight
-// eases 7 <-> 2 in the flight camera block: 2 when the view is centered
-// (shuttle ~6 deg below center at 20 m back), 7 when looking around.
-// Starts at 2: a fresh flight is the centered view.
-let camHeight = 2;
+// so the centered height is ~4 m, not the exact centerline: camHeight
+// eases 7 <-> 4 in the flight camera block: 4 when the view is centered
+// (shuttle ~11 deg below center at 20 m back), 7 when looking around.
+// Starts at 4: a fresh flight is the centered view.
+let camHeight = 4;
 // Roll-free shuttle orientation (round 30, Brant: no wonky angles when
 // centered, shuttle flat despite the mothership's orientation):
 // shipYaw/shipPitch are the single source of truth for the shuttle's
@@ -544,9 +544,9 @@ let touchLookSeq = 0, centerTouchSeq = 0;
 // CENTER (round 30, Brant: centered for navigation): tapping CENTER
 // eases the look offsets to zero, putting the camera straight behind
 // the shuttle on its tail axis, looking forward along the nose — the
-// view the shuttle is flown by. The height offset eases to ~2 m with
-// it, so the camera sits directly behind the shuttle just above the
-// centerline and the shuttle reads near-center in frame (the old fixed
+// view the shuttle is flown by. The height offset eases to ~4 m with
+// it, so the camera sits behind and a little above the shuttle
+// and the shuttle reads near-center in frame (the old fixed
 // +7 m left it ~19 deg below-center).
 // The camera NEVER leaves the shuttle:
 // no port-aim, no axial-aim, no detached viewpoint. Both earlier
@@ -3399,7 +3399,7 @@ function undock() {
   shuttle.quaternion.setFromEuler(new THREE.Euler(shipPitch, shipYaw, 0, 'YXZ'));
   // Co-rotating start: the shuttle inherits the station's local velocity.
   shuttleVel.copy(tangent).multiplyScalar(OMEGA * rr);
-  camYaw = 0; camPitch = 0; centerEase = false; camHeight = 2; // fresh flight starts on the neutral trailing view (centered: just above the centerline)
+  camYaw = 0; camPitch = 0; centerEase = false; camHeight = 4; // fresh flight starts on the neutral trailing view (centered: a little above the craft)
   shuttle.visible = true;
   btnMode.style.display = 'none';
   modeText.textContent = 'Departed';
@@ -3981,17 +3981,17 @@ function updateFlight(dt) {
   // line + shuttle centered in frame): the old fixed +7 m sat the camera
   // well above the shuttle, so the shuttle projected ~19 deg below frame
   // center. When the view is centered — CENTER armed, idle-settled, or
-  // offsets already at zero — the height offset eases to ~2 m, putting
-  // the camera directly behind the shuttle just above its centerline,
-  // looking straight forward along the nose: the shuttle sits
-  // near-center in frame (~6 deg below center at 20 m back) and the
-  // view ahead stays essentially level. Fresh look input eases it back
-  // to 7 m. Eased, never snapped (the camera position itself is
-  // additionally lerped at 8/s below).
+  // offsets already at zero — the height offset eases to ~4 m, putting
+  // the camera behind and a little above the shuttle, looking straight
+  // forward along the nose: the shuttle sits near-center in frame
+  // (~11 deg below center at 20 m back) and the view ahead stays
+  // essentially level. Fresh look input eases it back to 7 m. Eased,
+  // never snapped (the camera position itself is additionally lerped
+  // at 8/s below).
   const idleSettling = (nowMs - lastCamInput > CAM_IDLE_SECS * 1000); // look-idle only: flight input does not block settling back behind
   const wantCentered = centerEase || idleSettling || (Math.abs(camYaw) < 0.005 && Math.abs(camPitch) < 0.005);
   const heightRate = centerEase ? CAM_CENTER_RATE : CAM_EASE_RATE;
-  camHeight += ((wantCentered ? 2 : 7) - camHeight) * (1 - Math.exp(-heightRate * dt));
+  camHeight += ((wantCentered ? 4 : 7) - camHeight) * (1 - Math.exp(-heightRate * dt));
   // Neutral trailing is NOSE-ONLY (round 30 fix): the camera base trails
   // the spacecraft's nose direction, never the velocity. The old blend
   // toward velocity swung the neutral 180° when velocity passed through
