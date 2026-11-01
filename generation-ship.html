@@ -89,7 +89,11 @@
   /* Breakout pattern, copied from backrooms-breakout: right-edge columns
      right 16 / right 91 (48px button + 27px gap), rows bottom 26 / bottom 101
      (48px + 27px gap). All nine buttons live in this bottom-right zone. */
-  #btn-mine { right: calc(91px + env(safe-area-inset-right, 0px)); bottom: calc(101px + env(safe-area-inset-bottom, 0px)); }
+  /* MINE is 56 px + cyan accent so it stands out at a glance in range;
+     same slot (right 91 / bottom 101): CENTER spans right 16–72, MINE
+     spans right 91–147, so the 19 px gap holds and both row tops sit
+     at 157 — no overlap with CENTER or LOOK. */
+  #btn-mine { width: 56px; height: 56px; right: calc(91px + env(safe-area-inset-right, 0px)); bottom: calc(101px + env(safe-area-inset-bottom, 0px)); border: 2px solid rgba(127, 227, 255, 0.9); background: linear-gradient(160deg, rgba(127, 227, 255, 0.35), rgba(127, 227, 255, 0.12)); box-shadow: 0 0 18px rgba(127, 227, 255, 0.55), 0 6px 18px rgba(0, 0, 0, 0.30); }
   #btn-center { width: 56px; height: 56px; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(101px + env(safe-area-inset-bottom, 0px)); }
   #btn-looksteer { right: calc(91px + env(safe-area-inset-right, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
   #btn-brake { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
@@ -520,10 +524,17 @@ let centerEase = false, centerEaseStarted = 0;
 // (shuttle ~6 deg below center at 20 m back), 7 when looking around.
 // Starts at 2: a fresh flight is the centered view.
 let camHeight = 2;
-// Horizontal centered view (round 30, Brant: "Horizontal"): levelBlend
-// eases 0 <-> 1 with the height blend — 1 when the view is centered,
-// 0 when looking around. Starts at 1: a fresh flight is the centered view.
-let levelBlend = 1;
+// Roll-free shuttle orientation (round 30, Brant: no wonky angles when
+// centered, shuttle flat despite the mothership's orientation):
+// shipYaw/shipPitch are the single source of truth for the shuttle's
+// attitude. rotateShuttle only accumulates them and rebuilds the
+// quaternion as Euler(pitch, yaw, 0, 'YXZ'), so combined yaw+pitch can
+// never accumulate roll (the YXZ roll component is identically zero) and
+// undock always starts flat. The old per-frame local yaw-then-pitch
+// quaternion multiplies did not commute, so maneuvering banked the
+// shuttle more and more; and undock's shortest-arc +Z-to-tangent mapping
+// baked in a port-dependent bank. Both are gone.
+let shipYaw = 0, shipPitch = 0;
 // Touch look-grab generation: incremented on every touch look claim.
 // CENTER records the generation at press time and only a NEW grab after
 // the press cancels the ease — moves from a drag already in progress
@@ -3351,10 +3362,19 @@ function undock() {
   const rr = RADIUS + 22;
   shuttle.position.set(Math.cos(phi) * rr, Math.sin(phi) * rr, playerZ);
   const tangent = new THREE.Vector3(-Math.sin(phi), Math.cos(phi), 0);
-  shuttle.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), tangent);
+  // Roll-free departure: yaw/pitch extracted from the tangent itself
+  // (same extraction as the save-restore path), so the nose leaves
+  // along the tangent EXACTLY as before, but with wings level — flat
+  // from every port regardless of the mothership's spin angle. The
+  // tangent lives in the XY plane, so its vertical part belongs in
+  // pitch, not thrown away: pitch zero would point the nose along
+  // ±X instead of the tangent (up to 90 deg off) and make the shuttle
+  // fly sideways at departure.
+  shipYaw = Math.atan2(tangent.x, tangent.z); shipPitch = Math.asin(Math.max(-1, Math.min(1, -tangent.y)));
+  shuttle.quaternion.setFromEuler(new THREE.Euler(shipPitch, shipYaw, 0, 'YXZ'));
   // Co-rotating start: the shuttle inherits the station's local velocity.
   shuttleVel.copy(tangent).multiplyScalar(OMEGA * rr);
-  camYaw = 0; camPitch = 0; centerEase = false; camHeight = 2; levelBlend = 1; // fresh flight starts on the neutral trailing view (centered: just above the centerline)
+  camYaw = 0; camPitch = 0; centerEase = false; camHeight = 2; // fresh flight starts on the neutral trailing view (centered: just above the centerline)
   shuttle.visible = true;
   btnMode.style.display = 'none';
   modeText.textContent = 'Departed';
@@ -3481,8 +3501,13 @@ const _axisY = new THREE.Vector3(0, 1, 0);
 const _axisX = new THREE.Vector3(1, 0, 0);
 const _q = new THREE.Quaternion();
 function rotateShuttle(yawDelta, pitchDelta) {
-  _q.setFromAxisAngle(_axisY, yawDelta); shuttle.quaternion.multiply(_q);
-  _q.setFromAxisAngle(_axisX, pitchDelta); shuttle.quaternion.multiply(_q);
+  // Roll-free: accumulate yaw/pitch state and rebuild. Euler 'YXZ' gives
+  // Q = Ry * Rx, matching the old single-axis steps exactly (same rates,
+  // same signs) — the only change is that combined yaw+pitch can no
+  // longer accumulate roll. Pitch is NOT clamped: looping past vertical
+  // still works, still roll-free.
+  shipYaw += yawDelta; shipPitch += pitchDelta;
+  shuttle.quaternion.setFromEuler(new THREE.Euler(shipPitch, shipYaw, 0, 'YXZ'));
 }
 canvas.addEventListener('pointerdown', function (e) {
   if (e.pointerType !== 'touch') return;
@@ -3935,10 +3960,6 @@ function updateFlight(dt) {
   const wantCentered = centerEase || idleSettling || (Math.abs(camYaw) < 0.005 && Math.abs(camPitch) < 0.005);
   const heightRate = centerEase ? CAM_CENTER_RATE : CAM_EASE_RATE;
   camHeight += ((wantCentered ? 2 : 7) - camHeight) * (1 - Math.exp(-heightRate * dt));
-  // Horizontal centered view (round 30, Brant: "Horizontal"): levelBlend
-  // eases to 1 with the same rate as the height blend, so the leveling
-  // below arrives smoothly, never as a pitch snap.
-  levelBlend += ((wantCentered ? 1 : 0) - levelBlend) * (1 - Math.exp(-heightRate * dt));
   // Neutral trailing is NOSE-ONLY (round 30 fix): the camera base trails
   // the spacecraft's nose direction, never the velocity. The old blend
   // toward velocity swung the neutral 180° when velocity passed through
@@ -3957,37 +3978,24 @@ function updateFlight(dt) {
   const camUp = upS.clone().applyAxisAngle(camRight, -camPitch);
   const desired = shuttle.position.clone().addScaledVector(camFwd, -20).addScaledVector(camUp, camHeight);
   camera.position.lerp(desired, 1 - Math.exp(-8 * dt));
-  // Horizontal centered view: when centered (levelBlend 1), the view
-  // direction is the nose direction with its pitch component removed
-  // (world-XZ normalized) and camera up is world up — zero total pitch,
-  // level horizon — so a pitched shuttle reads as pitched in frame
-  // while the horizon stays level, which is what makes the view
-  // navigable. The blend eases in with the height blend, so there is
-  // no pitch snap; at blend 0 the view follows the nose including its
-  // pitch, exactly as before. Camera position above is untouched: it
-  // stays behind the shuttle on its tail axis. Degenerate case (nose
-  // nearly vertical, no horizontal component) keeps the unleveled
-  // direction for that frame rather than normalizing a zero vector.
-  const lvlH = Math.hypot(camFwd.x, camFwd.z);
-  let viewFwd = camFwd, viewUp = camUp;
-  if (lvlH > 1e-4 && levelBlend > 0) {
-    const lvlFwd = new THREE.Vector3(camFwd.x / lvlH, 0, camFwd.z / lvlH);
-    viewFwd = camFwd.clone().lerp(lvlFwd, levelBlend).normalize();
-    viewUp = camUp.clone().lerp(new THREE.Vector3(0, 1, 0), levelBlend).normalize();
-  }
-  camera.up.copy(viewUp);
+  // Plain nose-parallel chase (round 30, roll-free fix): the old
+  // pitch-leveling is REMOVED — it treated a symptom. With
+  // the shuttle's orientation roll-free by construction, the chase view
+  // is already correct: the shuttle reads flat (wings level) from
+  // behind, the horizon reads level (never diagonal, pitched or not),
+  // and the mothership no longer slants with port angle.
+  camera.up.copy(camUp);
   // CENTER (Brant: centered for navigation): with offsets eased to
-  // zero the look target below is straight ahead — horizontal when
-  // centered, along the nose when looking around — the camera sits
+  // zero the look target below is straight ahead along the nose — the camera sits
   // on the shuttle's tail axis looking forward past it. NO aim
   // override exists anymore: neither port-aim nor axial-aim may
   // hijack the view direction. Guidance arrow logic below is
-  // untouched (it reads the camera orientation, so a level
-  // nose-forward view reads straight ahead).
+  // untouched (it reads the camera orientation, so a nose-forward
+  // view reads straight ahead).
   let lookTarget = new THREE.Vector3(
-    shuttle.position.x + viewFwd.x * 12,
-    shuttle.position.y + viewFwd.y * 12,
-    shuttle.position.z + viewFwd.z * 12
+    shuttle.position.x + camFwd.x * 12,
+    shuttle.position.y + camFwd.y * 12,
+    shuttle.position.z + camFwd.z * 12
   );
   camera.lookAt(lookTarget);
   // Flight nav readout (navigation aid ONLY — display only, never moves the
@@ -5747,7 +5755,16 @@ function restoreSavedPosition(pos) {
     transitioning = false;
     mode = 'flight'; driveState = 'COAST'; dockArmed = false;
     shuttle.position.set(pos.x, pos.y, pos.z);
-    shuttle.quaternion.set(pos.qx, pos.qy, pos.qz, pos.qw);
+    // Roll-free restore: convert the saved quaternion to yaw/pitch
+    // instead of copying it raw, so an old banked save re-levels while
+    // keeping the nose direction. (Past-vertical asin ambiguity: a save
+    // stored mid-loop restores nose-equivalent but may flip yaw — the
+    // nose direction itself is preserved.)
+    const savedQ = new THREE.Quaternion(pos.qx, pos.qy, pos.qz, pos.qw);
+    const fwdSave = new THREE.Vector3(0, 0, 1).applyQuaternion(savedQ);
+    shipYaw = Math.atan2(fwdSave.x, fwdSave.z);
+    shipPitch = Math.asin(Math.max(-1, Math.min(1, -fwdSave.y)));
+    shuttle.quaternion.setFromEuler(new THREE.Euler(shipPitch, shipYaw, 0, 'YXZ'));
     shuttleVel.set(0, 0, 0); shuttle.visible = true;
     btnMode.style.display = 'none'; btnJump.style.visibility = 'hidden';
     modeText.textContent = 'Departed'; btnExit.style.display = 'none';
