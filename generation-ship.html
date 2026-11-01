@@ -119,6 +119,7 @@
   #menuPanel {
     position: fixed; top: calc(60px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); z-index: 8; display: none;
     width: min(92vw, 430px); max-height: 82vh; overflow-y: auto;
+    touch-action: pan-y; -webkit-overflow-scrolling: touch;
     color: #d7e3f4; background: rgba(6, 10, 16, 0.92);
     border: 1px solid rgba(89, 214, 255, 0.5);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 22px rgba(89, 214, 255, 0.18);
@@ -146,6 +147,7 @@
   #menuPanel .subBody { display: none; }
   #menuPanel .subBody.open { display: block; }
   #menuPanel input[type=range] { width: 160px; accent-color: #59d6ff; vertical-align: middle; }
+  #menuScrollHint { display: none; color: #7fe3ff; font-size: 12px; text-align: center; padding: 2px 0 6px; cursor: pointer; }
   #failOverlay {
     position: fixed; inset: 0; z-index: 30; display: none; flex-direction: column;
     align-items: center; justify-content: center; gap: 12px;
@@ -324,6 +326,7 @@
 <button id="btn-menu" type="button" aria-label="Ship menu">&#9776;</button>
 <div id="menuPanel">
   <h2>SHIP STATUS // GENERATION SHIP</h2>
+  <div id="menuScrollHint">↓ Scroll for more below</div>
   <button class="closeBtn" id="btn-menu-save" type="button">SAVE JOURNEY</button>
   <div id="menuSaveMsg"></div>
   <button class="subHead" data-sub="progress" data-label="PROGRESS" type="button">▾ PROGRESS</button><div class="subBody open" id="sub-progress">
@@ -334,6 +337,10 @@
   <div class="row"><span>DICTATION SPOKEN</span><b id="progDict">0 / 2830</b></div>
   <div class="row"><span>SER VS. ESTAR SPOKEN</span><b id="progSer">0 / 100</b></div>
   <div class="controls">Progress counts spoken Spanish only — flipping, tapping, and listening don’t count; English practice doesn’t count either.</div>
+  </div><button class="subHead" data-sub="settings" data-label="SETTINGS" type="button">▸ SETTINGS</button><div class="subBody" id="sub-settings">
+  <div class="row"><span>SOUND VOLUME</span><span><input id="volSlider" type="range" min="0" max="100" value="100"> <b id="volPct">100%</b></span></div>
+  <div class="row"><span>VIBRATION</span><span><input id="vibeChk" type="checkbox" checked> <span class="controls">On</span></span></div>
+  <div class="controls">The slider controls game sounds (hum, thrust, footsteps, ding) — 0 is mute. Spoken words follow the device volume. Vibration works on Android; iPhones don’t let web pages vibrate, so it stays silent there.</div>
   </div><button class="subHead" data-sub="status" data-label="SHIP STATUS" type="button">▸ SHIP STATUS</button><div class="subBody" id="sub-status">
   <div class="row"><span>TRANSPONDER</span><b>BEACON 7 // BROADCASTING</b></div>
   <div class="row"><span>DRIVE</span><b id="menuDrive">DOCKED</b></div>
@@ -361,10 +368,6 @@
   </div><button class="subHead" data-sub="note" data-label="NOTE" type="button">▸ NOTE</button><div class="subBody" id="sub-note">
   <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; any asteroid can be mined (hold M, or the MINE button, for about 3 seconds within 100 m) for water from icy comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. (Jump arcs feel Mars-like by movement tuning; the ship&rsquo;s spin gravity itself is unchanged.) After departing, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, with a MEDICAL BAY room in the technology half. Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 25 km from the ship, grows urgent past 40 km, and past 50 km you are LOST and the run ends (retry returns you aboard, haul kept, free). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, all 1,000 Spanish vocabulary words float from about 3 km to 20 km out, plus exercise questions between 1.5 km and 15 km out — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold arrow under the port readout points to the nearest uncollected item — word or exercise question — with a tag saying which, and distant items show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, you return to your last save.</div>
   </div>
-  </div><button class="subHead" data-sub="settings" data-label="SETTINGS" type="button">▸ SETTINGS</button><div class="subBody" id="sub-settings">
-  <div class="row"><span>SOUND VOLUME</span><span><input id="volSlider" type="range" min="0" max="100" value="100"> <b id="volPct">100%</b></span></div>
-  <div class="row"><span>VIBRATION</span><span><input id="vibeChk" type="checkbox" checked> <span class="controls">On</span></span></div>
-  <div class="controls">The slider controls game sounds (hum, thrust, footsteps, ding) — 0 is mute. Spoken words follow the device volume. Vibration works on Android; iPhones don’t let web pages vibrate, so it stays silent there.</div>
   </div>
   <button class="closeBtn" id="btn-menu-home" type="button">GO TO HOME SCREEN</button>
   <button class="closeBtn" id="btn-menu-close" type="button">CLOSE</button>
@@ -3727,6 +3730,14 @@ function updateMenu() {
   // Keep the Settings controls in sync whenever the menu opens.
   if (volSlider) { volSlider.value = Math.round(gameVol * 100); if (volPct) volPct.textContent = Math.round(gameVol * 100) + '%'; }
   if (vibeChk) vibeChk.checked = vibeOn;
+  // Scroll hint: the panel is taller than a phone screen with PROGRESS
+  // open, so the bottom items hide below the fold with no affordance.
+  // Show the hint whenever more content sits below the visible area.
+  const hint = document.getElementById('menuScrollHint');
+  if (hint) {
+    const moreBelow = menuPanel.scrollHeight > menuPanel.clientHeight + 4 && menuPanel.scrollTop + menuPanel.clientHeight < menuPanel.scrollHeight - 4;
+    hint.style.display = moreBelow ? 'block' : 'none';
+  }
 }
 // PROGRESS submenu counts. The practice-spoken line counts the live
 // collected tiles (collecting a tile requires speaking it, so this
@@ -4044,6 +4055,12 @@ if (volSlider) volSlider.addEventListener('input', function () {
   if (volPct) volPct.textContent = volSlider.value + '%';
 });
 if (vibeChk) vibeChk.addEventListener('change', function () { vibeOn = vibeChk.checked; saveSettings(); });
+// Tapping the scroll hint jumps the menu panel to its bottom (Home/Close).
+const menuScrollHint = document.getElementById('menuScrollHint');
+if (menuScrollHint) menuScrollHint.addEventListener('pointerdown', function (e) {
+  e.preventDefault();
+  try { menuPanel.scrollTo({ top: menuPanel.scrollHeight, behavior: 'smooth' }); } catch (err) { menuPanel.scrollTop = menuPanel.scrollHeight; }
+});
 document.getElementById('btn-retry').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur(); failPrimaryAction();
 });
