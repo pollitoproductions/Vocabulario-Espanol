@@ -623,6 +623,13 @@ scene.add(new THREE.HemisphereLight(0xbdd3ff, 0x332211, 0.7));
 const sun = new THREE.DirectionalLight(0xfff1d6, 3.0);
 sun.position.set(400, 200, 300);
 scene.add(sun);
+// Fill light opposite the sun. The hull metals have no environment
+// reflections, so off-sun they read nearly black from outside — this
+// dim cool light from the far side lifts the night side (mothership
+// and shuttle alike) while the sun side keeps the contrast.
+const fill = new THREE.DirectionalLight(0x9fc0ff, 0.7);
+fill.position.set(-400, -200, -300);
+scene.add(fill);
 const sunBall = new THREE.Mesh(
   new THREE.SphereGeometry(40, 24, 24),
   new THREE.MeshBasicMaterial({ color: 0xffe9a8 })
@@ -804,7 +811,7 @@ for (const [zC, mat] of [[-LENGTH / 4, agriHullMat], [LENGTH / 4, chromeHullMat]
 }
 
 // Structural rings + central spine.
-const ringMat = new THREE.MeshStandardMaterial({ color: 0x2e343b, roughness: 0.6, metalness: 0.6 });
+const ringMat = new THREE.MeshStandardMaterial({ color: 0x2e343b, roughness: 0.6, metalness: 0.3 });
 for (let i = 0; i <= slices; i++) {
   const ring = new THREE.Mesh(new THREE.TorusGeometry(RADIUS - 0.4, 1.1, 8, 64), ringMat);
   ring.position.z = -LENGTH / 2 + i * sliceLen;
@@ -826,10 +833,10 @@ for (const s of [1, -1]) {
 // Exterior hull + caps (offset slightly outward to avoid coplanar faces).
 const hullGeo = new THREE.CylinderGeometry(RADIUS + 1, RADIUS + 1, LENGTH, 64, 1, true);
 hullGeo.rotateX(Math.PI / 2);
-const extHullMat = new THREE.MeshStandardMaterial({ color: 0x878f99, roughness: 0.45, metalness: 0.7, side: THREE.FrontSide });
+const extHullMat = new THREE.MeshStandardMaterial({ color: 0x878f99, roughness: 0.55, metalness: 0.25, side: THREE.FrontSide });
 ship.add(new THREE.Mesh(hullGeo, extHullMat));
 applyGameTexture(extHullMat, 'hull-panels.jpg', 28, 7);
-const capOutMat = new THREE.MeshStandardMaterial({ color: 0x7d858f, roughness: 0.5, metalness: 0.7 });
+const capOutMat = new THREE.MeshStandardMaterial({ color: 0x7d858f, roughness: 0.55, metalness: 0.25 });
 for (const s of [1, -1]) {
   const cap = new THREE.Mesh(new THREE.CircleGeometry(RADIUS + 1, 48), capOutMat);
   cap.position.z = s * (LENGTH / 2 + 0.5);
@@ -847,7 +854,7 @@ for (const cz of [-160, 0, 160]) {
 const glow = new THREE.Mesh(new THREE.CircleGeometry(18, 32), new THREE.MeshBasicMaterial({ color: 0x7fb8ff }));
 glow.position.z = -(LENGTH / 2 + 1.1); glow.rotation.y = Math.PI;
 ship.add(glow);
-const blockMat = new THREE.MeshStandardMaterial({ color: 0x565e68, roughness: 0.5, metalness: 0.7 });
+const blockMat = new THREE.MeshStandardMaterial({ color: 0x565e68, roughness: 0.55, metalness: 0.25 });
 for (let i = 0; i < 4; i++) {
   const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
   const b = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 24), blockMat);
@@ -3096,7 +3103,13 @@ function updateCellWalk(dt) {
 // multiplied the texture down to near-black (stealth look), so it was
 // reverted: the shape, not the tint, is what kills the toy look.
 const shuttle = new THREE.Group();
-const shuttleBodyMat = new THREE.MeshStandardMaterial({ color: 0xd8dde2, roughness: 0.35, metalness: 0.65 });
+// Flight light: rides with the shuttle (switched on in animate, flight
+// only) so the craft stays readable from the chase camera on its dark
+// side, and it spills onto nearby hull when flying close.
+const shuttleLight = new THREE.PointLight(0xfff1d6, 1.2, 90, 0);
+shuttleLight.position.set(0, 8, -5);
+shuttle.add(shuttleLight);
+const shuttleBodyMat = new THREE.MeshStandardMaterial({ color: 0xd8dde2, roughness: 0.45, metalness: 0.3 });
 applyGameTexture(shuttleBodyMat, 'hull-panels.jpg', 2, 1); // paneled hull; flat light-grey stays the fallback
 const dartProfile = [
   [0.0, -2.6], [0.55, -2.6], [0.85, -1.8], [0.95, -0.5],
@@ -3131,7 +3144,7 @@ function makeWingGeometry() {
   return g;
 }
 const wingGeo = makeWingGeometry();
-const wingMat = new THREE.MeshStandardMaterial({ color: 0xd8dde2, roughness: 0.35, metalness: 0.65, side: THREE.DoubleSide });
+const wingMat = new THREE.MeshStandardMaterial({ color: 0xd8dde2, roughness: 0.45, metalness: 0.3, side: THREE.DoubleSide });
 applyGameTexture(wingMat, 'hull-panels.jpg', 2, 1); // wings + fins share the hull panels; flat light-grey stays the fallback
 const wingR = new THREE.Mesh(wingGeo, wingMat);
 wingR.position.set(0.6, -0.1, -0.3);
@@ -6307,6 +6320,7 @@ function animate() {
       else updateFlight(dt);
     }
     if (!crashed && mode === 'walk') { checkStations(); checkTerminal(); checkDepart(); }
+    shuttleLight.visible = (mode === 'flight' && !crashed); // the flight light rides only while flying
   }
   // Round 25: auto-walk backstop. Any dock/undock transition or cell
   // entry clears auto-walk even if a dedicated call site is missed.
