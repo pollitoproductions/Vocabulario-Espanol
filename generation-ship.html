@@ -4490,7 +4490,7 @@ let audioCtx = null, burnNodes = null, noiseBuf = null;
 function ensureAudio() {
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') { const p = audioCtx.resume(); if (p && p.catch) p.catch(function () {}); }
+    if (audioCtx.state !== 'running') { const p = audioCtx.resume(); if (p && p.catch) p.catch(function () {}); }
     if (!burnNodes) {
       const len = audioCtx.sampleRate;
       const buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
@@ -4517,26 +4517,37 @@ function ensureAudio() {
       hum.connect(humGain); hum2.connect(hum2Gain); hum2Gain.connect(humGain);
       humGain.connect(audioCtx.destination);
       hum.start(); hum2.start();
-      burnNodes = { gain: g, hum: humGain };
+      // Muffled interior hum: the same two sines heard through the hull —
+      // lowpassed down to a dull drone for walk mode (inside the ship),
+      // so the interior is never dead silent either.
+      const innerFilt = audioCtx.createBiquadFilter();
+      innerFilt.type = 'lowpass'; innerFilt.frequency.value = 120; innerFilt.Q.value = 0.5;
+      const innerGain = audioCtx.createGain(); innerGain.gain.value = 0;
+      hum.connect(innerFilt); hum2.connect(innerFilt);
+      innerFilt.connect(innerGain); innerGain.connect(audioCtx.destination);
+      burnNodes = { gain: g, hum: humGain, inner: innerGain };
     }
   } catch (e) { /* audio unavailable: game stays silent, never crashes */ }
 }
-// Flight sound: thruster burn (looping filtered noise, gain ramps with
-// thrust) plus the idle engine hum. Called every frame from animate().
-// Round 30 fix: this used to depend on audioCtx already existing (created
-// only by a ding or a mic tap), so flying straight from DEPART with no
-// prior station or word collect meant total silence — the hum and burn
-// now ensure the context themselves, and DEPART is a tap gesture, so
-// the context is allowed to start.
-function updateBurnSound(thrust, flying) {
+// Flight + interior sound, updated every frame from animate(). Burn
+// (thrust noise) stops while a prompt is open so speech stays clear,
+// but the hums never cut for a prompt: the flight hum runs the whole
+// flight, and the muffled interior hum runs the whole time aboard, so
+// answering a question no longer starts or stops the drone. Self-gating
+// on mode/crash/title, so no call site has to get the gating right.
+function updateBurnSound(thrust) {
   try {
     ensureAudio();
     if (!audioCtx || !burnNodes) return;
     const t = audioCtx.currentTime;
-    const burnTarget = (flying && Math.abs(thrust) > 0.05) ? 0.1 : 0;
+    const inFlight = mode === 'flight' && !crashed;
+    const promptOpen = collectOpen || toolOpen || titleOpen;
+    const burnTarget = (inFlight && !promptOpen && Math.abs(thrust) > 0.05) ? 0.1 : 0;
+    const humTarget = inFlight ? 0.06 : 0;
+    const innerTarget = (mode === 'walk' && !titleOpen && !crashed) ? 0.035 : 0;
     burnNodes.gain.gain.setTargetAtTime(burnTarget, t, 0.08);
-    const humTarget = flying ? 0.045 : 0;
     burnNodes.hum.gain.setTargetAtTime(humTarget, t, 0.8);
+    burnNodes.inner.gain.setTargetAtTime(innerTarget, t, 0.8);
   } catch (e) {}
 }
 // Footsteps: light taps while walking, two surfaces — hard deck (upper
@@ -6098,10 +6109,9 @@ function animate() {
   // Round 25: auto-walk backstop. Any dock/undock transition or cell
   // entry clears auto-walk even if a dedicated call site is missed.
   if (mode !== 'walk' || inCell) stopAutoWalk();
-  // Flight sound: burn + idle hum while flying (silent docked, crashed,
-  // or while a prompt is open); footsteps while walking.
-  const flyingNow = !collectOpen && !toolOpen && !titleOpen && !crashed && mode === 'flight';
-  updateBurnSound(flyingNow ? lastThrust : 0, flyingNow);
+  // Flight + interior sound (self-gating inside updateBurnSound);
+  // footsteps while walking.
+  updateBurnSound(lastThrust);
   if (!crashed && mode === 'walk') updateFootsteps(dt);
   if (menuOn) updateMenu();
   renderer.render(scene, camera);
