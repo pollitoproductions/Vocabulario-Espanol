@@ -348,8 +348,9 @@
   <div class="controls">Progress counts spoken Spanish only — flipping, tapping, and listening don’t count; English practice doesn’t count either.</div>
   </div><button class="subHead" data-sub="settings" data-label="SETTINGS" type="button">▸ SETTINGS</button><div class="subBody" id="sub-settings">
   <div class="row"><span>SOUND VOLUME</span><span><input id="volSlider" type="range" min="0" max="100" value="100"> <b id="volPct">100%</b></span></div>
+  <div class="row"><span>SOUND EFFECTS</span><span><input id="sfxChk" type="checkbox" checked> <span class="controls">On</span></span></div>
   <div class="row"><span>VIBRATION</span><span><input id="vibeChk" type="checkbox" checked> <span class="controls">On</span></span></div>
-  <div class="controls">The slider controls game sounds (hum, thrust, footsteps, ding) — 0 is mute. Spoken words follow the device volume. Vibration works on Android; iPhones don’t let web pages vibrate, so it stays silent there.</div>
+  <div class="controls">The slider controls game sounds (hum, thrust, footsteps, ding) — 0 is mute. The SOUND EFFECTS switch turns those sounds off while spoken words keep playing at the device volume. Vibration works on Android; iPhones don’t let web pages vibrate, so it stays silent there.</div>
   </div><button class="subHead" data-sub="status" data-label="SHIP STATUS" type="button">▸ SHIP STATUS</button><div class="subBody" id="sub-status">
   <div class="row"><span>TRANSPONDER</span><b>ARK-7 // BROADCASTING</b></div>
   <div class="row"><span>DRIVE</span><b id="menuDrive">DOCKED</b></div>
@@ -3777,6 +3778,7 @@ function updateMenu() {
   // Keep the Settings controls in sync whenever the menu opens.
   if (volSlider) { volSlider.value = Math.round(gameVol * 100); if (volPct) volPct.textContent = Math.round(gameVol * 100) + '%'; }
   if (vibeChk) vibeChk.checked = vibeOn;
+  if (sfxChk) sfxChk.checked = sfxOn;
   // Scroll hint: the panel is taller than a phone screen with PROGRESS
   // open, so the bottom items hide below the fold with no affordance.
   // Show the hint whenever more content sits below the visible area.
@@ -4098,14 +4100,16 @@ function setSub(name) {
 document.querySelectorAll('#menuPanel .subHead').forEach(function (h) {
   h.addEventListener('click', function () { setSub(h.getAttribute('data-sub')); });
 });
-// Settings controls (menu → SETTINGS): volume slider + vibration toggle.
+// Settings controls (menu → SETTINGS): volume slider + sound-effects + vibration toggles.
 const volSlider = document.getElementById('volSlider');
 const volPct = document.getElementById('volPct');
+const sfxChk = document.getElementById('sfxChk');
 const vibeChk = document.getElementById('vibeChk');
 if (volSlider) volSlider.addEventListener('input', function () {
   gameVol = volSlider.value / 100; applyVolume(); saveSettings();
   if (volPct) volPct.textContent = volSlider.value + '%';
 });
+if (sfxChk) sfxChk.addEventListener('change', function () { sfxOn = sfxChk.checked; applyVolume(); saveSettings(); });
 if (vibeChk) vibeChk.addEventListener('change', function () { vibeOn = vibeChk.checked; saveSettings(); });
 // Tapping the scroll hint jumps the menu panel to its bottom (Home/Close).
 const menuScrollHint = document.getElementById('menuScrollHint');
@@ -4579,14 +4583,19 @@ function updateFlight(dt) {
 // Settings (menu → SETTINGS): sound volume + vibration, saved across
 // visits in their own key (never in the journey save, so a settings
 // change can never disturb a journey).
-let gameVol = 1, vibeOn = true, vibeTimer = 0;
+let gameVol = 1, vibeOn = true, sfxOn = true, vibeTimer = 0;
 try {
   const s = JSON.parse(localStorage.getItem('generationShipSettings_v1') || '{}');
   if (typeof s.volume === 'number') gameVol = Math.min(1, Math.max(0, s.volume));
   if (typeof s.vibration === 'boolean') vibeOn = s.vibration;
+  if (typeof s.sfx === 'boolean') sfxOn = s.sfx;
 } catch (e) {}
-function saveSettings() { try { localStorage.setItem('generationShipSettings_v1', JSON.stringify({ volume: gameVol, vibration: vibeOn })); } catch (e) {} }
-function applyVolume() { try { if (masterGain && audioCtx) masterGain.gain.setTargetAtTime(gameVol, audioCtx.currentTime, 0.05); } catch (e) {} }
+function saveSettings() { try { localStorage.setItem('generationShipSettings_v1', JSON.stringify({ volume: gameVol, vibration: vibeOn, sfx: sfxOn })); } catch (e) {} }
+// Sound effects live on the WebAudio master gain; spoken words use the
+// browser's speech engine, which never passes through it — so switching
+// effects off silences hum, thrust, footsteps, and the ding while every
+// Hear and Say-it voice keeps playing at the device volume.
+function applyVolume() { try { if (masterGain && audioCtx) masterGain.gain.setTargetAtTime(sfxOn ? gameVol : 0, audioCtx.currentTime, 0.05); } catch (e) {} }
 // Vibration: Android Chrome only — iPhones don't expose vibration to
 // web pages, so these calls silently do nothing there (guarded, never
 // an error). A number = one buzz; an array = buzz/pause pattern.
@@ -4598,7 +4607,7 @@ function ensureAudio() {
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state !== 'running') { const p = audioCtx.resume(); if (p && p.catch) p.catch(function () {}); }
-    if (!masterGain) { masterGain = audioCtx.createGain(); masterGain.gain.value = gameVol; masterGain.connect(audioCtx.destination); }
+    if (!masterGain) { masterGain = audioCtx.createGain(); masterGain.gain.value = sfxOn ? gameVol : 0; masterGain.connect(audioCtx.destination); }
     if (!burnNodes) {
       const len = audioCtx.sampleRate;
       const buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
