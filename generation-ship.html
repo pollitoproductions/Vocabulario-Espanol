@@ -814,7 +814,8 @@ spineGeo.rotateX(Math.PI / 2);
 ship.add(new THREE.Mesh(spineGeo, ringMat));
 
 // Interior end caps (seen from inside).
-const capInMat = new THREE.MeshStandardMaterial({ color: 0x39414a, roughness: 0.9, metalness: 0.2, side: THREE.DoubleSide });
+const capInMat = new THREE.MeshStandardMaterial({ color: 0x878f99, roughness: 0.9, metalness: 0.2, side: THREE.DoubleSide });
+applyGameTexture(capInMat, 'hull-panels.jpg', 16, 16); // paneled end caps
 for (const s of [1, -1]) {
   const cap = new THREE.Mesh(new THREE.CircleGeometry(RADIUS, 48), capInMat);
   cap.position.z = s * LENGTH / 2;
@@ -1548,7 +1549,8 @@ function basisQuat(radial) {
 // cos/sin directly, matching the ship's angle convention, so the gaps
 // land exactly on the doorway angles used by the walk collision below.
 {
-  const bulkMat = new THREE.MeshStandardMaterial({ color: 0x3a424c, roughness: 0.85, side: THREE.DoubleSide });
+  const bulkMat = new THREE.MeshStandardMaterial({ color: 0x878f99, roughness: 0.85, side: THREE.DoubleSide });
+  applyGameTexture(bulkMat, 'hull-panels.jpg', 16, 16); // paneled bulkhead
   const disc = new THREE.Mesh(new THREE.CircleGeometry(140, 48), bulkMat);
   disc.position.z = 0;
   ship.add(disc);
@@ -1602,7 +1604,7 @@ function basisQuat(radial) {
 {
   const ceilGeo = new THREE.CylinderGeometry(140, 140, 320, 48, 1, true);
   ceilGeo.rotateX(Math.PI / 2);
-  const ceilMat = new THREE.MeshStandardMaterial({ color: 0x2b323c, roughness: 0.9, side: THREE.DoubleSide });
+  const ceilMat = new THREE.MeshStandardMaterial({ color: 0x878f99, roughness: 0.9, side: THREE.DoubleSide });
   applyGameTexture(ceilMat, 'ceiling-panels.jpg', 24, 8); // Round 30: paneled ceiling (flat dark stays the fallback)
   const ceil = new THREE.Mesh(ceilGeo, ceilMat);
   ceil.position.z = 160;
