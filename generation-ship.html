@@ -126,6 +126,14 @@
     border-radius: 20px; padding: 14px 16px;
     font-family: "Courier New", ui-monospace, monospace; font-size: 13px; line-height: 1.55;
   }
+  /* Tap-catcher behind the menu panel: tapping anywhere outside the
+     panel closes the menu, so nobody has to scroll to CLOSE. It sits
+     below the panel (z 8) and the menu button (z 9) and above the game
+     canvas and buttons, and it is transparent — no visual change. */
+  #menuBackdrop {
+    position: fixed; inset: 0; z-index: 7; display: none;
+    background: transparent; touch-action: none;
+  }
   #menuPanel h2 { margin: 0 0 8px; font-size: 15px; letter-spacing: 0.12em; color: #7fe3ff; }
   #menuPanel .row { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 4px 0; }
   #menuPanel .row b { color: #59d6ff; text-align: right; }
@@ -324,6 +332,7 @@
   <div id="beaconWarn">LEAVING BEACON RANGE — TURN BACK — 20 km TO THE LIMIT</div>
 </div>
 <button id="btn-menu" type="button" aria-label="Ship menu">&#9776;</button>
+<div id="menuBackdrop" style="display:none"></div>
 <div id="menuPanel">
   <h2>SHIP STATUS // GENERATION SHIP</h2>
   <div id="menuScrollHint">↓ Scroll for more below</div>
@@ -439,6 +448,7 @@
     <div id="title-main-btns" style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap;">
       <button class="ctl2 primary" id="btn-title-resume" type="button" style="display:none">RESUME JOURNEY</button>
       <button class="ctl2" id="btn-title-begin" type="button">BEGIN NEW JOURNEY</button>
+      <button class="ctl2" id="btn-title-class" type="button">BACK TO CLASS SITE</button>
     </div>
     <div id="title-resume-summary"></div>
     <div id="title-confirm" style="display:none;">
@@ -2371,6 +2381,27 @@ for (const eb of ENTERABLES) {
     const g = fillGroup(ca, cz, 0.12);
     fillBox(g, 4, 0.15, 50, fillStreetMat, 0, 0, 0);
   }
+  // One water tower per neighborhood, same build as the original city
+  // tower (four legs, hull-panel tank, flat disc top). Spots sit on
+  // each lane's axis 40 m past a lane end — all eight checked clear of
+  // streets, squares, terminals, cell corridors, gallery, arch,
+  // quarters, mess tables, and the neighborhood's own furniture. The
+  // (2.725, 110) neighborhood takes its south end instead: its north
+  // end crowds the Workshop doorway corridor.
+  const fillTankMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5, metalness: 0.4 });
+  applyGameTexture(fillTankMat, 'hull-panels.jpg', 4, 1);
+  function fillWaterTower(angle, z) {
+    const g = fillGroup(angle, z, 0.4);
+    for (const [lx, lz] of [[-1.5, -1.5], [1.5, -1.5], [-1.5, 1.5], [1.5, 1.5]])
+      fillBox(g, 0.4, 6, 0.4, fillPostMat, lx, 2.6, lz);
+    const tank = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 4, 12), fillTankMat);
+    tank.position.set(0, 7.6, 0);
+    g.add(tank);
+    const tankTop = new THREE.Mesh(new THREE.CylinderGeometry(2.8, 2.8, 0.3, 12), fillTankMat);
+    tankTop.position.set(0, 9.75, 0);
+    g.add(tankTop);
+  }
+  for (const [ta, tz] of [[0.55, 190], [0.625, 290], [2.725, 70], [2.375, 290], [3.425, 190], [3.775, 300], [5.175, 240], [5.525, 240]]) fillWaterTower(ta, tz);
 }
 
 // ---------- Round 11: lived-in habitat dressing ----------
@@ -3512,6 +3543,7 @@ const wordArrow = document.getElementById('wordArrow');
 const wordDist = document.getElementById('wordDist');
 const beaconWarn = document.getElementById('beaconWarn');
 const menuPanel = document.getElementById('menuPanel');
+const menuBackdrop = document.getElementById('menuBackdrop');
 const btnMode = document.getElementById('btn-mode');
 const btnMenu = document.getElementById('btn-menu');
 const btnJump = document.getElementById('btn-jump');
@@ -3549,6 +3581,7 @@ function toggleMenu() {
   menuOn = !menuOn;
   if (menuOn) stopAutoWalk();
   menuPanel.style.display = menuOn ? 'block' : 'none';
+  menuBackdrop.style.display = menuOn ? 'block' : 'none';
   btnMenu.classList.toggle('on', menuOn);
   if (menuOn) { menuSaveMsg.textContent = ''; updateMenu(); }
 }
@@ -4031,6 +4064,9 @@ document.getElementById('btn-menu').addEventListener('pointerdown', function (e)
 });
 document.getElementById('btn-menu-close').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur(); toggleMenu();
+});
+document.getElementById('menuBackdrop').addEventListener('pointerdown', function (e) {
+  e.preventDefault(); if (menuOn) toggleMenu();
 });
 // Round 24: menu submenus. One open at a time (phone panel stays usable).
 // The open section persists across menu opens; PROGRESS is the default.
@@ -6602,6 +6638,10 @@ document.getElementById('btn-title-begin').addEventListener('pointerdown', funct
     hideTitle();
     announceBoarding(); // a new journey starts aboard
   }
+});
+document.getElementById('btn-title-class').addEventListener('pointerdown', function (e) {
+  e.preventDefault(); e.target.blur();
+  window.location.href = 'index.html'; // back to the class landing page
 });
 document.getElementById('btn-title-confirm').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur();
