@@ -145,6 +145,7 @@
   }
   #menuPanel .subBody { display: none; }
   #menuPanel .subBody.open { display: block; }
+  #menuPanel input[type=range] { width: 160px; accent-color: #59d6ff; vertical-align: middle; }
   #failOverlay {
     position: fixed; inset: 0; z-index: 30; display: none; flex-direction: column;
     align-items: center; justify-content: center; gap: 12px;
@@ -359,6 +360,11 @@
   </div>
   </div><button class="subHead" data-sub="note" data-label="NOTE" type="button">▸ NOTE</button><div class="subBody" id="sub-note">
   <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; any asteroid can be mined (hold M, or the MINE button, for about 3 seconds within 100 m) for water from icy comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. (Jump arcs feel Mars-like by movement tuning; the ship&rsquo;s spin gravity itself is unchanged.) After departing, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, with a MEDICAL BAY room in the technology half. Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 25 km from the ship, grows urgent past 40 km, and past 50 km you are LOST and the run ends (retry returns you aboard, haul kept, free). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, all 1,000 Spanish vocabulary words float from about 3 km to 20 km out, plus exercise questions between 1.5 km and 15 km out — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold arrow under the port readout points to the nearest uncollected item — word or exercise question — with a tag saying which, and distant items show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, you return to your last save.</div>
+  </div>
+  </div><button class="subHead" data-sub="settings" data-label="SETTINGS" type="button">▸ SETTINGS</button><div class="subBody" id="sub-settings">
+  <div class="row"><span>SOUND VOLUME</span><span><input id="volSlider" type="range" min="0" max="100" value="100"> <b id="volPct">100%</b></span></div>
+  <div class="row"><span>VIBRATION</span><span><input id="vibeChk" type="checkbox" checked> <span class="controls">On</span></span></div>
+  <div class="controls">The slider controls game sounds (hum, thrust, footsteps, ding) — 0 is mute. Spoken words follow the device volume. Vibration works on Android; iPhones don’t let web pages vibrate, so it stays silent there.</div>
   </div>
   <button class="closeBtn" id="btn-menu-home" type="button">GO TO HOME SCREEN</button>
   <button class="closeBtn" id="btn-menu-close" type="button">CLOSE</button>
@@ -3033,7 +3039,7 @@ function updateCellWalk(dt) {
   if (jumpH > 0 || jumpV > 0) {
     jumpV -= JUMP_G * dt;
     jumpH += jumpV * dt;
-    if (jumpH <= 0) { jumpH = 0; jumpV = 0; }
+    if (jumpH <= 0) { jumpH = 0; jumpV = 0; buzz(60); } // landing thud
   }
   const base = cellGroup.position;
   const pos = new THREE.Vector3(base.x + cellX, 1.7 + jumpH, base.z + cellZ);
@@ -3557,6 +3563,7 @@ function hideNav() {
 function doJump() {
   if (mode !== 'walk' || jumpH > 0) return;
   jumpV = JUMP_VEL;
+  buzz(30); // takeoff kick
 }
 
 // Collision ends the run: full-screen MISSION FAILED, frozen flight.
@@ -3717,6 +3724,9 @@ function updateMenu() {
     menuPort.textContent = 'DOCKED';
   }
   updateProgressUI();
+  // Keep the Settings controls in sync whenever the menu opens.
+  if (volSlider) { volSlider.value = Math.round(gameVol * 100); if (volPct) volPct.textContent = Math.round(gameVol * 100) + '%'; }
+  if (vibeChk) vibeChk.checked = vibeOn;
 }
 // PROGRESS submenu counts. The practice-spoken line counts the live
 // collected tiles (collecting a tile requires speaking it, so this
@@ -3749,6 +3759,7 @@ function undock() {
   dockArmed = false; // auto-dock stays OFF until the shuttle has flown clear of every port
   mode = 'flight';
   driveState = 'COAST';
+  buzz([80, 60, 80]); // departure thrum
   const phi = playerAngle + cylAngle;
   const rr = RADIUS + 22;
   shuttle.position.set(Math.cos(phi) * rr, Math.sin(phi) * rr, playerZ);
@@ -3784,6 +3795,7 @@ function undock() {
 function autoDock(port) {
   mode = 'walk';
   driveState = 'DOCKED';
+  buzz([60, 80, 120]); // dock clunk + settle
   if (port && !port.top) {
     // Match the touched body port to its terminal: same angle, and the
     // closest z among that angle's terminals (this picks up the nudged
@@ -4011,7 +4023,7 @@ document.getElementById('btn-menu-close').addEventListener('pointerdown', functi
 let menuSub = 'progress';
 function setSub(name) {
   menuSub = name;
-  ['status', 'progress', 'manual', 'note'].forEach(function (n) {
+  ['status', 'progress', 'manual', 'note', 'settings'].forEach(function (n) {
     const b = document.getElementById('sub-' + n);
     if (b) b.classList.toggle('open', n === name);
   });
@@ -4023,6 +4035,15 @@ function setSub(name) {
 document.querySelectorAll('#menuPanel .subHead').forEach(function (h) {
   h.addEventListener('click', function () { setSub(h.getAttribute('data-sub')); });
 });
+// Settings controls (menu → SETTINGS): volume slider + vibration toggle.
+const volSlider = document.getElementById('volSlider');
+const volPct = document.getElementById('volPct');
+const vibeChk = document.getElementById('vibeChk');
+if (volSlider) volSlider.addEventListener('input', function () {
+  gameVol = volSlider.value / 100; applyVolume(); saveSettings();
+  if (volPct) volPct.textContent = volSlider.value + '%';
+});
+if (vibeChk) vibeChk.addEventListener('change', function () { vibeOn = vibeChk.checked; saveSettings(); });
 document.getElementById('btn-retry').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur(); failPrimaryAction();
 });
@@ -4144,7 +4165,7 @@ function updateWalk(dt) {
   if (jumpH > 0 || jumpV > 0) {
     jumpV -= JUMP_G * dt;
     jumpH += jumpV * dt;
-    if (jumpH <= 0) { jumpH = 0; jumpV = 0; }
+    if (jumpH <= 0) { jumpH = 0; jumpV = 0; buzz(60); } // landing thud
   }
 
   // Coriolis: while airborne the player keeps their inertial tangential
@@ -4486,11 +4507,29 @@ function updateFlight(dt) {
 // WebAudio: one shared context, created on the first user gesture (never
 // before — autoplay rules), every call wrapped in try/catch so a missing
 // audio device can never break the game.
-let audioCtx = null, burnNodes = null, noiseBuf = null;
+// Settings (menu → SETTINGS): sound volume + vibration, saved across
+// visits in their own key (never in the journey save, so a settings
+// change can never disturb a journey).
+let gameVol = 1, vibeOn = true, vibeTimer = 0;
+try {
+  const s = JSON.parse(localStorage.getItem('generationShipSettings_v1') || '{}');
+  if (typeof s.volume === 'number') gameVol = Math.min(1, Math.max(0, s.volume));
+  if (typeof s.vibration === 'boolean') vibeOn = s.vibration;
+} catch (e) {}
+function saveSettings() { try { localStorage.setItem('generationShipSettings_v1', JSON.stringify({ volume: gameVol, vibration: vibeOn })); } catch (e) {} }
+function applyVolume() { try { if (masterGain && audioCtx) masterGain.gain.setTargetAtTime(gameVol, audioCtx.currentTime, 0.05); } catch (e) {} }
+// Vibration: Android Chrome only — iPhones don't expose vibration to
+// web pages, so these calls silently do nothing there (guarded, never
+// an error). A number = one buzz; an array = buzz/pause pattern.
+function buzz(pattern) {
+  try { if (vibeOn && 'vibrate' in navigator) navigator.vibrate(pattern); } catch (e) {}
+}
+let audioCtx = null, burnNodes = null, noiseBuf = null, masterGain = null;
 function ensureAudio() {
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state !== 'running') { const p = audioCtx.resume(); if (p && p.catch) p.catch(function () {}); }
+    if (!masterGain) { masterGain = audioCtx.createGain(); masterGain.gain.value = gameVol; masterGain.connect(audioCtx.destination); }
     if (!burnNodes) {
       const len = audioCtx.sampleRate;
       const buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
@@ -4502,7 +4541,7 @@ function ensureAudio() {
       const filt = audioCtx.createBiquadFilter();
       filt.type = 'lowpass'; filt.frequency.value = 500; filt.Q.value = 0.5;
       const g = audioCtx.createGain(); g.gain.value = 0;
-      src.connect(filt); filt.connect(g); g.connect(audioCtx.destination);
+      src.connect(filt); filt.connect(g); g.connect(masterGain);
       src.start();
       // Idle engine hum, rounded: two pure sines — 55 Hz plus a quiet
       // 110 Hz octave so it stays audible on phone speakers — with no
@@ -4515,7 +4554,7 @@ function ensureAudio() {
       const humGain = audioCtx.createGain(); humGain.gain.value = 0;
       const hum2Gain = audioCtx.createGain(); hum2Gain.gain.value = 0.45;
       hum.connect(humGain); hum2.connect(hum2Gain); hum2Gain.connect(humGain);
-      humGain.connect(audioCtx.destination);
+      humGain.connect(masterGain);
       hum.start(); hum2.start();
       // Muffled interior hum: the same two sines heard through the hull —
       // lowpassed down to a dull drone for walk mode (inside the ship),
@@ -4524,7 +4563,7 @@ function ensureAudio() {
       innerFilt.type = 'lowpass'; innerFilt.frequency.value = 120; innerFilt.Q.value = 0.5;
       const innerGain = audioCtx.createGain(); innerGain.gain.value = 0;
       hum.connect(innerFilt); hum2.connect(innerFilt);
-      innerFilt.connect(innerGain); innerGain.connect(audioCtx.destination);
+      innerFilt.connect(innerGain); innerGain.connect(masterGain);
       burnNodes = { gain: g, hum: humGain, inner: innerGain };
     }
   } catch (e) { /* audio unavailable: game stays silent, never crashes */ }
@@ -4573,8 +4612,8 @@ function playStep(soft) {
     try {
       const pan = audioCtx.createStereoPanner();
       pan.pan.value = stepSide * 0.25;
-      g.connect(pan); pan.connect(audioCtx.destination);
-    } catch (e2) { g.connect(audioCtx.destination); }
+      g.connect(pan); pan.connect(masterGain || audioCtx.destination);
+    } catch (e2) { g.connect(masterGain || audioCtx.destination); }
     src.start(t, Math.random() * 0.5, soft ? 0.16 : 0.11);
     stepSide = -stepSide;
   } catch (e) {}
@@ -4612,6 +4651,8 @@ function updateFootsteps(dt) {
 // chimes instead of pings. The web tools keep the site-standard 0.5;
 // this softer one is ship-only. Only ever played on a correct pronunciation.
 function playDing() {
+  // Triple little buzz on every correct answer — the ding's haptic twin.
+  buzz([50, 70, 50, 70, 50]);
   try {
     ensureAudio();
     if (!audioCtx) return;
@@ -4623,7 +4664,7 @@ function playDing() {
       g.gain.linearRampToValueAtTime(0.3, start + 0.12);
       g.gain.setValueAtTime(0.3, start + 0.35);
       g.gain.linearRampToValueAtTime(0.0001, stop);
-      o.connect(g); g.connect(audioCtx.destination);
+      o.connect(g); g.connect(masterGain || audioCtx.destination);
       o.start(start); o.stop(stop + 0.05);
     };
     note(880, t0, t0 + 0.55);
@@ -6112,6 +6153,12 @@ function animate() {
   // Flight + interior sound (self-gating inside updateBurnSound);
   // footsteps while walking.
   updateBurnSound(lastThrust);
+  // Thrust rumble: a gentle pulse train while the engines push (never
+  // during a prompt, so speech stays clean).
+  if (mode === 'flight' && !crashed && !collectOpen && !toolOpen && Math.abs(lastThrust) > 0.05) {
+    vibeTimer += dt;
+    if (vibeTimer >= 0.25) { buzz(50); vibeTimer = 0; }
+  } else vibeTimer = 0;
   if (!crashed && mode === 'walk') updateFootsteps(dt);
   if (menuOn) updateMenu();
   renderer.render(scene, camera);
