@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Generation Ship — Prototype</title>
+<title>Generation Ship</title>
 <style>
   * { box-sizing: border-box; }
   html, body {
@@ -2999,12 +2999,19 @@ function exitCell() {
 btnExit.addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur(); exitCell();
 });
+const ARROW_LOOK_RATE = 1.5; // rad/s — arrow-key look (walk + cells), pairs with WASD movement
 function updateCellWalk(dt) {
   let f = 0, s = 0;
-  if (keys.KeyW || keys.ArrowUp) f += 1;
-  if (keys.KeyS || keys.ArrowDown) f -= 1;
+  if (keys.KeyW) f += 1;
+  if (keys.KeyS) f -= 1;
   if (keys.KeyD) s += 1;
   if (keys.KeyA) s -= 1;
+  // Arrow keys look (not move) in cells, so they work together with WASD:
+  // Left/Right turn the view, Up/Down pitch it.
+  if (keys.ArrowLeft) cellYaw -= ARROW_LOOK_RATE * dt;
+  if (keys.ArrowRight) cellYaw += ARROW_LOOK_RATE * dt;
+  if (keys.ArrowUp) cellPitch = Math.min(1.45, cellPitch + ARROW_LOOK_RATE * dt);
+  if (keys.ArrowDown) cellPitch = Math.max(-1.45, cellPitch - ARROW_LOOK_RATE * dt);
   f += joyY; s += joyX;
   // Round 25 auto-walk: when on, forward pressure stays applied; the
   // normalize below keeps it at base/run speed, and holding back (S or
@@ -3854,6 +3861,37 @@ document.addEventListener('mousemove', function (e) {
     }
   }
 });
+// Mouse drag look (no pointer lock needed): holding the left button on
+// the canvas and dragging looks around, in every mode, even while WASD
+// is held — so looking never requires stopping first. When pointer lock
+// IS engaged the lock handler above owns the mouse and this stays out
+// of the way. Touch drags are handled separately (lookPointerId).
+let mouseDragId = null, mouseDragX = 0, mouseDragY = 0;
+canvas.addEventListener('pointerdown', function (e) {
+  if (e.pointerType === 'touch' || e.button !== 0) return;
+  mouseDragId = e.pointerId; mouseDragX = e.clientX; mouseDragY = e.clientY;
+});
+window.addEventListener('pointermove', function (e) {
+  if (e.pointerId !== mouseDragId || pointerLocked || crashed) return;
+  const dx = e.clientX - mouseDragX, dy = e.clientY - mouseDragY;
+  mouseDragX = e.clientX; mouseDragY = e.clientY;
+  if (inCell) {
+    cellYaw += dx * 0.005;
+    cellPitch = Math.max(-1.45, Math.min(1.45, cellPitch - dy * 0.005));
+  } else if (mode === 'walk') {
+    yaw -= dx * 0.005;
+    pitch = Math.max(-1.45, Math.min(1.45, pitch - dy * 0.005));
+  } else if (lookSteerMode === 'steer') {
+    steerDragYaw += dx; steerDragPitch += dy;
+    lastFlightInput = performance.now();
+  } else {
+    camYaw -= dx * 0.005;
+    camPitch = Math.max(-1.45, Math.min(1.45, camPitch - dy * 0.005));
+  }
+});
+function endMouseDrag(e) { if (e.pointerId === mouseDragId) mouseDragId = null; }
+window.addEventListener('pointerup', endMouseDrag);
+window.addEventListener('pointercancel', endMouseDrag);
 document.addEventListener('keydown', function (e) {
   if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'ArrowDown' || e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
     e.preventDefault();
@@ -4042,10 +4080,16 @@ function galleryFactor(a, z) {
 // ---------- Docked: first person on the inner surface, carried by the spin ----------
 function updateWalk(dt) {
   let f = 0, s = 0;
-  if (keys.KeyW || keys.ArrowUp) f += 1;
-  if (keys.KeyS || keys.ArrowDown) f -= 1;
+  if (keys.KeyW) f += 1;
+  if (keys.KeyS) f -= 1;
   if (keys.KeyD) s += 1;
   if (keys.KeyA) s -= 1;
+  // Arrow keys look (not move) on deck, so they work together with WASD:
+  // Left/Right turn the view, Up/Down pitch it.
+  if (keys.ArrowLeft) yaw += ARROW_LOOK_RATE * dt;
+  if (keys.ArrowRight) yaw -= ARROW_LOOK_RATE * dt;
+  if (keys.ArrowUp) pitch = Math.min(1.45, pitch + ARROW_LOOK_RATE * dt);
+  if (keys.ArrowDown) pitch = Math.max(-1.45, pitch - ARROW_LOOK_RATE * dt);
   f += joyY; s += joyX;
   // Round 25 auto-walk: when on, forward pressure stays applied; the
   // normalize below keeps it at base/run speed, and holding back (S or
@@ -4150,6 +4194,10 @@ function updateFlight(dt) {
   // mode (the on-screen THRUST/RETRO/TURN buttons were removed as redundant).
   if (keys.KeyA) yawIn += 1;
   if (keys.KeyD) yawIn -= 1;
+  // Left/Right arrows guide the ship exactly like A/D (they did nothing
+  // in flight before); Up/Down already pitch, below.
+  if (keys.ArrowLeft) yawIn += 1;
+  if (keys.ArrowRight) yawIn -= 1;
   yawIn -= joyX;
   if (keys.ArrowUp) pitchIn -= 1;
   if (keys.ArrowDown) pitchIn += 1;
@@ -4456,14 +4504,19 @@ function ensureAudio() {
       const g = audioCtx.createGain(); g.gain.value = 0;
       src.connect(filt); filt.connect(g); g.connect(audioCtx.destination);
       src.start();
-      // Idle engine hum: a low triangle drone (its harmonics survive phone
-      // speakers) that runs the whole flight, so the ship is never dead
+      // Idle engine hum, rounded: two pure sines — 55 Hz plus a quiet
+      // 110 Hz octave so it stays audible on phone speakers — with no
+      // triangle edge. Runs the whole flight, so the ship is never dead
       // silent while coasting or turning. Gain swells in on DEPART.
       const hum = audioCtx.createOscillator();
-      hum.type = 'triangle'; hum.frequency.value = 55;
+      hum.type = 'sine'; hum.frequency.value = 55;
+      const hum2 = audioCtx.createOscillator();
+      hum2.type = 'sine'; hum2.frequency.value = 110;
       const humGain = audioCtx.createGain(); humGain.gain.value = 0;
-      hum.connect(humGain); humGain.connect(audioCtx.destination);
-      hum.start();
+      const hum2Gain = audioCtx.createGain(); hum2Gain.gain.value = 0.45;
+      hum.connect(humGain); hum2.connect(hum2Gain); hum2Gain.connect(humGain);
+      humGain.connect(audioCtx.destination);
+      hum.start(); hum2.start();
       burnNodes = { gain: g, hum: humGain };
     }
   } catch (e) { /* audio unavailable: game stays silent, never crashes */ }
@@ -4488,9 +4541,9 @@ function updateBurnSound(thrust, flying) {
 }
 // Footsteps: light taps while walking, two surfaces — hard deck (upper
 // half, rooms) gets a crisp bandpassed tap, agriculture soil gets a soft
-// lowpassed thud. Stride timing follows real movement (camera travel),
+// lowpassed thud. Stride timing follows real movement (ship-frame travel),
 // so steps never play while standing still, mid-jump, or with a panel open.
-let stepTimer = 0, stepLastX = 0, stepLastZ = 0, stepSide = 1;
+let stepTimer = 0, stepLastA = 0, stepLastB = 0, stepLastCell = false, stepSide = 1;
 function playStep(soft) {
   try {
     if (!audioCtx || !noiseBuf) return;
@@ -4498,12 +4551,12 @@ function playStep(soft) {
     const src = audioCtx.createBufferSource();
     src.buffer = noiseBuf;
     const filt = audioCtx.createBiquadFilter();
-    if (soft) { filt.type = 'lowpass'; filt.frequency.value = 500 * (0.9 + Math.random() * 0.2); filt.Q.value = 0.5; }
-    else { filt.type = 'bandpass'; filt.frequency.value = 1400 * (0.9 + Math.random() * 0.2); filt.Q.value = 1; }
+    if (soft) { filt.type = 'lowpass'; filt.frequency.value = 450 * (0.9 + Math.random() * 0.2); filt.Q.value = 0.5; }
+    else { filt.type = 'bandpass'; filt.frequency.value = 1100 * (0.9 + Math.random() * 0.2); filt.Q.value = 1; }
     const g = audioCtx.createGain();
-    const peak = soft ? 0.06 : 0.07;
+    const peak = soft ? 0.045 : 0.05;
     g.gain.setValueAtTime(0.0001, t);
-    g.gain.linearRampToValueAtTime(peak, t + (soft ? 0.02 : 0.008));
+    g.gain.linearRampToValueAtTime(peak, t + (soft ? 0.025 : 0.015));
     g.gain.linearRampToValueAtTime(0.0001, t + (soft ? 0.14 : 0.09));
     src.connect(filt); filt.connect(g);
     try {
@@ -4519,14 +4572,19 @@ function updateFootsteps(dt) {
   try {
     ensureAudio();
     if (!audioCtx || !noiseBuf) return;
-    if (mode !== 'walk' || crashed || collectOpen || toolOpen || titleOpen || menuOn || jumpH !== 0) {
+    // Ship-frame position: deck walk moves playerAngle/playerZ, cells move
+    // cellX/cellZ. (Camera world position must NOT be used: the ship's spin
+    // moves the camera ~0.36 m/frame even standing still, which played
+    // steps when the player was not moving at all.)
+    const pa = inCell ? cellX : playerAngle * playerEyeR;
+    const pb = inCell ? cellZ : playerZ;
+    if (mode !== 'walk' || crashed || collectOpen || toolOpen || titleOpen || menuOn || jumpH !== 0 || inCell !== stepLastCell) {
       stepTimer = 0;
-      stepLastX = camera.position.x; stepLastZ = camera.position.z;
+      stepLastA = pa; stepLastB = pb; stepLastCell = inCell;
       return;
     }
-    const dx = camera.position.x - stepLastX, dz = camera.position.z - stepLastZ;
-    const moved = Math.hypot(dx, dz);
-    stepLastX = camera.position.x; stepLastZ = camera.position.z;
+    const moved = Math.hypot(pa - stepLastA, pb - stepLastB);
+    stepLastA = pa; stepLastB = pb;
     if (moved > 10) { stepTimer = 0; return; } // teleport/dock: no step burst
     if (moved < 0.02) { stepTimer = 0; return; }
     const running = keys.ShiftLeft || keys.ShiftRight || Math.hypot(joyX, joyY) > 0.9;
