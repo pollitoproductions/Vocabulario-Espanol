@@ -99,10 +99,10 @@
   /* EXIT (cells only) shares DEPART's slot at right 92 — the two never
      co-appear (DEPART is docked/walk, EXIT is cells-only), and JUMP
      keeps the corner in both states. REVIEW keeps its rung above JUMP
-     (right 16, bottom 176). The old OPEN station button is retired:
-     stations auto-open on walk-up, so #btn-station never displays. */
+     (right 16, bottom 176). LEARN sits between them (right 16, bottom
+     101) with MINE's cyan accent so it pops at a glance in range. */
   #btn-exit { right: calc(92px + env(safe-area-inset-right, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
-  #btn-station { width: 56px; height: 56px; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(101px + env(safe-area-inset-bottom, 0px)); }
+  #btn-station { width: 56px; height: 56px; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(101px + env(safe-area-inset-bottom, 0px)); border: 2px solid rgba(127, 227, 255, 0.9); background: linear-gradient(160deg, rgba(127, 227, 255, 0.35), rgba(127, 227, 255, 0.12)); box-shadow: 0 0 18px rgba(127, 227, 255, 0.55), 0 6px 18px rgba(0, 0, 0, 0.30); }
   #btn-terminal { width: 56px; height: 56px; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(176px + env(safe-area-inset-bottom, 0px)); }
   /* Mini menu button: small, rounded, cyber-blue synthetic look. */
   #btn-menu {
@@ -357,7 +357,7 @@
     <div class="mHead">TOUCH</div>
     <div class="mBody">Left half: floating stick (push to its edge to run) &middot; drag the right side: starts on STEER (drag steers the ship, drag up to climb; the LOOK/STEER button switches to LOOK mode, which looks around; the left stick steers in both modes; the camera stays where you leave it) &middot; DEPART at an Exploration Terminal — one inside each hull port, eight in all (docking is automatic within 100 m of any port) &middot; JUMP while walking aboard &middot; hold MINE within 100 m of any asteroid (about 3 seconds) &middot; hold BRAKE to stop in flight &middot; &#9776; ship menu &middot; the nav readout is always on while flying</div>
     <div class="mHead">LEARNING STATIONS</div>
-    <div class="mBody">The six tool stations are walk-up consoles in the agriculture ring: walk up to a glowing ring and stand there a moment — it opens on its own (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). A station never blocks you &mdash; speaking is feedback only, except that spoken Spanish earns progress. On Practice, Conjugation, and Ser vs. estar, the audio row stays hidden until you answer &mdash; answer first, then listen.</div>
+    <div class="mBody">The six tool stations are walk-up consoles in the agriculture ring: walk up to a glowing ring and tap LEARN (or press Enter); Close or Escape returns you to walking. Every station speaks in Spanish and English and lets you practise saying it (ding on a correct answer). A station never blocks you &mdash; speaking is feedback only, except that spoken Spanish earns progress. On Practice, Conjugation, and Ser vs. estar, the audio row stays hidden until you answer &mdash; answer first, then listen.</div>
     <div class="mHead">COLLECTING IN SPACE</div>
     <div class="mBody">Fly within 250 m of a floating word or exercise question to pause and pronounce it: words ask for the Spanish word; questions ask you to speak the answer (tap Show answer to peek &mdash; peeking never counts, only speaking does). Say it right to collect it for +5 WATER and +5 METAL; Leave (or Escape) flies on, and the item waits until you are 400 m clear. A gold arrow points to the nearest uncollected item &mdash; word or question &mdash; with a tag saying which; distant items show as small glow dots until their plates stream in.</div>
     <div class="mHead">REVIEW TERMINALS</div>
@@ -470,7 +470,7 @@
   <button class="ctl on" id="btn-looksteer" type="button" style="display:none">STEER</button>
   <button class="ctl" id="btn-brake" type="button" style="display:none">BRAKE</button>
   <button class="ctl" id="btn-exit" type="button" style="display:none">EXIT</button>
-  <button class="ctl" id="btn-station" type="button" style="display:none">OPEN</button>
+  <button class="ctl" id="btn-station" type="button" style="display:none">LEARN</button>
   <button class="ctl" id="btn-terminal" type="button" style="display:none">REVIEW</button>
 </div>
 <canvas id="game"></canvas>
@@ -5100,18 +5100,21 @@ const announceIsIOS = typeof navigator !== 'undefined' && (/iPad|iPhone|iPod/.te
 // computer sounds calm rather than harsh, and quieter on desktop.
 // iPhone rules baked in here: a greeting spoken from a timer (or in the
 // same breath as a cancel) gets silently dropped, while tap-driven
-// exercise speech works — so this never cancels-and-speaks at once.
+// exercise speech works — so this never cancels-and-speaks at once,
+// and a line that never starts gets one fresh attempt a moment later
+// (the iPhone flake: heard once in several tries).
 function speakAnnouncement(text, lang, onState) {
   try {
     if (!('speechSynthesis' in window)) return;
     const synth = window.speechSynthesis;
-    const say = function () {
+    const chain = lang === 'es' ? ['es-mx', 'es-us', 'es'] : ['en-us', 'en'];
+    let started = false, ended = false, retried = false;
+    const speakOnce = function () {
       try {
         const u = new SpeechSynthesisUtterance(text);
         u.rate = 0.8;
         u.pitch = 0.9;
         if (!announceIsIOS) u.volume = 0.75;
-        const chain = lang === 'es' ? ['es-mx', 'es-us', 'es'] : ['en-us', 'en'];
         const voices = synth.getVoices ? synth.getVoices() : [];
         u.voice = null;
         for (let i = 0; i < chain.length; i++) {
@@ -5119,22 +5122,30 @@ function speakAnnouncement(text, lang, onState) {
           if (v) { u.voice = v; break; }
         }
         if (!u.voice) u.lang = lang === 'es' ? 'es-MX' : 'en-US';
-        if (onState) {
-          u.onstart = function () { onState(true); };
-          u.onend = function () { onState(false); };
-          u.onerror = function () { onState(false); };
-        }
+        u.onstart = function () { started = true; if (onState) onState(true); };
+        u.onend = function () { if (!ended) { ended = true; if (onState) onState(false); } };
+        u.onerror = function () { if (!ended) { ended = true; if (onState) onState(false); } };
         synth.speak(u);
-      } catch (e) { if (onState) onState(false); }
+        // No-start retry: if nothing started and nothing is speaking
+        // a moment later, the line was swallowed — cancel and try once
+        // more with a fresh utterance.
+        setTimeout(function () {
+          if (started || ended || retried) return;
+          try { if (synth.speaking) return; } catch (e) {}
+          retried = true;
+          try { synth.cancel(); } catch (e) {}
+          setTimeout(speakOnce, 150);
+        }, 1200);
+      } catch (e) { if (onState && !ended) { ended = true; onState(false); } }
     };
     try {
       if (synth.speaking || synth.pending) {
         synth.cancel();
-        setTimeout(say, 100); // cancelled speech needs a beat before the next line
+        setTimeout(speakOnce, 100); // cancelled speech needs a beat before the next line
       } else {
-        say();
+        speakOnce();
       }
-    } catch (e) { say(); }
+    } catch (e) { speakOnce(); }
   } catch (e) { if (onState) onState(false); }
 }
 function announcePair(en, es) {
@@ -5150,7 +5161,22 @@ function announcePair(en, es) {
     const sayEnglish = function () {
       if (gen !== announceGen) return;
       speakAnnouncement(en, 'en', function (playing) { if (!playing) saySpanish(); });
-      setTimeout(saySpanish, 8000);
+      // Spanish waits until English is truly finished: if the engine
+      // still reports speaking at 8 s, re-check every 2 s (up to five
+      // times) instead of talking over it, then give up quietly.
+      let fallbackTries = 0;
+      const fallback = function () {
+        if (done || gen !== announceGen) return;
+        try {
+          const s = window.speechSynthesis;
+          if (s && (s.speaking || s.pending)) {
+            if (fallbackTries < 5) { fallbackTries++; setTimeout(fallback, 2000); }
+            return;
+          }
+        } catch (e) {}
+        saySpanish();
+      };
+      setTimeout(fallback, 8000);
     };
     if (announceIsIOS) {
       // iPhones drop speech that waits on a timer after a tap, so the
@@ -5429,19 +5455,12 @@ function stationDist2(st) {
   const dz = playerZ - st.z;
   return tang * tang + dz * dz;
 }
-// Stations auto-open on walk-up (Brant: "you just walk up to them") —
-// the OPEN button is retired and never displays. A station opens only
-// after the player has stayed continuously inside its 8 m trigger for
-// STATION_DWELL_MS (walking straight past never pops it open), and
-// after a station UI is closed it stays shut while the player still
-// stands in its trigger, re-arming only once the player has left every
-// trigger (same spirit as the cell re-entry cooldown).
-// Pass-through math: the 8 m trigger is 16 m across; a straight pass
-// at walk speed (18 m/s) takes 0.89 s, at run speed (27 m/s) 0.59 s.
-// 1200 ms sits above both, so passing through never opens a station,
-// while standing still at one opens it after a moment.
-const STATION_DWELL_MS = 1200;
-let stationDwellId = null, stationDwellSince = 0, stationBlockedId = null;
+// Learning stations are button-activated, same rules as REVIEW and
+// DEPART: the LEARN button shows while the player stands inside a
+// station's 8 m trigger (applied every frame, hidden out of range)
+// and opens that station only on tap (or Enter). No dwell, no
+// auto-open, no leave-and-return block — tapping is the player's own
+// choice, so closing and re-tapping just works.
 function checkStations() {
   if (toolOpen || reviewOpen) { btnStation.style.display = 'none'; stationNear = null; return; }
   let best = null, bestD2 = STATION_DIST * STATION_DIST;
@@ -5449,25 +5468,21 @@ function checkStations() {
     const d2 = stationDist2(st);
     if (d2 < bestD2) { bestD2 = d2; best = st; }
   }
+  btnStation.style.display = best ? '' : 'none';
   if (best !== stationNear) {
     stationNear = best;
-    stationDwellId = best ? best.id : null;
-    stationDwellSince = performance.now();
     if (best) {
-      hint.textContent = (best.id === stationBlockedId) ? '' : 'Near the ' + best.title + ' station — stay a moment and it opens';
+      btnStation.textContent = 'LEARN';
+      hint.textContent = 'Near the ' + best.title + ' station — tap LEARN or press Enter';
     } else {
       if (hint.textContent.indexOf('Near the ') === 0) hint.textContent = '';
     }
   }
-  // Leave-and-return re-arm: leaving every trigger clears the block.
-  if (!best && stationBlockedId) stationBlockedId = null;
-  // A modal pause (menu / title / collect) restarts the dwell, so the
-  // dwell counts only genuinely standing at the station, unblocked.
-  if (menuOn || titleOpen || collectOpen) stationDwellSince = performance.now();
-  if (best && best.id !== stationBlockedId && stationDwellId === best.id && !menuOn && !titleOpen && !collectOpen && !crashed && performance.now() - stationDwellSince >= STATION_DWELL_MS) {
-    openTool(best.id);
-  }
 }
+btnStation.addEventListener('pointerdown', function (e) {
+  e.preventDefault(); e.target.blur();
+  if (stationNear) openTool(stationNear.id);
+});
 function openTool(id) {
   const st = STATIONS.find(function (s) { return s.id === id; });
   if (!st) return;
@@ -5490,7 +5505,6 @@ function openTool(id) {
 }
 function closeTool() {
   if (!toolOpen) return;
-  stationBlockedId = toolId; // do not reopen while still standing in this trigger
   toolOpen = false; toolId = null;
   stopToolListening(false);
   try { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch (e) {}
