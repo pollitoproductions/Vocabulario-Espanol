@@ -3655,6 +3655,7 @@ function failPrimaryAction() {
         failOverlay.style.display = 'none';
         mineProgress = 0; mineHeld = false; mineTarget = null;
         btnMine.style.display = 'none';
+        if (mode === 'walk') announceBoarding(); // restored aboard — greet back (a flight restore stays silent)
         return;
       }
     }
@@ -3697,6 +3698,7 @@ function retryMission() {
   btnMode.style.display = '';
   btnJump.style.visibility = 'visible';
   updateHint();
+  announceBoarding(); // crash/LOST retry restarts aboard — the ship greets you back
 }
 // Gravity readout is computed from the actual spin rate and radius, not faked.
 const spinG = OMEGA * OMEGA * RADIUS;
@@ -3771,6 +3773,7 @@ function undock() {
   mode = 'flight';
   driveState = 'COAST';
   buzz([80, 60, 80]); // departure thrum
+  announceDeparting(); // farewell on every departure, English then Spanish
   const phi = playerAngle + cylAngle;
   const rr = RADIUS + 22;
   shuttle.position.set(Math.cos(phi) * rr, Math.sin(phi) * rr, playerZ);
@@ -3807,6 +3810,7 @@ function autoDock(port) {
   mode = 'walk';
   driveState = 'DOCKED';
   buzz([60, 80, 120]); // dock clunk + settle
+  announceBoarding(); // the ship greets every boarding, English then Spanish
   if (port && !port.top) {
     // Match the touched body port to its terminal: same angle, and the
     // closest z among that angle's terminals (this picks up the nudged
@@ -5076,6 +5080,35 @@ function setToolFeedback(msg, ok) { toolFeedback.textContent = msg; toolFeedback
 // volume), en-US voice preferred.
 function speakEn(text, onState) {
   speakUtterance(text, ['en-us', 'en'], 'en-US', onState);
+}
+// Ship's-voice announcements: the BEACON 7 greets every boarding and
+// farewells every departure, English first, then the Spanish translation
+// (the ship carries a second language, so its computer speaks both).
+// Chained on the English line's end event, with a timed fallback in case
+// a browser never fires it, and a generation guard so a newer
+// announcement (e.g. a quick dock-then-depart) never gets talked over by
+// the older one's Spanish line. Speech follows the device volume like
+// every other spoken line (never sets utterance.volume).
+let announceGen = 0;
+function announcePair(en, es) {
+  try {
+    if (!('speechSynthesis' in window)) return;
+    const gen = ++announceGen;
+    let done = false;
+    const saySpanish = function () {
+      if (done || gen !== announceGen) return;
+      done = true;
+      speakWord(es);
+    };
+    speakEn(en, function (playing) { if (!playing) saySpanish(); });
+    setTimeout(saySpanish, 8000);
+  } catch (e) {}
+}
+function announceBoarding() {
+  announcePair('Welcome back to the Beacon Seven', 'Bienvenido de nuevo a Beacon Seven');
+}
+function announceDeparting() {
+  announcePair('Enjoy your flight and watch out for space rocks', 'Disfruta tu vuelo y ten cuidado con las rocas espaciales');
 }
 // ---------- Round 18: bilingual Hear + Say-it on every station ----------
 // Uniform audio row in the tool panel. Hear ES / Hear EN speak the current
@@ -6480,6 +6513,7 @@ btnTitleResume.addEventListener('pointerdown', function (e) {
   returnAboard();
   applySave(s);
   hideTitle();
+  if (mode === 'walk') announceBoarding(); // resumed aboard — greet back (a flight restore stays silent)
 });
 document.getElementById('btn-title-begin').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur();
@@ -6491,6 +6525,7 @@ document.getElementById('btn-title-begin').addEventListener('pointerdown', funct
     try { window.localStorage.removeItem(SAVE_KEY); } catch (err) {}
     resetProgress();
     hideTitle();
+    announceBoarding(); // a new journey starts aboard
   }
 });
 document.getElementById('btn-title-confirm').addEventListener('pointerdown', function (e) {
@@ -6500,6 +6535,7 @@ document.getElementById('btn-title-confirm').addEventListener('pointerdown', fun
   titleMainBtns.style.display = 'flex';
   titleConfirm.style.display = 'none';
   hideTitle();
+  announceBoarding(); // a confirmed new journey starts aboard
 });
 document.getElementById('btn-title-cancel').addEventListener('pointerdown', function (e) {
   e.preventDefault(); e.target.blur();
