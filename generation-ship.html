@@ -4438,16 +4438,17 @@ function updateFlight(dt) {
 // WebAudio: one shared context, created on the first user gesture (never
 // before — autoplay rules), every call wrapped in try/catch so a missing
 // audio device can never break the game.
-let audioCtx = null, burnNodes = null;
+let audioCtx = null, burnNodes = null, noiseBuf = null;
 function ensureAudio() {
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (audioCtx.state === 'suspended') { const p = audioCtx.resume(); if (p && p.catch) p.catch(function () {}); }
     if (!burnNodes) {
       const len = audioCtx.sampleRate;
       const buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
       const ch = buf.getChannelData(0);
       for (let i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1;
+      noiseBuf = buf;
       const src = audioCtx.createBufferSource();
       src.buffer = buf; src.loop = true;
       const filt = audioCtx.createBiquadFilter();
@@ -4455,22 +4456,92 @@ function ensureAudio() {
       const g = audioCtx.createGain(); g.gain.value = 0;
       src.connect(filt); filt.connect(g); g.connect(audioCtx.destination);
       src.start();
-      burnNodes = { gain: g };
+      // Idle engine hum: a low triangle drone (its harmonics survive phone
+      // speakers) that runs the whole flight, so the ship is never dead
+      // silent while coasting or turning. Gain swells in on DEPART.
+      const hum = audioCtx.createOscillator();
+      hum.type = 'triangle'; hum.frequency.value = 55;
+      const humGain = audioCtx.createGain(); humGain.gain.value = 0;
+      hum.connect(humGain); humGain.connect(audioCtx.destination);
+      hum.start();
+      burnNodes = { gain: g, hum: humGain };
     }
   } catch (e) { /* audio unavailable: game stays silent, never crashes */ }
 }
-// Thruster burn: looping filtered noise, gain ramps with thrust. Called
-// every frame from animate(), already gated to thrusting flight only.
-function updateBurnSound(thrust) {
+// Flight sound: thruster burn (looping filtered noise, gain ramps with
+// thrust) plus the idle engine hum. Called every frame from animate().
+// Round 30 fix: this used to depend on audioCtx already existing (created
+// only by a ding or a mic tap), so flying straight from DEPART with no
+// prior station or word collect meant total silence — the hum and burn
+// now ensure the context themselves, and DEPART is a tap gesture, so
+// the context is allowed to start.
+function updateBurnSound(thrust, flying) {
   try {
+    ensureAudio();
     if (!audioCtx || !burnNodes) return;
-    const target = Math.abs(thrust) > 0.05 ? 0.1 : 0;
-    burnNodes.gain.gain.setTargetAtTime(target, audioCtx.currentTime, 0.08);
+    const t = audioCtx.currentTime;
+    const burnTarget = (flying && Math.abs(thrust) > 0.05) ? 0.1 : 0;
+    burnNodes.gain.gain.setTargetAtTime(burnTarget, t, 0.08);
+    const humTarget = flying ? 0.045 : 0;
+    burnNodes.hum.gain.setTargetAtTime(humTarget, t, 0.8);
   } catch (e) {}
 }
-// Site-standard correct-answer ding: two sine notes, 880 Hz then
-// 1318.5 Hz, peak gain 0.5, first note stopping at +0.55 s, second at
-// +1.1 s. Only ever played on a correct pronunciation.
+// Footsteps: light taps while walking, two surfaces — hard deck (upper
+// half, rooms) gets a crisp bandpassed tap, agriculture soil gets a soft
+// lowpassed thud. Stride timing follows real movement (camera travel),
+// so steps never play while standing still, mid-jump, or with a panel open.
+let stepTimer = 0, stepLastX = 0, stepLastZ = 0, stepSide = 1;
+function playStep(soft) {
+  try {
+    if (!audioCtx || !noiseBuf) return;
+    const t = audioCtx.currentTime;
+    const src = audioCtx.createBufferSource();
+    src.buffer = noiseBuf;
+    const filt = audioCtx.createBiquadFilter();
+    if (soft) { filt.type = 'lowpass'; filt.frequency.value = 500 * (0.9 + Math.random() * 0.2); filt.Q.value = 0.5; }
+    else { filt.type = 'bandpass'; filt.frequency.value = 1400 * (0.9 + Math.random() * 0.2); filt.Q.value = 1; }
+    const g = audioCtx.createGain();
+    const peak = soft ? 0.06 : 0.07;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(peak, t + (soft ? 0.02 : 0.008));
+    g.gain.linearRampToValueAtTime(0.0001, t + (soft ? 0.14 : 0.09));
+    src.connect(filt); filt.connect(g);
+    try {
+      const pan = audioCtx.createStereoPanner();
+      pan.pan.value = stepSide * 0.25;
+      g.connect(pan); pan.connect(audioCtx.destination);
+    } catch (e2) { g.connect(audioCtx.destination); }
+    src.start(t, Math.random() * 0.5, soft ? 0.16 : 0.11);
+    stepSide = -stepSide;
+  } catch (e) {}
+}
+function updateFootsteps(dt) {
+  try {
+    ensureAudio();
+    if (!audioCtx || !noiseBuf) return;
+    if (mode !== 'walk' || crashed || collectOpen || toolOpen || titleOpen || menuOn || jumpH !== 0) {
+      stepTimer = 0;
+      stepLastX = camera.position.x; stepLastZ = camera.position.z;
+      return;
+    }
+    const dx = camera.position.x - stepLastX, dz = camera.position.z - stepLastZ;
+    const moved = Math.hypot(dx, dz);
+    stepLastX = camera.position.x; stepLastZ = camera.position.z;
+    if (moved > 10) { stepTimer = 0; return; } // teleport/dock: no step burst
+    if (moved < 0.02) { stepTimer = 0; return; }
+    const running = keys.ShiftLeft || keys.ShiftRight || Math.hypot(joyX, joyY) > 0.9;
+    stepTimer += dt;
+    if (stepTimer >= (running ? 0.30 : 0.42)) {
+      stepTimer = 0;
+      const soft = !inCell && playerZ < 0;
+      playStep(soft);
+    }
+  } catch (e) {}
+}
+// Correct-answer ding, softened for the ship: the same two sine notes
+// (880 Hz then 1318.5 Hz), but peak gain 0.3 with a slow attack, so it
+// chimes instead of pings. The web tools keep the site-standard 0.5;
+// this softer one is ship-only. Only ever played on a correct pronunciation.
 function playDing() {
   try {
     ensureAudio();
@@ -4480,8 +4551,8 @@ function playDing() {
       const o = audioCtx.createOscillator(), g = audioCtx.createGain();
       o.type = 'sine'; o.frequency.value = freq;
       g.gain.setValueAtTime(0.0001, start);
-      g.gain.linearRampToValueAtTime(0.5, start + 0.05);
-      g.gain.setValueAtTime(0.5, start + 0.35);
+      g.gain.linearRampToValueAtTime(0.3, start + 0.12);
+      g.gain.setValueAtTime(0.3, start + 0.35);
       g.gain.linearRampToValueAtTime(0.0001, stop);
       o.connect(g); g.connect(audioCtx.destination);
       o.start(start); o.stop(stop + 0.05);
@@ -5969,9 +6040,11 @@ function animate() {
   // Round 25: auto-walk backstop. Any dock/undock transition or cell
   // entry clears auto-walk even if a dedicated call site is missed.
   if (mode !== 'walk' || inCell) stopAutoWalk();
-  // Thruster burn sound: thrusting flight only — silent docked, crashed,
-  // or while the collect prompt is open.
-  updateBurnSound(!collectOpen && !toolOpen && !titleOpen && !crashed && mode === 'flight' ? lastThrust : 0);
+  // Flight sound: burn + idle hum while flying (silent docked, crashed,
+  // or while a prompt is open); footsteps while walking.
+  const flyingNow = !collectOpen && !toolOpen && !titleOpen && !crashed && mode === 'flight';
+  updateBurnSound(flyingNow ? lastThrust : 0, flyingNow);
+  if (!crashed && mode === 'walk') updateFootsteps(dt);
   if (menuOn) updateMenu();
   renderer.render(scene, camera);
 }
