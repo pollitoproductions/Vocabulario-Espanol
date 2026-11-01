@@ -517,18 +517,15 @@ let centerEase = false, centerEaseStarted = 0;
 // when CENTER was tapped must not kill it (that was the "won't center"
 // failure in LOOK mode, where every look move refreshed lastCamInput).
 let touchLookSeq = 0, centerTouchSeq = 0;
-// CENTER axial aim (round 30, Brant: ass-end view): tapping CENTER also
-// arms aligning the view with the ship's central axis, looking from
-// the back (aft) to the front (+z world — the hull spins around Z,
-// so the axis direction never changes; see the flight camera block).
-// It persists after the ease completes until fresh look input
-// arrives (same cancel conditions as the ease). The camera POSITION
-// stays behind the shuttle (no camera move, no steering); only the
-// view direction aligns. Cleared on undock. (The round 30 port-aim
-// that preceded this is removed: Brant said it just made him look AT
-// the mothership instead of along it.)
-let centerAxial = false;
-function centerCamera() { centerEase = true; centerEaseStarted = performance.now(); centerTouchSeq = touchLookSeq; centerAxial = true; }
+// CENTER (round 30, Brant: centered for navigation): tapping CENTER
+// eases the look offsets to zero, putting the camera straight behind
+// the shuttle on its tail axis, looking forward along the nose — the
+// view the shuttle is flown by. The camera NEVER leaves the shuttle:
+// no port-aim, no axial-aim, no detached viewpoint. Both earlier
+// overrides took the view OFF the shuttle Brant is flying (port-aim
+// stared at the mothership's side; axial-aim stared along the
+// mothership's axis), so both are removed. Cleared on undock.
+function centerCamera() { centerEase = true; centerEaseStarted = performance.now(); centerTouchSeq = touchLookSeq; }
 // Round 30 LOOK/STEER toggle (Brant playtest: on touch the left stick
 // gives yaw + thrust and right-side drag only moves the camera, so
 // there is NO ship-pitch input at all and flight is flat — the top of
@@ -3340,7 +3337,7 @@ function undock() {
   shuttle.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), tangent);
   // Co-rotating start: the shuttle inherits the station's local velocity.
   shuttleVel.copy(tangent).multiplyScalar(OMEGA * rr);
-  camYaw = 0; camPitch = 0; centerEase = false; centerAxial = false; // fresh flight starts on the neutral trailing view
+  camYaw = 0; camPitch = 0; centerEase = false; // fresh flight starts on the neutral trailing view
   shuttle.visible = true;
   btnMode.style.display = 'none';
   modeText.textContent = 'Departed';
@@ -3892,28 +3889,28 @@ function updateFlight(dt) {
   // do NOT cancel — otherwise CENTER could never complete in LOOK mode
   // while the look finger was still moving.
   if (centerEase) {
-    if (touchLookSeq !== centerTouchSeq || lastMouseLookInput > centerEaseStarted) { centerEase = false; centerAxial = false; }
+    // CENTER ease: fast (~3/s) toward zero offsets, cancelled only by
+    // a NEW look-grab after the press (touchLookSeq) or a mouse look
+    // move after the press. STEER-mode grabs never cancel it (they
+    // steer the ship, not the camera). Once the offsets hit zero the
+    // view IS the nose-forward chase view, so no separate aim flag is
+    // needed: the chase view persists until fresh look input moves
+    // the offsets again, and the idle ease settles to the same view.
+    if (touchLookSeq !== centerTouchSeq || lastMouseLookInput > centerEaseStarted) { centerEase = false; }
     else {
       const ck = 1 - Math.exp(-CAM_CENTER_RATE * dt);
       camYaw *= (1 - ck); camPitch *= (1 - ck);
       if (Math.abs(camYaw) < 0.005 && Math.abs(camPitch) < 0.005) { camYaw = 0; camPitch = 0; centerEase = false; }
     }
-  } else if (centerAxial) {
-    // Aim outlives the ease: after CENTER settles, the view keeps
-    // its axial alignment until fresh look input arrives (a new grab
-    // or mouse move after the press). Moves from a drag already in
-    // progress at press time do not clear it, same as the ease.
-    if (touchLookSeq !== centerTouchSeq || lastMouseLookInput > centerEaseStarted) centerAxial = false;
   }
   // Neutral trailing is NOSE-ONLY (round 30 fix): the camera base trails
   // the spacecraft's nose direction, never the velocity. The old blend
   // toward velocity swung the neutral 180° when velocity passed through
   // zero during a thrust reversal — that was the view-flip Brant saw.
   // Nose-trailing moves only with ship yaw (0.9 rad/s), so it can never
-  // flip on reversal. CENTER / C / idle ease all position the camera
-  // 'directly behind the spacecraft.' CENTER additionally aligns the
-  // view with the ship's central axis while its aim is armed (see below);
-  // idle ease never aims. No look computation
+  // flip on reversal. CENTER / C fast-eases the offsets to zero, which
+  // IS the nose-forward chase view; idle ease settles to that same
+  // view. Neither aims the view anywhere else. No look computation
   // here is origin-relative: the camera sits on shuttle.position plus
   // nose-derived offsets, never on the map centre.
   const neutralFwd = fwd.clone();
@@ -3925,24 +3922,18 @@ function updateFlight(dt) {
   const desired = shuttle.position.clone().addScaledVector(camFwd, -20).addScaledVector(camUp, 7);
   camera.position.lerp(desired, 1 - Math.exp(-8 * dt));
   camera.up.copy(camUp);
-  // CENTER axial aim: the camera STAYS positioned behind the nose
-  // (desired above is untouched), but while the CENTER aim is armed
-  // the view itself looks straight along the ship's central axis,
-  // back (aft) to front (+z world). From aft of the ship this is a
-  // face-on ass-end view; from other approach angles the ship's
-  // length recedes along the view. The camera is NOT moved behind
-  // the rear end to force a face-on view — that would detach it
-  // from the shuttle, and only the view's alignment was asked for.
-  // Guidance arrow logic below is untouched (it reads the camera
-  // orientation, so an axial view simply reads along the axis).
+  // CENTER (Brant: centered for navigation): with offsets eased to
+  // zero the look target below is straight ahead along the nose —
+  // the camera sits on the shuttle's tail axis looking forward past
+  // it. NO aim override exists anymore: neither port-aim nor
+  // axial-aim may hijack the view direction. Guidance arrow logic
+  // below is untouched (it reads the camera orientation, so a
+  // nose-forward view reads straight ahead).
   let lookTarget = new THREE.Vector3(
     shuttle.position.x + camFwd.x * 12,
     shuttle.position.y + camFwd.y * 12,
     shuttle.position.z + camFwd.z * 12
   );
-  if (centerAxial) {
-    lookTarget = new THREE.Vector3(shuttle.position.x, shuttle.position.y, shuttle.position.z + 12);
-  }
   camera.lookAt(lookTarget);
   // Flight nav readout (navigation aid ONLY — display only, never moves the
   // shuttle): screen-space direction from the camera to the NEAREST of the
