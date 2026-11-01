@@ -326,7 +326,6 @@
 </head>
 <body>
 <div id="hud">
-  <div>Mode: <b id="modeText">Docked</b></div>
   <div id="navLine"><span id="guideArrow">&#8593;</span><span id="guideDist"></span><span id="navSpeed"></span><span id="guideElev"></span></div>
   <div id="wordLine"><span id="wordArrow">&#8593;</span><span id="wordDist"></span></div>
   <div id="beaconWarn">LEAVING BEACON RANGE — TURN BACK — 20 km TO THE LIMIT</div>
@@ -3608,7 +3607,6 @@ const COLLECT_METAL = 5;        // metal per collected word
 let mineHeld = false, mineProgress = 0, mineTarget = null, mineTimer = null;
 
 // ---------- HUD ----------
-const modeText = document.getElementById('modeText');
 const menuGrav = document.getElementById('menuGrav');
 const menuRpm = document.getElementById('menuRpm');
 const menuSpeed = document.getElementById('menuSpeed');
@@ -3807,7 +3805,6 @@ function retryMission() {
   btnMine.style.display = 'none';
   driveState = 'DOCKED';
   hideNav();
-  modeText.textContent = 'Docked';
   btnMode.textContent = 'DEPART';
   btnMode.style.display = '';
   btnJump.style.visibility = 'visible';
@@ -3908,7 +3905,6 @@ function undock() {
   camYaw = 0; camPitch = 0; camHeight = 7; // fresh flight starts on the neutral trailing view (behind and above the craft, looking down on its top)
   shuttle.visible = true;
   btnMode.style.display = 'none';
-  modeText.textContent = 'Departed';
   btnJump.style.visibility = 'hidden';
   updateHint();
 }
@@ -3947,7 +3943,6 @@ function autoDock(port) {
   hideNav();
   btnMine.style.display = 'none';
   mineProgress = 0; mineTarget = null;
-  modeText.textContent = 'Docked';
   btnMode.textContent = 'DEPART';
   btnMode.style.display = '';
   btnJump.style.visibility = 'visible';
@@ -6522,7 +6517,7 @@ function restoreSavedPosition(pos) {
     cellX = 0; cellZ = 8; cellYaw = 0; cellPitch = 0;
     btnExit.style.display = 'none';
     btnMode.textContent = 'DEPART'; btnMode.style.display = '';
-    modeText.textContent = 'Docked'; btnJump.style.visibility = 'visible';
+    btnJump.style.visibility = 'visible';
     hideNav(); updateHint();
     return;
   }
@@ -6543,7 +6538,7 @@ function restoreSavedPosition(pos) {
     shuttle.quaternion.setFromEuler(new THREE.Euler(shipPitch, shipYaw, 0, 'YXZ'));
     shuttleVel.set(0, 0, 0); shuttle.visible = true;
     btnMode.style.display = 'none'; btnJump.style.visibility = 'hidden';
-    modeText.textContent = 'Departed'; btnExit.style.display = 'none';
+    btnExit.style.display = 'none';
     updateHint();
     return;
   }
@@ -6558,7 +6553,7 @@ function restoreSavedPosition(pos) {
     cellGroup.visible = true; inCell = true;
     savedExterior = null; // exitCell's doorway override places the player; no stale exterior is restored
     btnMode.style.display = 'none'; btnExit.style.display = '';
-    modeText.textContent = 'Docked'; btnJump.style.visibility = 'visible';
+    btnJump.style.visibility = 'visible';
     updateHint();
   } else {
     hideCell();
@@ -6569,7 +6564,7 @@ function restoreSavedPosition(pos) {
     noReenterUntil = performance.now() + 3000;
     btnExit.style.display = 'none';
     btnMode.textContent = 'DEPART'; btnMode.style.display = '';
-    modeText.textContent = 'Docked'; btnJump.style.visibility = 'visible';
+    btnJump.style.visibility = 'visible';
     hideNav(); updateHint();
   }
 }
@@ -6673,7 +6668,6 @@ function returnAboard() {
   try { btnMine.style.display = 'none'; } catch (e) {}
   driveState = 'DOCKED';
   hideNav();
-  modeText.textContent = 'Docked';
   btnMode.textContent = 'DEPART';
   btnMode.style.display = '';
   btnJump.style.visibility = 'visible';
