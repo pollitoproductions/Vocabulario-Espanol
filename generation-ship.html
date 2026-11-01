@@ -44,10 +44,6 @@
     color: #fff; background: #111; font-size: 18px; text-align: center; padding: 24px;
   }
   #nogl[hidden] { display: none; }
-  #fade {
-    position: fixed; inset: 0; z-index: 40; background: #000; opacity: 0;
-    pointer-events: none; transition: opacity 0.25s ease;
-  }
   #joy {
     position: fixed; z-index: 6; display: none;
     width: 120px; height: 120px; border-radius: 50%;
@@ -96,12 +92,10 @@
   #btn-mine { width: 56px; height: 56px; right: calc(91px + env(safe-area-inset-right, 0px)); bottom: calc(101px + env(safe-area-inset-bottom, 0px)); border: 2px solid rgba(127, 227, 255, 0.9); background: linear-gradient(160deg, rgba(127, 227, 255, 0.35), rgba(127, 227, 255, 0.12)); box-shadow: 0 0 18px rgba(127, 227, 255, 0.55), 0 6px 18px rgba(0, 0, 0, 0.30); }
   #btn-looksteer { right: calc(91px + env(safe-area-inset-right, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
   #btn-brake { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
-  /* EXIT (cells only) shares DEPART's slot at right 92 — the two never
-     co-appear (DEPART is docked/walk, EXIT is cells-only), and JUMP
-     keeps the corner in both states. REVIEW keeps its rung above JUMP
+  /* DEPART sits at right 92 (docked/walk), and JUMP keeps the corner
+     in both states. REVIEW keeps its rung above JUMP
      (right 16, bottom 176). LEARN sits between them (right 16, bottom
      101) with MINE's cyan accent so it pops at a glance in range. */
-  #btn-exit { right: calc(92px + env(safe-area-inset-right, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
   #btn-station { width: 56px; height: 56px; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(101px + env(safe-area-inset-bottom, 0px)); border: 2px solid rgba(127, 227, 255, 0.9); background: linear-gradient(160deg, rgba(127, 227, 255, 0.35), rgba(127, 227, 255, 0.12)); box-shadow: 0 0 18px rgba(127, 227, 255, 0.55), 0 6px 18px rgba(0, 0, 0, 0.30); }
   #btn-terminal { width: 56px; height: 56px; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(176px + env(safe-area-inset-bottom, 0px)); }
   /* Mini menu button: small, rounded, cyber-blue synthetic look. */
@@ -372,10 +366,10 @@
     <div class="mHead">REVIEW TERMINALS</div>
     <div class="mBody">Eight gold review terminals stand around the industrial side &mdash; one on the mezzanine, seven on the main deck, spread evenly around the hull. Walk up and tap Review (or press Enter) to review everything you have already spoken, by tool, with Hear in both languages. Reviewing never changes progress.</div>
     <div class="mHead">SAVING</div>
-    <div class="mBody">SAVE JOURNEY in this menu saves at once; the game also saves after every collect, every mining yield, and every docking. GO TO HOME SCREEN saves, then returns to the title screen. Resuming restores your haul, your collected items, and your position &mdash; aboard, inside a cell, or in flight.</div>
+    <div class="mBody">SAVE JOURNEY in this menu saves at once; the game also saves after every collect, every mining yield, and every docking. GO TO HOME SCREEN saves, then returns to the title screen. Resuming restores your haul, your collected items, and your position &mdash; aboard or in flight.</div>
   </div>
   </div><button class="subHead" data-sub="note" data-label="NOTE" type="button">▸ NOTE</button><div class="subBody" id="sub-note">
-  <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; any asteroid can be mined (hold M, or the MINE button, for about 3 seconds within 100 m) for water from icy comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. (Jump arcs feel Mars-like by movement tuning; the ship&rsquo;s spin gravity itself is unchanged.) After departing, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland, Greenhouse cell) and the enclosed industrial half forward, split into TECHNOLOGY (Workshop cell, plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION (Classroom cell); a bulkhead with four glowing entrances divides the halves, with a MEDICAL BAY room in the technology half. Walk into a glowing GREENHOUSE, WORKSHOP, CLASSROOM, or MEDICAL BAY doorway to step into its cell, and leave by the EXIT door, the EXIT button, or E. Beacon range: a warning appears past 25 km from the ship, grows urgent past 40 km, and past 50 km you are LOST and the run ends (retry returns you aboard, haul kept, free). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, all 1,000 Spanish vocabulary words float from about 3 km to 20 km out, plus exercise questions between 1.5 km and 15 km out — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold arrow under the port readout points to the nearest uncollected item — word or exercise question — with a tag saying which, and distant items show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, you return to your last save.</div>
+  <div class="controls">An ark bound for another star. Spin gravity holds the decks &mdash; thrust is the only other gravity you&rsquo;ll get. Nine glowing docking ports: eight around the hull, one at the top end-cap hub. Fly within 100 m of any port and you dock automatically &mdash; there is no dock button. Hitting the hull or an asteroid anywhere else ends the run. An asteroid belt drifts clear of the ship &mdash; dodge the rocks; any asteroid can be mined (hold M, or the MINE button, for about 3 seconds within 100 m) for water from icy comets and metal from metal rocks. Jumps inside the ship: the ground slides beneath you while you&rsquo;re airborne, because the ship keeps spinning and you don&rsquo;t. (Jump arcs feel Mars-like by movement tuning; the ship&rsquo;s spin gravity itself is unchanged.) After departing, docking re-arms once you fly 150 m clear of every port, so launching never snaps you straight back aboard. Inside, the ship is divided into sections: AGRICULTURE aft (open farmland) and the enclosed industrial half forward, split into TECHNOLOGY (plus a two-story gallery hall with stair towers and a railed upper gallery) and EDUCATION; a bulkhead with four glowing entrances divides the halves. Beacon range: a warning appears past 25 km from the ship, grows urgent past 40 km, and past 50 km you are LOST and the run ends (retry returns you aboard, haul kept, free). A cyan beacon beam rises from the nearest port while you fly, and the nav readout adds an up/down elevation angle, so guidance works in 3D — but it only ever points, it never steers or returns you. Farther out, all 1,000 Spanish vocabulary words float from about 3 km to 20 km out, plus exercise questions between 1.5 km and 15 km out — fly within 250 m of one to pause and pronounce it; say it right to collect it for +5 WATER and +5 METAL. A gold arrow under the port readout points to the nearest uncollected item — word or exercise question — with a tag saying which, and distant items show as small glow dots until their plates stream in. Crash repairs cost 10 WATER + 10 METAL; your first crash is free. If you can't pay, you return to your last save.</div>
   </div>
   <button class="closeBtn" id="btn-menu-home" type="button">GO TO HOME SCREEN</button>
   <button class="closeBtn" id="btn-menu-close" type="button">CLOSE</button>
@@ -469,7 +463,6 @@
   <button id="btn-retry" type="button">RETRY</button>
   <button id="btn-fail-title" type="button" style="display:none;">RETURN TO TITLE</button>
 </div>
-<div id="fade"></div>
 <div id="hint"></div>
 <div id="nogl" hidden>Sorry &mdash; this prototype needs WebGL, and your browser could not provide it. Try a recent desktop or mobile browser.</div>
 <div id="joy"><div id="knob"></div></div>
@@ -479,7 +472,6 @@
   <button class="ctl" id="btn-mine" type="button" style="display:none">MINE</button>
   <button class="ctl on" id="btn-looksteer" type="button" style="display:none">STEER</button>
   <button class="ctl" id="btn-brake" type="button" style="display:none">BRAKE</button>
-  <button class="ctl" id="btn-exit" type="button" style="display:none">EXIT</button>
   <button class="ctl" id="btn-station" type="button" style="display:none">LEARN</button>
   <button class="ctl" id="btn-terminal" type="button" style="display:none">REVIEW</button>
 </div>
@@ -965,18 +957,6 @@ for (const qa of bodyPortAngles) {
   }
 }
 
-// Enterable-building anchors (fixed, so they are findable on every load):
-// one per interior section. Decorative boxes below are kept clear of them.
-const ENTERABLES = [
-  { zone: 'agri', label: 'GREENHOUSE', angle: 0.6, z: -170, doorDir: 1, color: 0x39d97a, css: '#39d97a' },
-  { zone: 'tech', label: 'WORKSHOP', angle: 2.8, z: 170, doorDir: -1, color: 0x59d6ff, css: '#59d6ff' },
-  { zone: 'edu', label: 'CLASSROOM', angle: 4.5, z: 260, doorDir: -1, color: 0xe8a33d, css: '#e8a33d' },
-  // Round 17: the medical bay becomes a real enterable room (Dictation).
-  // Doorway faces -z (toward the technology centre): the 7PI/4 port landing
-  // at z +106.7 sits on the building's far side, outside the 7 m trigger
-  // band, so docking at that port never instantly enters the bay.
-  { zone: 'med', label: 'MEDICAL BAY', angle: 5.5, z: 100, doorDir: -1, color: 0x9fd8ef, css: '#9fd8ef' },
-];
 function angDiff(a, b) { let d = a - b; return Math.atan2(Math.sin(d), Math.cos(d)); }
 // Bulkhead entrance doorways (see the bulkhead section below): decorative
 // boxes must not block these either.
@@ -1000,19 +980,16 @@ function habitatBlocked(a, z) {
 }
 // A few blocky habitats on the inner surface (children of the ship, so they spin with it).
 for (let i = 0; i < 14; i++) {
-  // Keep decorative boxes clear of enterable doorways, bulkhead entrances,
-  // the health-bay slot, and the gallery ramps, so no random box can
-  // ever block a doorway or a stair.
+  // Keep decorative boxes clear of bulkhead entrances and the gallery
+  // ramps, so no random box can ever block an entrance or a stair.
   let a = 0, z = 0, clear = false;
   for (let t = 0; t < 12 && !clear; t++) {
     a = Math.random() * Math.PI * 2;
     z = -LENGTH / 2 + 20 + Math.random() * (LENGTH - 40);
-    const clearCells = ENTERABLES.every((eb) => Math.abs(angDiff(a, eb.angle)) > 0.6 || Math.abs(z - eb.z) > 30);
     const clearBulk = BULK_DOORS.every((d) => Math.abs(angDiff(a, d)) > 0.15 || Math.abs(z) > 25);
-    const clearHealth = Math.abs(angDiff(a, 5.5)) > 0.4 || Math.abs(z - 100) > 20;
     const inGalleryArc = a > GALLERY_A0 - 0.2 && a < GALLERY_A1 + 0.2;
     const clearGallery = !inGalleryArc || !(z > 35 && z < 165);
-    clear = clearCells && clearBulk && clearHealth && clearGallery && !habitatBlocked(a, z);
+    clear = clearBulk && clearGallery && !habitatBlocked(a, z);
   }
   if (!clear) continue;
   const w = 6 + Math.random() * 10, h = 4 + Math.random() * 8, d = 6 + Math.random() * 10;
@@ -1039,23 +1016,19 @@ for (const [bzc, blen] of [[110, 120], [240, 60]]) {
   band.position.z = bzc;
   ship.add(band);
 }
-// ---------- Interior sections + enterable buildings (cells) ----------
+// ---------- Interior sections ----------
 // Round 9 layout (z along the 640 m hull, -320 aft ... +320 forward):
-//   AGRICULTURE  z -320 ... 0    open, no ceiling, Greenhouse cell (z -170)
+//   AGRICULTURE  z -320 ... 0    open, no ceiling
 //   BULKHEAD     z = 0           solid disc + ring, 4 entrance doorways
-//   TECHNOLOGY   z 0 ... +200    enclosed, Workshop cell (z +170)
-//   EDUCATION    z +200 ... +320 enclosed, Classroom cell (z +260)
-//   MEDICAL BAY  room at z +100, angle 5.5 (Dictation station moved to the agriculture ring, round-30 layout)
+//   TECHNOLOGY   z 0 ... +200    enclosed
+//   EDUCATION    z +200 ... +320 enclosed
 //   GALLERY HALL two-story hall, angles 4.45 ... 4.95 rad, podium
 //                z +60 ... +140, upper deck radius 150, stair towers
 //                z +40 ... +60 and +140 ... +160
 // Mounted signs label each section; the floors themselves are the solid
 // section surfaces (green agriculture / chrome industrial, split at the
 // bulkhead). The old translucent tint bands are gone: they muddied the
-// solid floors and reintroduced the striping. One fixed,
-// clearly-signed building per section has a working doorway into an
-// interior cell room; other buildings stay decorative.
-const EB_WIDTH = 16, EB_HEIGHT = 9, EB_DEPTH = 14;
+// solid floors and reintroduced the striping. Other buildings stay decorative.
 // ROUND 13 — FIT-TEXT SIGN TEXTURE. Round 11's fixed 52px font on a
 // fixed 512px canvas overflowed for every label over 16 chars
 // (monospace advance ~0.6em: 'AGRICULTURAL SECTOR' needs ~593px,
@@ -1170,7 +1143,7 @@ const stationBeacons = []; // beacon-pillar materials (open-area stations only)
 // shared pair for all six stations so the cost is two draw items per
 // station and one pulse update total. Rings lie flat on the deck
 // (torus rotated X by 90 deg, axis -> local +Y, which is up off the
-// deck in both ship and cell frames).
+// deck in the ship frame).
 const stationAuraRingGeo = new THREE.TorusGeometry(2.6, 0.22, 8, 40);
 const stationAuraHaloGeo = new THREE.TorusGeometry(4.0, 0.15, 8, 40);
 const stationAuraRingMat = new THREE.MeshBasicMaterial({ color: 0x59d6ff });
@@ -1249,36 +1222,6 @@ function basisQuat(radial) {
   const zA2 = new THREE.Vector3().crossVectors(xA, yA).normalize();
   const m = new THREE.Matrix4().makeBasis(xA, yA, zA2);
   return new THREE.Quaternion().setFromRotationMatrix(m);
-}
-for (const eb of ENTERABLES) {
-  const radial = new THREE.Vector3(Math.cos(eb.angle), Math.sin(eb.angle), 0);
-  const grp = new THREE.Group();
-  grp.position.copy(radial).multiplyScalar(RADIUS - EB_HEIGHT / 2);
-  grp.position.z = eb.z;
-  grp.quaternion.copy(basisQuat(radial));
-  const body = new THREE.Mesh(new THREE.BoxGeometry(EB_WIDTH, EB_HEIGHT, EB_DEPTH),
-    new THREE.MeshStandardMaterial({ color: eb.zone === 'agri' ? 0x5a6b4a : eb.zone === 'edu' ? 0x6b5a3a : 0x4a5560, roughness: 0.9 }));
-  grp.add(body);
-  // Glowing doorway on the face toward the middle corridor.
-  const frame = new THREE.Mesh(new THREE.PlaneGeometry(6, 6.5),
-    new THREE.MeshBasicMaterial({ color: eb.color }));
-  frame.position.set(0, -EB_HEIGHT / 2 + 3.25, eb.doorDir * (EB_DEPTH / 2 + 0.06));
-  if (eb.doorDir < 0) frame.rotation.y = Math.PI;
-  grp.add(frame);
-  const door = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 5.5),
-    new THREE.MeshStandardMaterial({ color: 0x0a0f14, roughness: 1 }));
-  door.position.set(0, -EB_HEIGHT / 2 + 2.75, eb.doorDir * (EB_DEPTH / 2 + 0.12));
-  if (eb.doorDir < 0) door.rotation.y = Math.PI;
-  grp.add(door);
-  ship.add(grp);
-  // Mounted above the doorway on the building face itself (local Y 2.8
-  // sits just above the door head), not floating in front of it.
-  const sign = makeMountedSign(eb.label + ' - ENTER', eb.css, 4);
-  sign.position.set(0, 2.8, eb.doorDir * (EB_DEPTH / 2 + 0.2));
-  grp.add(sign);
-  // Round 24: the doorway tool labels are GONE (sign dedup: exactly one
-  // tool-name sign per station — the big console sign above the console).
-  // The ENTER sign above stays; it names the building, not the tool.
 }
 
 // ---------- Round 9: bulkhead, industrial enclosure, gallery ----------
@@ -2732,8 +2675,7 @@ for (const eb of ENTERABLES) {
 // spread evenly around the ring — 60 degrees apart, offset 15 degrees from
 // the bulkhead doorway angles (0/90/180/270), so no console ever blocks a
 // doorway path. All six use beacon 14 (open agriculture, no ceiling) and
-// the same 4 m walk-up trigger as before; the four cells stay enterable
-// rooms, only the consoles moved. The gallery console's warm light went
+// the same 4 m walk-up trigger as before. The gallery console's warm light went
 // with it — no console is left in the gallery. (Round 25's arch removal
 // still stands: no posts, no calls; the mess and gallery approaches stay
 // clean open walk space.)
@@ -2873,7 +2815,7 @@ for (const et of EXPLORATION_TERMINALS) {
   ship.add(econ);
 }
 function explorationDist2() {
-  if (mode !== 'walk' || inCell || transitioning) return Infinity;
+  if (mode !== 'walk') return Infinity;
   let best = Infinity;
   for (const et of EXPLORATION_TERMINALS) {
     const tang = Math.abs(angDiff(playerAngle, et.angle)) * 160;
@@ -2895,270 +2837,7 @@ function checkDepart() {
     else if (hint.textContent.indexOf('Near the Exploration Terminal') === 0) hint.textContent = '';
   }
 }
-// Round 30 (layout): the four cell consoles above no longer stand outside
-// their buildings' doorways — all six stations now live in the agriculture
-// ring (see the unified station block above). The rooms stay enterable
-// and unchanged.
-// Medical bay (round 17): the reserved slot is now a real enterable
-// room — its exterior building, glowing doorway and ENTER sign come
-// from the ENTERABLES loop above (zone 'med'), and its interior cell
-// is built by buildCell('med') below. The old taped outline and
-// 'RESERVED' sign are gone; the DICTATION console moved to the agriculture ring in the round-30
-// layout; the bay itself is unchanged.
-// Interior cells: enclosed rooms built far from the station (x = 5000 /
-// 5600, clear of the belt's 2600 m reach), so the camera can step into
-// one without the ship's spin or the belt interfering.
-function buildCell(theme) {
-  const grp = new THREE.Group();
-  const wallCol = theme === 'agri' ? 0x3d4a38 : theme === 'edu' ? 0x5a4a38 : 0x2c3644;
-  const floorCol = theme === 'agri' ? 0x4a3b28 : theme === 'edu' ? 0x3a3128 : 0x232b36;
-  const floor = new THREE.Mesh(new THREE.BoxGeometry(34, 0.5, 22), new THREE.MeshStandardMaterial({ color: floorCol, roughness: 1 }));
-  floor.position.y = -0.25; grp.add(floor);
-  const ceil = new THREE.Mesh(new THREE.BoxGeometry(34, 0.5, 22), new THREE.MeshStandardMaterial({ color: 0x1c222c, roughness: 1 }));
-  ceil.position.y = 7.25; grp.add(ceil);
-  const wallMat = new THREE.MeshStandardMaterial({ color: wallCol, roughness: 0.95 });
-  for (const s of [1, -1]) {
-    const w = new THREE.Mesh(new THREE.BoxGeometry(34, 7, 0.5), wallMat);
-    w.position.set(0, 3.5, s * 11.25); grp.add(w);
-    const w2 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 7, 22), wallMat);
-    w2.position.set(s * 17.25, 3.5, 0); grp.add(w2);
-  }
-  grp.add(new THREE.AmbientLight(0xffffff, 0.9));
-  const pl = new THREE.PointLight(0xffffff, 0.8, 40, 0);
-  pl.position.set(0, 6, 0); grp.add(pl);
-  if (theme === 'agri') {
-    // Grow rows: soil beds with plant rows + overhead grow lights.
-    const soilMat = new THREE.MeshStandardMaterial({ color: 0x3a2c1c, roughness: 1 });
-    const plantMat = new THREE.MeshStandardMaterial({ color: 0x3fae5a, roughness: 0.9 });
-    const lightMat = new THREE.MeshBasicMaterial({ color: 0xffd9a0 });
-    for (const bz of [-6, 0, 6]) {
-      const bed = new THREE.Mesh(new THREE.BoxGeometry(20, 1, 2.5), soilMat);
-      bed.position.set(0, 0.5, bz); grp.add(bed);
-      for (let k = 0; k < 8; k++) {
-        const plant = new THREE.Mesh(new THREE.ConeGeometry(0.45, 1.4, 8), plantMat);
-        plant.position.set(-14 + k * 4, 1.7, bz);
-        grp.add(plant);
-      }
-      const strip = new THREE.Mesh(new THREE.BoxGeometry(20, 0.2, 0.4), lightMat);
-      strip.position.set(0, 5.5, bz); grp.add(strip);
-    }
-    for (const sx of [-14, 14]) {
-      const tank = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 4, 16), new THREE.MeshStandardMaterial({ color: 0x7a8a99, roughness: 0.4, metalness: 0.6 }));
-      tank.position.set(sx, 2, -9); grp.add(tank);
-    }
-  } else if (theme === 'tech') {
-    // Consoles with glowing screens + machines.
-    const deskMat = new THREE.MeshStandardMaterial({ color: 0x39424e, roughness: 0.6, metalness: 0.4 });
-    const screenMat = new THREE.MeshBasicMaterial({ color: 0x59d6ff });
-    const screenMat2 = new THREE.MeshBasicMaterial({ color: 0x39d97a });
-    for (const cz of [-6, 0, 6]) {
-      const desk = new THREE.Mesh(new THREE.BoxGeometry(8, 2.6, 2), deskMat);
-      desk.position.set(-6, 1.3, cz); grp.add(desk);
-      const scr = new THREE.Mesh(new THREE.PlaneGeometry(6, 2.2), cz === 0 ? screenMat2 : screenMat);
-      scr.position.set(-6, 3.6, cz - 0.9); scr.rotation.x = -0.25; grp.add(scr);
-    }
-    for (const sx of [10, 14]) {
-      const mach = new THREE.Mesh(new THREE.BoxGeometry(3, 5.5, 3), deskMat);
-      mach.position.set(sx, 2.75, -6); grp.add(mach);
-      const cyl = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 5, 16), new THREE.MeshStandardMaterial({ color: 0x5a6673, roughness: 0.4, metalness: 0.7 }));
-      cyl.position.set(sx, 2.5, 6); grp.add(cyl);
-    }
-  } else if (theme === 'med') {
-    // Medical bay / quiet listening room: an exam bed, cabinets along
-    // the walls, and a counter. The Dictation station console sits at
-    // (0, -6), clear of the entry path (entry at z 8, exit past z 9.5).
-    const bed = new THREE.Mesh(new THREE.BoxGeometry(4, 1, 2.2),
-      new THREE.MeshStandardMaterial({ color: 0x7a8a99, roughness: 0.5, metalness: 0.3 }));
-    bed.position.set(-9, 0.5, -2); grp.add(bed);
-    const pillow = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 1.6),
-      new THREE.MeshStandardMaterial({ color: 0xeaf2ff, roughness: 1 }));
-    pillow.position.set(-10.5, 1.2, -2); grp.add(pillow);
-    const cabMat = new THREE.MeshStandardMaterial({ color: 0x39424e, roughness: 0.6, metalness: 0.4 });
-    for (const cz of [-6, 6]) {
-      const cab = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4, 3), cabMat);
-      cab.position.set(16.4, 2, cz); grp.add(cab);
-    }
-    const counter = new THREE.Mesh(new THREE.BoxGeometry(10, 1, 1.5), cabMat);
-    counter.position.set(0, 1, -10.2); grp.add(counter);
-    const quiet = new THREE.Mesh(new THREE.PlaneGeometry(6, 2),
-      new THREE.MeshBasicMaterial({ color: 0x9fd8ef }));
-    quiet.position.set(-16.9, 3.5, 0); quiet.rotation.y = Math.PI / 2; grp.add(quiet);
-  } else {
-    // Classroom / library: desks facing a board, a screen, and shelves
-    // with books. No text on the board or screen — this round is
-    // organization only; lesson content comes later.
-    const deskMat = new THREE.MeshStandardMaterial({ color: 0x6b5a3a, roughness: 0.8 });
-    const chairMat = new THREE.MeshStandardMaterial({ color: 0x4a3b28, roughness: 0.9 });
-    const board = new THREE.Mesh(new THREE.PlaneGeometry(10, 3),
-      new THREE.MeshStandardMaterial({ color: 0x2a4a34, roughness: 0.9 }));
-    board.position.set(0, 3.5, -10.9); grp.add(board);
-    const scr = new THREE.Mesh(new THREE.PlaneGeometry(6, 2.5), new THREE.MeshBasicMaterial({ color: 0x59d6ff }));
-    scr.position.set(-16.9, 3.5, 0); scr.rotation.y = Math.PI / 2; grp.add(scr);
-    for (const rz of [-4, 2]) {
-      for (const dx of [-8, 0, 8]) {
-        const desk = new THREE.Mesh(new THREE.BoxGeometry(2.5, 1, 1.2), deskMat);
-        desk.position.set(dx, 0.5, rz); grp.add(desk);
-        const chair = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), chairMat);
-        chair.position.set(dx, 0.5, rz + 1.2); grp.add(chair);
-      }
-    }
-    const shelfMat = new THREE.MeshStandardMaterial({ color: 0x4a3b28, roughness: 0.9 });
-    const bookCols = [0xa33b3b, 0x3b6aa3, 0x3ba35a, 0xa3873b, 0x6b3ba3];
-    for (const sy of [1.5, 3]) {
-      const shelf = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.3, 12), shelfMat);
-      shelf.position.set(16.6, sy, 0); grp.add(shelf);
-      for (let b = 0; b < 12; b++) {
-        const book = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.1, 0.4),
-          new THREE.MeshStandardMaterial({ color: bookCols[b % bookCols.length], roughness: 0.9 }));
-        book.position.set(16.6, sy + 0.7, -5 + b);
-        grp.add(book);
-      }
-    }
-  }
-  // Round 23: the cell consoles moved OUTSIDE (see the exterior stations
-  // block after the open-area stations): the rooms stay enterable and
-  // unchanged, but no console hides inside one any more.
-  // Exit doorway on the +z wall + EXIT sign.
-  const exitFrame = new THREE.Mesh(new THREE.PlaneGeometry(6, 6.5), new THREE.MeshBasicMaterial({ color: 0xffd94d }));
-  exitFrame.position.set(0, 3.25, 10.94); exitFrame.rotation.y = Math.PI;
-  grp.add(exitFrame);
-  const exitDoor = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 5.5), new THREE.MeshStandardMaterial({ color: 0x0a0f14, roughness: 1 }));
-  exitDoor.position.set(0, 2.75, 10.88); exitDoor.rotation.y = Math.PI;
-  grp.add(exitDoor);
-  const exitSign = makeTextSprite('EXIT', '#ffd94d', 8, 2);
-  exitSign.position.set(0, 5.5, 10.2);
-  grp.add(exitSign);
-  grp.visible = false;
-  scene.add(grp);
-  return grp;
-}
-const agriCell = buildCell('agri');
-agriCell.position.set(5000, 0, 0);
-const techCell = buildCell('tech');
-techCell.position.set(5600, 0, 0);
-const eduCell = buildCell('edu');
-eduCell.position.set(6200, 0, 0);
-const medCell = buildCell('med');
-medCell.position.set(6800, 0, 0);
-// Cell state + transitions. A brief fade covers the switch; the player
-// can never get trapped: exit doorway, EXIT button, and E all leave,
-// and the exterior position is restored exactly.
-let inCell = false, cellZone = null, cellGroup = null;
-// Re-entry cooldown: after any cell exit, no doorway trigger can refire
-// until this time (performance.now() ms). See exitCell.
-let noReenterUntil = 0;
-let cellX = 0, cellZ = 8, cellYaw = 0, cellPitch = 0;
-let savedExterior = null, transitioning = false;
-const fadeEl = document.getElementById('fade');
-const btnExit = document.getElementById('btn-exit');
-function enterCell(zone) {
-  if (inCell || transitioning || mode !== 'walk') return;
-  transitioning = true;
-  stopAutoWalk();
-  savedExterior = { angle: playerAngle, z: playerZ, yaw, pitch };
-  cellZone = zone;
-  cellGroup = zone === 'agri' ? agriCell : zone === 'tech' ? techCell : zone === 'med' ? medCell : eduCell;
-  cellX = 0; cellZ = 8; cellYaw = 0; cellPitch = 0;
-  jumpH = 0; jumpV = 0;
-  fadeEl.style.opacity = '1';
-  setTimeout(() => {
-    cellGroup.visible = true;
-    inCell = true;
-    btnMode.style.display = 'none';
-    btnExit.style.display = '';
-    hint.textContent = (zone === 'agri' ? 'Greenhouse cell' : zone === 'tech' ? 'Workshop cell' : zone === 'med' ? 'Medical bay cell' : 'Classroom cell') + ' — walk to the EXIT door, tap EXIT, or press E to leave';
-    setTimeout(updateHint, 4000);
-    fadeEl.style.opacity = '0';
-    setTimeout(() => { transitioning = false; }, 300);
-  }, 280);
-}
-function exitCell() {
-  if (!inCell || transitioning) return;
-  transitioning = true;
-  fadeEl.style.opacity = '1';
-  setTimeout(() => {
-    cellGroup.visible = false;
-    inCell = false;
-    cellGroup = null;
-    if (savedExterior) {
-      playerAngle = savedExterior.angle; playerZ = savedExterior.z;
-      yaw = savedExterior.yaw; pitch = savedExterior.pitch;
-    }
-    // Step out of the doorway trigger on exit: the saved position sits
-    // INSIDE the trigger box (that is how entry fired), so restoring it
-    // verbatim would re-enter the cell on the next frame, forever. Place
-    // the player 10 m outside the doorway on the approach side instead.
-    // AND turn to face AWAY from the doorway: the old code restored the
-    // entry yaw, which faced the door, so walking straight forward
-    // walked straight back into the trigger. Facing away axially (in
-    // the doorDir direction) makes forward walk leave the cell behind.
-    // AND start a brief re-entry cooldown (noReenterUntil): even a
-    // player who turns straight around cannot refire the trigger until
-    // it expires, by which time forward walking has carried them clear.
-    const ebOut = ENTERABLES.find((e) => e.zone === cellZone);
-    if (ebOut) {
-      playerZ = ebOut.z + ebOut.doorDir * (EB_DEPTH / 2 + 10);
-      yaw = ebOut.doorDir > 0 ? 0 : Math.PI;
-      pitch = 0;
-    }
-    noReenterUntil = performance.now() + 3000;
-    jumpH = 0; jumpV = 0;
-    btnExit.style.display = 'none';
-    btnMode.style.display = '';
-    btnMode.textContent = 'DEPART';
-    fadeEl.style.opacity = '0';
-    setTimeout(() => { transitioning = false; }, 300);
-  }, 280);
-}
-btnExit.addEventListener('pointerdown', function (e) {
-  e.preventDefault(); e.target.blur(); exitCell();
-});
-const ARROW_LOOK_RATE = 1.5; // rad/s — arrow-key look (walk + cells), pairs with WASD movement
-function updateCellWalk(dt) {
-  let f = 0, s = 0;
-  if (keys.KeyW) f += 1;
-  if (keys.KeyS) f -= 1;
-  if (keys.KeyD) s += 1;
-  if (keys.KeyA) s -= 1;
-  // Arrow keys look (not move) in cells, so they work together with WASD:
-  // Left/Right turn the view, Up/Down pitch it.
-  if (keys.ArrowLeft) cellYaw -= ARROW_LOOK_RATE * dt;
-  if (keys.ArrowRight) cellYaw += ARROW_LOOK_RATE * dt;
-  if (keys.ArrowUp) cellPitch = Math.min(1.45, cellPitch + ARROW_LOOK_RATE * dt);
-  if (keys.ArrowDown) cellPitch = Math.max(-1.45, cellPitch - ARROW_LOOK_RATE * dt);
-  f += joyY; s += joyX;
-  // Round 25 auto-walk: when on, forward pressure stays applied; the
-  // normalize below keeps it at base/run speed, and holding back (S or
-  // stick-down) cancels forward motion. Stops via stopAutoWalk().
-  if (autoWalk) f += 1;
-  const len = Math.hypot(f, s);
-  if (len > 1) { f /= len; s /= len; }
-  // Round 25 run: Shift held, or the touch joystick pushed to its edge
-  // (magnitude > 0.9). Keyboard-only input has joyMag 0, so Shift is the
-  // only keyboard run; joystick edge is the touch run.
-  const joyMag = Math.hypot(joyX, joyY);
-  const running = (keys.ShiftLeft || keys.ShiftRight || joyMag > 0.9);
-  const spd = WALK_SPEED * (running ? RUN_MULT : 1);
-  // Cell forward is -z at cellYaw 0; right = cross(fwd, up).
-  const fwd = new THREE.Vector3(Math.sin(cellYaw), 0, -Math.cos(cellYaw));
-  const right = new THREE.Vector3(-fwd.z, 0, fwd.x);
-  cellX = Math.max(-15.5, Math.min(15.5, cellX + (fwd.x * f + right.x * s) * spd * dt));
-  cellZ = Math.max(-9.5, Math.min(9.5, cellZ + (fwd.z * f + right.z * s) * spd * dt));
-  if (jumpH > 0 || jumpV > 0) {
-    jumpV -= JUMP_G * dt;
-    jumpH += jumpV * dt;
-    if (jumpH <= 0) { jumpH = 0; jumpV = 0; buzz(60); } // landing thud
-  }
-  const base = cellGroup.position;
-  const pos = new THREE.Vector3(base.x + cellX, 1.7 + jumpH, base.z + cellZ);
-  const viewDir = fwd.clone().multiplyScalar(Math.cos(cellPitch));
-  viewDir.y = Math.sin(cellPitch);
-  camera.position.copy(pos);
-  camera.up.set(0, 1, 0);
-  camera.lookAt(pos.x + viewDir.x, pos.y + viewDir.y, pos.z + viewDir.z);
-  // Exit: walk into the EXIT doorway (or tap EXIT / press E).
-  if (cellZ > 9.5 - 0.01 && Math.abs(cellX) < 4) exitCell();
-}
+const ARROW_LOOK_RATE = 1.5; // rad/s — arrow-key look (walk), pairs with WASD movement
 
 // ---------- Shuttle (undocked) ----------
 // Round 30 shuttle restyle (Brant: sleek 2500, no toy plane): the old
@@ -3635,13 +3314,13 @@ const btnLookSteer = document.getElementById('btn-looksteer');
 const btnBrake = document.getElementById('btn-brake');
 let brakeHeld = false; // hold-to-brake (BRAKE button, Space, or B; same decay)
 // Round 25: Backrooms-style auto-walk (ship walk mode only). Toggle with
-// Q; stops on tool/collect open, cell entry,
+// Q; stops on tool/collect open,
 // dock/undock, menu/title open, or crash (see stopAutoWalk call sites
-// plus the animate-loop backstop). Never engages in flight or cells.
+// plus the animate-loop backstop). Never engages in flight.
 let autoWalk = false;
 function stopAutoWalk() { autoWalk = false; }
 function toggleAutoWalk() {
-  if (menuOn || mode !== 'walk' || inCell || crashed || titleOpen || toolOpen || collectOpen || reviewOpen) return;
+  if (menuOn || mode !== 'walk' || crashed || titleOpen || toolOpen || collectOpen || reviewOpen) return;
   autoWalk = !autoWalk;
 }
 const failText = document.getElementById('failText');
@@ -3879,7 +3558,7 @@ updateHint();
 // an F press away from the terminal shows a directing hint instead
 // of departing.
 function undock() {
-  if (crashed || mode !== 'walk' || inCell) return;
+  if (crashed || mode !== 'walk') return;
   if (explorationDist2() >= DEPART_DIST * DEPART_DIST) return; // gated DEPART: only at the Exploration Terminal
   dockArmed = false; // auto-dock stays OFF until the shuttle has flown clear of every port
   mode = 'flight';
@@ -3957,7 +3636,6 @@ function autoDock(port) {
 function toggleMode() {
   stopAutoWalk();
   if (mode !== 'walk') return;
-  if (inCell || transitioning) return; // in a cell, F never departed; keep that silent
   if (explorationDist2() >= DEPART_DIST * DEPART_DIST) {
     hint.textContent = 'Walk to an Exploration Terminal — one stands inside each hull port — to depart.';
     setTimeout(updateHint, 4000);
@@ -3976,10 +3654,7 @@ document.addEventListener('pointerlockchange', function () {
 document.addEventListener('mousemove', function (e) {
   if (!pointerLocked) return;
   if (crashed) return;
-  if (inCell) {
-    cellYaw += e.movementX * 0.0022;
-    cellPitch = Math.max(-1.45, Math.min(1.45, cellPitch - e.movementY * 0.0022));
-  } else if (mode === 'walk') {
+  if (mode === 'walk') {
     yaw -= e.movementX * 0.0022;
     pitch = Math.max(-1.45, Math.min(1.45, pitch - e.movementY * 0.0022));
   } else {
@@ -4012,10 +3687,7 @@ window.addEventListener('pointermove', function (e) {
   if (e.pointerId !== mouseDragId || pointerLocked || crashed) return;
   const dx = e.clientX - mouseDragX, dy = e.clientY - mouseDragY;
   mouseDragX = e.clientX; mouseDragY = e.clientY;
-  if (inCell) {
-    cellYaw += dx * 0.005;
-    cellPitch = Math.max(-1.45, Math.min(1.45, cellPitch - dy * 0.005));
-  } else if (mode === 'walk') {
+  if (mode === 'walk') {
     yaw -= dx * 0.005;
     pitch = Math.max(-1.45, Math.min(1.45, pitch - dy * 0.005));
   } else if (lookSteerMode === 'steer') {
@@ -4047,7 +3719,6 @@ document.addEventListener('keydown', function (e) {
   if (e.code === 'KeyH' && !e.repeat) toggleMenu();
   if (e.code === 'KeyQ' && !e.repeat) toggleAutoWalk();
   if (e.code === 'KeyR' && !e.repeat) retryMission();
-  if (e.code === 'KeyE' && !e.repeat && inCell) exitCell();
   keys[e.code] = true;
 });
 document.addEventListener('keyup', function (e) { keys[e.code] = false; });
@@ -4075,10 +3746,7 @@ window.addEventListener('pointermove', function (e) {
   if (e.pointerId === lookPointerId) {
     const dx = e.clientX - lastLookX, dy = e.clientY - lastLookY;
     lastLookX = e.clientX; lastLookY = e.clientY;
-    if (inCell) {
-      cellYaw += dx * 0.005;
-      cellPitch = Math.max(-1.45, Math.min(1.45, cellPitch - dy * 0.005));
-    } else if (mode === 'walk') {
+    if (mode === 'walk') {
       yaw -= dx * 0.005;
       pitch = Math.max(-1.45, Math.min(1.45, pitch - dy * 0.005));
     } else if (lookSteerMode === 'steer') {
@@ -4316,19 +3984,6 @@ function updateWalk(dt) {
     playerAngle += OMEGA * (groundR / rNow - 1) * dt;
   }
 
-  // Enterable buildings: walking into a glowing doorway transitions into
-  // that building's interior cell (see enterCell). Checked in ship-frame
-  // coordinates: tangential distance along the deck + axial distance.
-  // Gated to the main deck: from the gallery (eye radius under 155)
-  // a doorway below cannot trigger, so the Workshop stays reachable
-  // only at deck level. Also gated by the post-exit re-entry cooldown
-  // (noReenterUntil), so an exit can never instantly refire its door.
-  for (const eb of ENTERABLES) {
-    const tang = Math.abs(angDiff(playerAngle, eb.angle)) * playerEyeR;
-    const faceZ = eb.z + eb.doorDir * (EB_DEPTH / 2);
-    const zIn = eb.doorDir > 0 ? (playerZ >= faceZ && playerZ <= faceZ + 7) : (playerZ <= faceZ && playerZ >= faceZ - 7);
-    if (tang < 5.5 && zIn && playerEyeR > 155 && performance.now() >= noReenterUntil) { enterCell(eb.zone); break; }
-  }
 
   // Camera: up points toward the axis (spin-gravity feel), carried by the spin.
   const phi2 = playerAngle + cylAngle;
@@ -4734,7 +4389,7 @@ function updateBurnSound(thrust) {
 // half, rooms) gets a crisp bandpassed tap, agriculture soil gets a soft
 // lowpassed thud. Stride timing follows real movement (ship-frame travel),
 // so steps never play while standing still, mid-jump, or with a panel open.
-let stepTimer = 0, stepLastA = 0, stepLastB = 0, stepLastCell = false, stepSide = 1;
+let stepTimer = 0, stepLastA = 0, stepLastB = 0, stepSide = 1;
 function playStep(soft) {
   try {
     if (!audioCtx || !noiseBuf) return;
@@ -4763,15 +4418,14 @@ function updateFootsteps(dt) {
   try {
     ensureAudio();
     if (!audioCtx || !noiseBuf) return;
-    // Ship-frame position: deck walk moves playerAngle/playerZ, cells move
-    // cellX/cellZ. (Camera world position must NOT be used: the ship's spin
+    // Ship-frame position: deck walk moves playerAngle/playerZ. (Camera world position must NOT be used: the ship's spin
     // moves the camera ~0.36 m/frame even standing still, which played
     // steps when the player was not moving at all.)
-    const pa = inCell ? cellX : playerAngle * playerEyeR;
-    const pb = inCell ? cellZ : playerZ;
-    if (mode !== 'walk' || crashed || collectOpen || toolOpen || titleOpen || menuOn || jumpH !== 0 || inCell !== stepLastCell) {
+    const pa = playerAngle * playerEyeR;
+    const pb = playerZ;
+    if (mode !== 'walk' || crashed || collectOpen || toolOpen || titleOpen || menuOn || jumpH !== 0) {
       stepTimer = 0;
-      stepLastA = pa; stepLastB = pb; stepLastCell = inCell;
+      stepLastA = pa; stepLastB = pb;
       return;
     }
     const moved = Math.hypot(pa - stepLastA, pb - stepLastB);
@@ -4782,7 +4436,7 @@ function updateFootsteps(dt) {
     stepTimer += dt;
     if (stepTimer >= (running ? 0.30 : 0.42)) {
       stepTimer = 0;
-      const soft = !inCell && playerZ < 0;
+      const soft = playerZ < 0;
       playStep(soft);
     }
   } catch (e) {}
@@ -5563,14 +5217,14 @@ const STATIONS = [
 const STATION_DIST = 8; // metres: walk-up range for every station (doubled from 4)
 function stationDist2(st) {
   if (st.kind === 'ext') {
-    // Round 23: exterior consoles trigger by walk-up proximity alone —
-    // no cell entry required. Same 4 m radius as every other station.
-    if (mode !== 'walk' || inCell || transitioning) return Infinity;
+    // Round 23: exterior consoles trigger by walk-up proximity alone.
+    // Same 4 m radius as every other station.
+    if (mode !== 'walk') return Infinity;
     const tang = Math.abs(angDiff(playerAngle, st.angle)) * 160;
     const dz = playerZ - st.z;
     return tang * tang + dz * dz;
   }
-  if (mode !== 'walk' || inCell || transitioning) return Infinity;
+  if (mode !== 'walk') return Infinity;
   if (st.zone === 'gallery' && galleryFactor(playerAngle, playerZ) < 0.9) return Infinity;
   const tang = Math.abs(angDiff(playerAngle, st.angle)) * 160;
   const dz = playerZ - st.z;
@@ -5655,7 +5309,7 @@ let reviewOpen = false, terminalNear = false;
 const btnTerminal = document.getElementById('btn-terminal');
 const reviewPanel = document.getElementById('reviewPanel');
 function terminalDist2() {
-  if (mode !== 'walk' || inCell || transitioning || toolOpen || reviewOpen) return Infinity;
+  if (mode !== 'walk' || toolOpen || reviewOpen) return Infinity;
   const gf = galleryFactor(playerAngle, playerZ);
   let best = Infinity;
   for (const tp of REVIEW_TERMINALS_POS) {
@@ -6388,15 +6042,15 @@ function animate() {
     updateWordTiles(dt, clock.elapsedTime);
     updateQuestionTiles(dt, clock.elapsedTime);
     if (!crashed) {
-      if (mode === 'walk') { if (inCell) updateCellWalk(dt); else updateWalk(dt); }
+      if (mode === 'walk') updateWalk(dt);
       else updateFlight(dt);
     }
     if (!crashed && mode === 'walk') { checkStations(); checkTerminal(); checkDepart(); }
     shuttleLight.visible = (mode === 'flight' && !crashed); // the flight light rides only while flying
   }
-  // Round 25: auto-walk backstop. Any dock/undock transition or cell
-  // entry clears auto-walk even if a dedicated call site is missed.
-  if (mode !== 'walk' || inCell) stopAutoWalk();
+  // Round 25: auto-walk backstop. Any dock/undock transition clears
+  // auto-walk even if a dedicated call site is missed.
+  if (mode !== 'walk') stopAutoWalk();
   // Flight + interior sound (self-gating inside updateBurnSound);
   // footsteps while walking.
   updateBurnSound(lastThrust);
@@ -6421,8 +6075,7 @@ function animate() {
 // migrates to empty progress sets, same pattern, never rejected.
 // Round 26: position is captured at save time (single site: saveGame) and
 // restored on load. Walk restores deck angle/z/yaw/pitch (mezzanine height
-// derives from angle/z, as in live walk); in-cell restores cell + local
-// coords; flight restores shuttle position + orientation with velocity
+// derives from angle/z, as in live walk); flight restores shuttle position + orientation with velocity
 // zeroed; docked restores the standard spawn. A save without pos (any
 // pre-round-26 save) loads as docked, exactly as before. Resume and
 // return-to-last-save both restore the saved position — the restore point
@@ -6472,9 +6125,6 @@ function capturePosition() {
     return { mode: 'flight', x: shuttle.position.x, y: shuttle.position.y, z: shuttle.position.z,
       qx: shuttle.quaternion.x, qy: shuttle.quaternion.y, qz: shuttle.quaternion.z, qw: shuttle.quaternion.w };
   }
-  if (inCell) {
-    return { mode: 'walk', cell: cellZone, cx: cellX, cz: cellZ, cyaw: cellYaw, cpitch: cellPitch };
-  }
   if (driveState === 'DOCKED' && playerAngle === 0 && playerZ === 40) return { mode: 'docked' };
   return { mode: 'walk', angle: playerAngle, z: playerZ, yaw: yaw, pitch: pitch };
 }
@@ -6488,11 +6138,6 @@ function validPos(p) {
     return { mode: 'flight', x: p.x, y: p.y, z: p.z, qx: p.qx, qy: p.qy, qz: p.qz, qw: p.qw };
   }
   if (p.mode === 'walk') {
-    if (p.cell) {
-      if (p.cell !== 'agri' && p.cell !== 'tech' && p.cell !== 'edu' && p.cell !== 'med') return null;
-      if (![p.cx, p.cz, p.cyaw, p.cpitch].every(Number.isFinite)) return null;
-      return { mode: 'walk', cell: p.cell, cx: p.cx, cz: p.cz, cyaw: p.cyaw, cpitch: p.cpitch };
-    }
     if (![p.angle, p.z, p.yaw, p.pitch].every(Number.isFinite)) return null;
     return { mode: 'walk', angle: p.angle, z: p.z, yaw: p.yaw, pitch: p.pitch };
   }
@@ -6505,25 +6150,16 @@ function validPos(p) {
 // respawns mid-drift into a rock or snaps straight to a port.
 function restoreSavedPosition(pos) {
   jumpH = 0; jumpV = 0;
-  const hideCell = function () {
-    if (inCell) { try { if (cellGroup) cellGroup.visible = false; } catch (e) {} inCell = false; cellGroup = null; cellZone = null; }
-  };
   if (!pos || pos.mode === 'docked') {
-    hideCell();
-    transitioning = false;
     mode = 'walk'; driveState = 'DOCKED'; dockArmed = true;
     shuttle.visible = false; shuttleVel.set(0, 0, 0);
     playerAngle = 0; playerZ = 40; yaw = 0; pitch = 0;
-    cellX = 0; cellZ = 8; cellYaw = 0; cellPitch = 0;
-    btnExit.style.display = 'none';
     btnMode.textContent = 'DEPART'; btnMode.style.display = '';
     btnJump.style.visibility = 'visible';
     hideNav(); updateHint();
     return;
   }
   if (pos.mode === 'flight') {
-    hideCell();
-    transitioning = false;
     mode = 'flight'; driveState = 'COAST'; dockArmed = false;
     shuttle.position.set(pos.x, pos.y, pos.z);
     // Roll-free restore: convert the saved quaternion to yaw/pitch
@@ -6538,35 +6174,16 @@ function restoreSavedPosition(pos) {
     shuttle.quaternion.setFromEuler(new THREE.Euler(shipPitch, shipYaw, 0, 'YXZ'));
     shuttleVel.set(0, 0, 0); shuttle.visible = true;
     btnMode.style.display = 'none'; btnJump.style.visibility = 'hidden';
-    btnExit.style.display = 'none';
     updateHint();
     return;
   }
   // Walk: aboard, deck height deriving from angle/z as in live walk.
   mode = 'walk'; driveState = 'DOCKED'; dockArmed = true;
   shuttle.visible = false; shuttleVel.set(0, 0, 0);
-  if (pos.cell) {
-    try { if (cellGroup) cellGroup.visible = false; } catch (e) {}
-    cellZone = pos.cell;
-    cellGroup = pos.cell === 'agri' ? agriCell : pos.cell === 'tech' ? techCell : pos.cell === 'med' ? medCell : eduCell;
-    cellX = pos.cx; cellZ = pos.cz; cellYaw = pos.cyaw; cellPitch = pos.cpitch;
-    cellGroup.visible = true; inCell = true;
-    savedExterior = null; // exitCell's doorway override places the player; no stale exterior is restored
-    btnMode.style.display = 'none'; btnExit.style.display = '';
-    btnJump.style.visibility = 'visible';
-    updateHint();
-  } else {
-    hideCell();
-    transitioning = false;
-    playerAngle = pos.angle; playerZ = pos.z; yaw = pos.yaw; pitch = pos.pitch;
-    // Brief re-entry cooldown: a restored deck spot near a doorway can
-    // never refire a cell trigger on the first frame back.
-    noReenterUntil = performance.now() + 3000;
-    btnExit.style.display = 'none';
-    btnMode.textContent = 'DEPART'; btnMode.style.display = '';
-    btnJump.style.visibility = 'visible';
-    hideNav(); updateHint();
-  }
+  playerAngle = pos.angle; playerZ = pos.z; yaw = pos.yaw; pitch = pos.pitch;
+  btnMode.textContent = 'DEPART'; btnMode.style.display = '';
+  btnJump.style.visibility = 'visible';
+  hideNav(); updateHint();
 }
 function readSave() {
   try {
@@ -6653,17 +6270,12 @@ function resetProgress() {
 function returnAboard() {
   crashed = false;
   try { failOverlay.style.display = 'none'; } catch (e) {}
-  if (inCell) {
-    try { if (cellGroup) cellGroup.visible = false; } catch (e) {}
-    inCell = false; cellGroup = null; cellZone = null;
-  }
-  transitioning = false;
   dockArmed = true;
   mode = 'walk';
   try { shuttle.visible = false; } catch (e) {}
   shuttleVel.set(0, 0, 0);
   playerAngle = 0; playerZ = 40; yaw = 0; pitch = 0;
-  jumpH = 0; jumpV = 0; cellX = 0; cellZ = 8; cellYaw = 0; cellPitch = 0;
+  jumpH = 0; jumpV = 0;
   mineProgress = 0; mineHeld = false; mineTarget = null;
   try { btnMine.style.display = 'none'; } catch (e) {}
   driveState = 'DOCKED';
