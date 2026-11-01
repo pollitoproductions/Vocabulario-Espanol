@@ -2682,17 +2682,30 @@ function updateCellWalk(dt) {
 }
 
 // ---------- Shuttle (undocked) ----------
+// Round 30 shuttle restyle (Brant: sleek 2500, no toy plane): the old
+// light-grey capsule + red cone nose read as a toy plane with a clown
+// nose, so both are gone. The body is now a single dark dart — a lathe
+// profile from a flat tail to a sharp nose point, nose +Z, same overall
+// extents as before (tail -2.6, tip +4.4) so camera, docking and the
+// thruster glows all keep their places. Hull panels stay the texture;
+// the dark graphite tint is what kills the plastic look.
 const shuttle = new THREE.Group();
-const shuttleBodyMat = new THREE.MeshStandardMaterial({ color: 0xd8dde2, roughness: 0.35, metalness: 0.65 });
-applyGameTexture(shuttleBodyMat, 'hull-panels.jpg', 2, 1); // round 30 shuttle pass: paneled hull; flat light-grey stays the fallback
-const fuselageGeo = new THREE.CapsuleGeometry(1.05, 3.0, 6, 18);
-fuselageGeo.rotateX(Math.PI / 2); // capsule axis (Y) -> Z (shuttle forward)
+const shuttleBodyMat = new THREE.MeshStandardMaterial({ color: 0x2a2f36, roughness: 0.4, metalness: 0.8 });
+applyGameTexture(shuttleBodyMat, 'hull-panels.jpg', 2, 1); // paneled hull; flat dark-grey stays the fallback
+const dartProfile = [
+  [0.0, -2.6], [0.55, -2.6], [0.85, -1.8], [0.95, -0.5],
+  [0.9, 1.2], [0.7, 2.6], [0.38, 3.6], [0.0, 4.4]
+].map(function (p) { return new THREE.Vector2(p[0], p[1]); });
+const fuselageGeo = new THREE.LatheGeometry(dartProfile, 24);
+fuselageGeo.rotateX(Math.PI / 2); // lathe height (Y) -> +Z (shuttle forward, nose tip at +4.4)
 shuttle.add(new THREE.Mesh(fuselageGeo, shuttleBodyMat));
-const noseGeo = new THREE.ConeGeometry(1.05, 2.0, 24);
-noseGeo.rotateX(Math.PI / 2); // cone tip -> +Z (shuttle forward)
-const nose = new THREE.Mesh(noseGeo, new THREE.MeshStandardMaterial({ color: 0xc23b2a, roughness: 0.4, metalness: 0.3 }));
-nose.position.z = 3.5;
-shuttle.add(nose);
+// Cyan accent rings around the body (the game's interactive cyan, as trim).
+const shuttleRingMat = new THREE.MeshBasicMaterial({ color: 0x7fe3ff });
+const ringFwd = new THREE.Mesh(new THREE.TorusGeometry(0.84, 0.05, 8, 32), shuttleRingMat);
+ringFwd.position.z = 1.8;
+const ringAft = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.05, 8, 32), shuttleRingMat);
+ringAft.position.z = -1.6;
+shuttle.add(ringFwd, ringAft);
 // Smooth canopy.
 const canopy = new THREE.Mesh(
   new THREE.SphereGeometry(0.62, 20, 14),
@@ -2701,18 +2714,19 @@ const canopy = new THREE.Mesh(
 canopy.scale.set(1, 0.55, 1.9);
 canopy.position.set(0, 0.95, 0.6);
 shuttle.add(canopy);
-// Swept wings: extruded planform with beveled edges (smooth, not boxy).
+// Swept delta wings: sharper sweep than before (leading edge angles well
+// back), extruded planform with beveled edges, sitting low on the body.
 function makeWingGeometry() {
   const s = new THREE.Shape();
-  s.moveTo(0, 1.1); s.lineTo(3.4, 0.2); s.lineTo(3.4, -0.9); s.lineTo(0, -1.1); s.closePath();
+  s.moveTo(0, 1.3); s.lineTo(3.6, -0.6); s.lineTo(3.6, -1.2); s.lineTo(0, -1.2); s.closePath();
   const g = new THREE.ExtrudeGeometry(s, { depth: 0.16, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.06, bevelSegments: 2 });
   g.rotateX(Math.PI / 2); // planform into XZ, thickness into Y
   g.translate(0, 0.14, 0);
   return g;
 }
 const wingGeo = makeWingGeometry();
-const wingMat = new THREE.MeshStandardMaterial({ color: 0xd8dde2, roughness: 0.35, metalness: 0.65, side: THREE.DoubleSide });
-applyGameTexture(wingMat, 'hull-panels.jpg', 2, 1); // round 30 shuttle pass: wings + fin share the hull panels; flat light-grey stays the fallback
+const wingMat = new THREE.MeshStandardMaterial({ color: 0x2a2f36, roughness: 0.4, metalness: 0.8, side: THREE.DoubleSide });
+applyGameTexture(wingMat, 'hull-panels.jpg', 2, 1); // wings + fins share the hull panels; flat dark-grey stays the fallback
 const wingR = new THREE.Mesh(wingGeo, wingMat);
 wingR.position.set(0.6, -0.1, -0.3);
 shuttle.add(wingR);
@@ -2720,11 +2734,16 @@ const wingL = new THREE.Mesh(wingGeo, wingMat);
 wingL.rotation.z = Math.PI; // mirror span, keep chord direction
 wingL.position.set(-0.6, -0.1, -0.3);
 shuttle.add(wingL);
-// Tapered tail fin, flattened along the chord.
-const fin = new THREE.Mesh(new THREE.ConeGeometry(0.9, 1.8, 16), wingMat);
-fin.scale.set(1, 1, 0.22);
-fin.position.set(0, 1.4, -1.9);
-shuttle.add(fin);
+// Twin canted tail fins: four-sided pyramids, flattened along the chord
+// and tilted outward — angular, not a single toy cone.
+function makeFinMesh(side) {
+  const f = new THREE.Mesh(new THREE.ConeGeometry(0.75, 1.7, 4), wingMat);
+  f.scale.set(1, 1, 0.3);
+  f.rotation.z = side * 0.5; // cant outward
+  f.position.set(side * 0.5, 1.35, -1.9);
+  return f;
+}
+shuttle.add(makeFinMesh(1), makeFinMesh(-1));
 const flameGeo = new THREE.ConeGeometry(0.7, 2.4, 16);
 flameGeo.rotateX(-Math.PI / 2); // tip -> -Z (exhaust trails behind)
 const flame = new THREE.Mesh(flameGeo, new THREE.MeshBasicMaterial({ color: 0xffa63d }));
@@ -2738,9 +2757,9 @@ const retroFlameGeo = new THREE.ConeGeometry(0.32, 1.4, 12);
 retroFlameGeo.rotateX(Math.PI / 2); // tip -> +Z (exhaust pushes forward)
 const retroFlameMat = new THREE.MeshBasicMaterial({ color: 0xffa63d });
 const retroL = new THREE.Mesh(retroFlameGeo, retroFlameMat);
-retroL.position.set(-0.85, 0, 3.4); retroL.visible = false;
+retroL.position.set(-0.65, 0, 3.3); retroL.visible = false;
 const retroR = new THREE.Mesh(retroFlameGeo, retroFlameMat);
-retroR.position.set(0.85, 0, 3.4); retroR.visible = false;
+retroR.position.set(0.65, 0, 3.3); retroR.visible = false;
 shuttle.add(retroL, retroR);
 // Side (RCS) thrusters (round 30 shuttle pass): rear side pods, same orange
 // burn family. Frame, stated explicitly because the names were swapped
