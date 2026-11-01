@@ -511,6 +511,19 @@ const CAM_EASE_RATE = 0.6; // gentle lerp rate (time constant ~1.7 s, never a sn
 // responsive but not a hard snap; look input cancels it instantly.
 const CAM_CENTER_RATE = 3;
 let centerEase = false, centerEaseStarted = 0;
+// Centerline height (round 30, Brant: camera lined up with the center
+// line + shuttle centered in frame): the old fixed +7 m put the camera
+// well above the shuttle, so the shuttle projected ~19 deg below frame
+// center. Brant: sitting a little above the shuttle is actually okay,
+// so the centered height is ~2 m, not the exact centerline: camHeight
+// eases 7 <-> 2 in the flight camera block: 2 when the view is centered
+// (shuttle ~6 deg below center at 20 m back), 7 when looking around.
+// Starts at 2: a fresh flight is the centered view.
+let camHeight = 2;
+// Horizontal centered view (round 30, Brant: "Horizontal"): levelBlend
+// eases 0 <-> 1 with the height blend — 1 when the view is centered,
+// 0 when looking around. Starts at 1: a fresh flight is the centered view.
+let levelBlend = 1;
 // Touch look-grab generation: incremented on every touch look claim.
 // CENTER records the generation at press time and only a NEW grab after
 // the press cancels the ease — moves from a drag already in progress
@@ -520,7 +533,11 @@ let touchLookSeq = 0, centerTouchSeq = 0;
 // CENTER (round 30, Brant: centered for navigation): tapping CENTER
 // eases the look offsets to zero, putting the camera straight behind
 // the shuttle on its tail axis, looking forward along the nose — the
-// view the shuttle is flown by. The camera NEVER leaves the shuttle:
+// view the shuttle is flown by. The height offset eases to ~2 m with
+// it, so the camera sits directly behind the shuttle just above the
+// centerline and the shuttle reads near-center in frame (the old fixed
+// +7 m left it ~19 deg below-center).
+// The camera NEVER leaves the shuttle:
 // no port-aim, no axial-aim, no detached viewpoint. Both earlier
 // overrides took the view OFF the shuttle Brant is flying (port-aim
 // stared at the mothership's side; axial-aim stared along the
@@ -3337,7 +3354,7 @@ function undock() {
   shuttle.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), tangent);
   // Co-rotating start: the shuttle inherits the station's local velocity.
   shuttleVel.copy(tangent).multiplyScalar(OMEGA * rr);
-  camYaw = 0; camPitch = 0; centerEase = false; // fresh flight starts on the neutral trailing view
+  camYaw = 0; camPitch = 0; centerEase = false; camHeight = 2; levelBlend = 1; // fresh flight starts on the neutral trailing view (centered: just above the centerline)
   shuttle.visible = true;
   btnMode.style.display = 'none';
   modeText.textContent = 'Departed';
@@ -3903,6 +3920,25 @@ function updateFlight(dt) {
       if (Math.abs(camYaw) < 0.005 && Math.abs(camPitch) < 0.005) { camYaw = 0; camPitch = 0; centerEase = false; }
     }
   }
+  // Centerline height (round 30, Brant: camera lined up with the center
+  // line + shuttle centered in frame): the old fixed +7 m sat the camera
+  // well above the shuttle, so the shuttle projected ~19 deg below frame
+  // center. When the view is centered — CENTER armed, idle-settled, or
+  // offsets already at zero — the height offset eases to ~2 m, putting
+  // the camera directly behind the shuttle just above its centerline,
+  // looking straight forward along the nose: the shuttle sits
+  // near-center in frame (~6 deg below center at 20 m back) and the
+  // view ahead stays essentially level. Fresh look input eases it back
+  // to 7 m. Eased, never snapped (the camera position itself is
+  // additionally lerped at 8/s below).
+  const idleSettling = (nowMs - lastCamInput > CAM_IDLE_SECS * 1000 && nowMs - lastFlightInput > CAM_IDLE_SECS * 1000);
+  const wantCentered = centerEase || idleSettling || (Math.abs(camYaw) < 0.005 && Math.abs(camPitch) < 0.005);
+  const heightRate = centerEase ? CAM_CENTER_RATE : CAM_EASE_RATE;
+  camHeight += ((wantCentered ? 2 : 7) - camHeight) * (1 - Math.exp(-heightRate * dt));
+  // Horizontal centered view (round 30, Brant: "Horizontal"): levelBlend
+  // eases to 1 with the same rate as the height blend, so the leveling
+  // below arrives smoothly, never as a pitch snap.
+  levelBlend += ((wantCentered ? 1 : 0) - levelBlend) * (1 - Math.exp(-heightRate * dt));
   // Neutral trailing is NOSE-ONLY (round 30 fix): the camera base trails
   // the spacecraft's nose direction, never the velocity. The old blend
   // toward velocity swung the neutral 180° when velocity passed through
@@ -3919,20 +3955,39 @@ function updateFlight(dt) {
   const camRight = new THREE.Vector3().crossVectors(upS, camFwd).normalize();
   camFwd.applyAxisAngle(camRight, -camPitch); // positive camPitch looks up
   const camUp = upS.clone().applyAxisAngle(camRight, -camPitch);
-  const desired = shuttle.position.clone().addScaledVector(camFwd, -20).addScaledVector(camUp, 7);
+  const desired = shuttle.position.clone().addScaledVector(camFwd, -20).addScaledVector(camUp, camHeight);
   camera.position.lerp(desired, 1 - Math.exp(-8 * dt));
-  camera.up.copy(camUp);
+  // Horizontal centered view: when centered (levelBlend 1), the view
+  // direction is the nose direction with its pitch component removed
+  // (world-XZ normalized) and camera up is world up — zero total pitch,
+  // level horizon — so a pitched shuttle reads as pitched in frame
+  // while the horizon stays level, which is what makes the view
+  // navigable. The blend eases in with the height blend, so there is
+  // no pitch snap; at blend 0 the view follows the nose including its
+  // pitch, exactly as before. Camera position above is untouched: it
+  // stays behind the shuttle on its tail axis. Degenerate case (nose
+  // nearly vertical, no horizontal component) keeps the unleveled
+  // direction for that frame rather than normalizing a zero vector.
+  const lvlH = Math.hypot(camFwd.x, camFwd.z);
+  let viewFwd = camFwd, viewUp = camUp;
+  if (lvlH > 1e-4 && levelBlend > 0) {
+    const lvlFwd = new THREE.Vector3(camFwd.x / lvlH, 0, camFwd.z / lvlH);
+    viewFwd = camFwd.clone().lerp(lvlFwd, levelBlend).normalize();
+    viewUp = camUp.clone().lerp(new THREE.Vector3(0, 1, 0), levelBlend).normalize();
+  }
+  camera.up.copy(viewUp);
   // CENTER (Brant: centered for navigation): with offsets eased to
-  // zero the look target below is straight ahead along the nose —
-  // the camera sits on the shuttle's tail axis looking forward past
-  // it. NO aim override exists anymore: neither port-aim nor
-  // axial-aim may hijack the view direction. Guidance arrow logic
-  // below is untouched (it reads the camera orientation, so a
+  // zero the look target below is straight ahead — horizontal when
+  // centered, along the nose when looking around — the camera sits
+  // on the shuttle's tail axis looking forward past it. NO aim
+  // override exists anymore: neither port-aim nor axial-aim may
+  // hijack the view direction. Guidance arrow logic below is
+  // untouched (it reads the camera orientation, so a level
   // nose-forward view reads straight ahead).
   let lookTarget = new THREE.Vector3(
-    shuttle.position.x + camFwd.x * 12,
-    shuttle.position.y + camFwd.y * 12,
-    shuttle.position.z + camFwd.z * 12
+    shuttle.position.x + viewFwd.x * 12,
+    shuttle.position.y + viewFwd.y * 12,
+    shuttle.position.z + viewFwd.z * 12
   );
   camera.lookAt(lookTarget);
   // Flight nav readout (navigation aid ONLY — display only, never moves the
