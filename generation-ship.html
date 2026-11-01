@@ -2684,14 +2684,16 @@ function updateCellWalk(dt) {
 // ---------- Shuttle (undocked) ----------
 // Round 30 shuttle restyle (Brant: sleek 2500, no toy plane): the old
 // light-grey capsule + red cone nose read as a toy plane with a clown
-// nose, so both are gone. The body is now a single dark dart — a lathe
+// nose, so both are gone. The body is now a single sleek dart — a lathe
 // profile from a flat tail to a sharp nose point, nose +Z, same overall
 // extents as before (tail -2.6, tip +4.4) so camera, docking and the
 // thruster glows all keep their places. Hull panels stay the texture;
-// the dark graphite tint is what kills the plastic look.
+// the tint stays light so the panels read — the dark tint tried first
+// multiplied the texture down to near-black (stealth look), so it was
+// reverted: the shape, not the tint, is what kills the toy look.
 const shuttle = new THREE.Group();
-const shuttleBodyMat = new THREE.MeshStandardMaterial({ color: 0x2a2f36, roughness: 0.4, metalness: 0.8 });
-applyGameTexture(shuttleBodyMat, 'hull-panels.jpg', 2, 1); // paneled hull; flat dark-grey stays the fallback
+const shuttleBodyMat = new THREE.MeshStandardMaterial({ color: 0xd8dde2, roughness: 0.35, metalness: 0.65 });
+applyGameTexture(shuttleBodyMat, 'hull-panels.jpg', 2, 1); // paneled hull; flat light-grey stays the fallback
 const dartProfile = [
   [0.0, -2.6], [0.55, -2.6], [0.85, -1.8], [0.95, -0.5],
   [0.9, 1.2], [0.7, 2.6], [0.38, 3.6], [0.0, 4.4]
@@ -2725,8 +2727,8 @@ function makeWingGeometry() {
   return g;
 }
 const wingGeo = makeWingGeometry();
-const wingMat = new THREE.MeshStandardMaterial({ color: 0x2a2f36, roughness: 0.4, metalness: 0.8, side: THREE.DoubleSide });
-applyGameTexture(wingMat, 'hull-panels.jpg', 2, 1); // wings + fins share the hull panels; flat dark-grey stays the fallback
+const wingMat = new THREE.MeshStandardMaterial({ color: 0xd8dde2, roughness: 0.35, metalness: 0.65, side: THREE.DoubleSide });
+applyGameTexture(wingMat, 'hull-panels.jpg', 2, 1); // wings + fins share the hull panels; flat light-grey stays the fallback
 const wingR = new THREE.Mesh(wingGeo, wingMat);
 wingR.position.set(0.6, -0.1, -0.3);
 shuttle.add(wingR);
