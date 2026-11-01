@@ -326,7 +326,7 @@
   <button class="closeBtn" id="btn-menu-save" type="button">SAVE JOURNEY</button>
   <div id="menuSaveMsg"></div>
   <button class="subHead" data-sub="progress" data-label="PROGRESS" type="button">▾ PROGRESS</button><div class="subBody open" id="sub-progress">
-  <div class="row"><span>WORDS COLLECTED</span><b id="progWords">0 / 1000</b></div>
+  <div class="row"><span>PRACTICE SPOKEN</span><b id="progWords">0 / 1000</b></div>
   <div class="row"><span>COGNATES SPOKEN</span><b id="progCog">0 / 487</b></div>
   <div class="row"><span>IDIOMS SPOKEN</span><b id="progIdioms">0 / 135</b></div>
   <div class="row"><span>CONJUGATION SPOKEN</span><b id="progConj">0 / 1695</b></div>
@@ -3334,9 +3334,9 @@ function updateMenu() {
   }
   updateProgressUI();
 }
-// PROGRESS submenu counts. Words come from the live collected tiles
-// (collecting a tile requires speaking it, so the words line already
-// proves practice — no separate practice line). The five spoken sets
+// PROGRESS submenu counts. The practice-spoken line counts the live
+// collected tiles (collecting a tile requires speaking it, so this
+// line already proves practice — no separate practice line). The five spoken sets
 // live in prog (see save section) and are restored from the save on
 // Resume; station-spoken words are still credited in prog.practice
 // for the station's known-exclusion and the review panel, just not
