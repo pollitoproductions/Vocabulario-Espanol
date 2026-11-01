@@ -2229,6 +2229,142 @@ for (const eb of ENTERABLES) {
   }
 }
 
+// ---------- Nov 1: upper-half city fabric (round 30, updated) ----------
+// The residential pattern spreads across the whole upper half (everything
+// that is not agriculture): axial streets ring the half, seven town
+// squares sit centered on the seven main-deck review terminals (the
+// terminals themselves do not move), and eight neighborhoods fill the
+// gaps between the existing city, the quarters row, the gallery, the
+// cell doorways, and the exploration terminals. The schoolhouse stays
+// the only school. The gallery platform and its stairs are left alone
+// on purpose — that space is reserved for something significant later.
+// Decorative only, like the original city: no collision, no new lights.
+// Every placement was checked against the keep-outs (terminals, cells,
+// gallery arc, arch, quarters strip, mess tables, bulkhead approaches)
+// before it was written; the checker is /tmp/gen-fill.py.
+{
+  const fillStreetMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 });
+  applyGameTexture(fillStreetMat, 'deck-floor.jpg', 1, 30);
+  const fillPlazaMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 });
+  applyGameTexture(fillPlazaMat, 'deck-floor.jpg', 6, 6);
+  const fillLeafMat = new THREE.MeshStandardMaterial({ color: 0x3fae5a, roughness: 0.9 });
+  const fillTrunkMat = new THREE.MeshStandardMaterial({ color: 0x4a3b28, roughness: 1 });
+  const fillBenchMat = new THREE.MeshStandardMaterial({ color: 0x6b5a3a, roughness: 0.9 });
+  const fillPostMat = new THREE.MeshStandardMaterial({ color: 0x4a5560, roughness: 0.85 });
+  const fillLampMat = new THREE.MeshBasicMaterial({ color: 0xffc27a });
+  const fillStallMats = [0xd94f30, 0x3fae5a, 0xe8a33d, 0x59d6ff].map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.85 }));
+  const fillHouseWallMats = [0xd8c9a8, 0xc9b8a0, 0xb8c4c9, 0xd0b8a0, 0xa8b8a0, 0xcbb89a].map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.9 }));
+  fillHouseWallMats.forEach(m => applyGameTexture(m, 'habitat.jpg', 2, 1));
+  const fillRoofMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6, metalness: 0.3 });
+  applyGameTexture(fillRoofMat, 'hull-panels.jpg', 2, 2);
+  const fillShopWallMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
+  applyGameTexture(fillShopWallMat, 'tech-interior.jpg', 2, 1);
+  const fillCropMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 });
+  applyGameTexture(fillCropMat, 'crops.jpg', 2, 1);
+  const fillDoorMat = new THREE.MeshStandardMaterial({ color: 0x3a2e22, roughness: 1 });
+  const fillWinMat = new THREE.MeshBasicMaterial({ color: 0xffc27a });
+  function fillGroup(angle, z, rOff) {
+    const radial = new THREE.Vector3(Math.cos(angle), Math.sin(angle), 0);
+    const grp = new THREE.Group();
+    grp.position.copy(radial).multiplyScalar(RADIUS - rOff);
+    grp.position.z = z;
+    grp.quaternion.copy(basisQuat(radial));
+    ship.add(grp);
+    return grp;
+  }
+  function fillBox(grp, w, h, d, mat, x, y, z) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    m.position.set(x, y, z);
+    grp.add(m);
+    return m;
+  }
+  function fillLamp(angle, z) {
+    const g = fillGroup(angle, z, 0.4);
+    fillBox(g, 0.25, 3, 0.25, fillPostMat, 0, 1.1, 0);
+    fillBox(g, 0.5, 0.3, 0.5, fillLampMat, 0, 2.7, 0);
+  }
+  // Axial streets: full length of the upper half, z 40..310. The 1.5
+  // main street and the 1.39/1.61 lanes already exist, so they are skipped.
+  for (const sa of [0.1, 0.45, 0.8, 1.85, 2.2, 2.55, 2.9, 3.25, 3.6, 3.95, 4.3, 4.65, 5.0, 5.35, 5.7, 6.05]) {
+    const g = fillGroup(sa, 175, 0.12);
+    fillBox(g, 6, 0.15, 270, fillStreetMat, 0, 0, 0);
+  }
+  // Town squares: a plaza disc centered on each main-deck review terminal,
+  // with lamps and stalls around it. Two squares are tight: the (1.20,180)
+  // square sits in the gap between the quarters row and the existing city
+  // (its west lamps/stall would land inside a quarters unit, so they are
+  // omitted), and the (3.89,100) square shares ground with an exploration
+  // terminal (its east lamps/stall would crowd the DEPART approach, so
+  // they are omitted). The terminals themselves are untouched.
+  for (const [ta, tz] of [[0.30, 220], [1.20, 180], [2.09, 180], [2.99, 300], [3.89, 100], [4.79, 200], [5.68, 280]]) {
+    const g = fillGroup(ta, tz, 0.12);
+    const disc = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 0.2, 32), fillPlazaMat);
+    g.add(disc);
+  }
+  for (const [la, lz] of [[0.2437, 211], [0.2437, 229], [0.3563, 211], [0.3563, 229], [1.2562, 171], [1.2562, 189], [2.0337, 171], [2.0337, 189], [2.1462, 171], [2.1462, 189], [2.9338, 291], [2.9338, 309], [3.0463, 291], [3.0463, 309], [3.8338, 91], [3.9463, 91], [4.7337, 191], [4.7337, 209], [4.8463, 191], [4.8463, 209], [5.6237, 271], [5.6237, 289], [5.7363, 271], [5.7363, 289]]) fillLamp(la, lz);
+  [[0.225, 220], [0.375, 220], [1.275, 180], [2.015, 180], [2.165, 180], [2.915, 300], [3.065, 300], [3.815, 100], [4.715, 200], [4.865, 200], [5.605, 280], [5.755, 280]].forEach(([sa, sz], si) => {
+    const g = fillGroup(sa, sz, 0.4);
+    fillBox(g, 0.25, 2.2, 0.25, fillPostMat, -1.5, 0.7, 0);
+    fillBox(g, 0.25, 2.2, 0.25, fillPostMat, 1.5, 0.7, 0);
+    fillBox(g, 3.6, 0.15, 3, fillPostMat, 0, 1.9, 0);
+    fillBox(g, 3, 1, 0.6, fillBenchMat, 0, 0.1, 0.9);
+    fillBox(g, 3.6, 0.1, 1.0, fillStallMats[si % fillStallMats.length], 0, 1.6, 1.4);
+  });
+  // Neighborhoods: eight blocks, each a center lane with two house rows
+  // facing it, a shop at each lane end (door toward the lane), gardens
+  // and trees at the corners, and lamps along the lane. Houses keep the
+  // city's flat roofs and textures; the school is not repeated anywhere.
+  let fillHouseIdx = 0;
+  function fillHouse(angle, z, face) {
+    const g = fillGroup(angle, z, 0.4);
+    const wall = fillHouseWallMats[fillHouseIdx % fillHouseWallMats.length];
+    fillHouseIdx++;
+    fillBox(g, 8, 6, 8, wall, 0, 2.6, 0);
+    fillBox(g, 8.6, 0.3, 8.6, fillRoofMat, 0, 5.75, 0);
+    fillBox(g, 0.15, 2.2, 1.2, fillDoorMat, face * 4.08, 0.7, 0);
+    fillBox(g, 0.12, 1.0, 2.6, fillWinMat, face * 4.06, 2.6, 0);
+    fillBox(g, 0.2, 0.2, 0.2, fillLampMat, face * 4.1, 2.2, 0);
+  }
+  function fillShop(angle, z, faceZ, awnMat) {
+    const g = fillGroup(angle, z, 0.4);
+    fillBox(g, 6, 4.5, 6, fillShopWallMat, 0, 1.85, 0);
+    fillBox(g, 4.5, 0.15, 1.8, awnMat, 0, 3.2, faceZ * 3.9);
+    fillBox(g, 1.2, 2.2, 0.15, fillDoorMat, 0, 0.7, faceZ * 3.08);
+    fillBox(g, 2.0, 1.0, 0.12, fillWinMat, 0, 2.4, faceZ * 3.06);
+    fillBox(g, 3.5, 0.15, 0.5, fillBenchMat, 0, -0.325, faceZ * 4.2);
+  }
+  function fillGarden(angle, z) {
+    const g = fillGroup(angle, z, 0.4);
+    fillBox(g, 6, 0.8, 0.15, fillBenchMat, 0, 0, -3);
+    fillBox(g, 6, 0.8, 0.15, fillBenchMat, 0, 0, 3);
+    fillBox(g, 0.15, 0.8, 6, fillBenchMat, -3, 0, 0);
+    fillBox(g, 0.15, 0.8, 6, fillBenchMat, 3, 0, 0);
+    fillBox(g, 5, 0.5, 1.2, fillCropMat, 0, -0.15, -1.5);
+    fillBox(g, 5, 0.5, 1.2, fillCropMat, 0, -0.15, 1.5);
+  }
+  function fillTree(angle, z) {
+    const g = fillGroup(angle, z, 0.4);
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 3, 8), fillTrunkMat);
+    trunk.position.set(0, 1.1, 0);
+    g.add(trunk);
+    [[1.2, 2.6], [0.9, 3.6], [0.6, 4.4]].forEach(([cr, cy]) => {
+      const cone = new THREE.Mesh(new THREE.ConeGeometry(cr, 2.0, 8), fillLeafMat);
+      cone.position.set(0, cy, 0);
+      g.add(cone);
+    });
+  }
+  for (const [ha, hz, face] of [[0.4938, 130, 1], [0.4938, 143, 1], [0.4938, 157, 1], [0.4938, 170, 1], [0.6063, 130, -1], [0.6063, 143, -1], [0.6063, 157, -1], [0.6063, 170, -1], [0.5687, 230, 1], [0.5687, 243, 1], [0.5687, 257, 1], [0.5687, 270, 1], [0.6813, 230, -1], [0.6813, 243, -1], [0.6813, 257, -1], [0.6813, 270, -1], [2.6688, 90, 1], [2.6688, 103, 1], [2.6688, 117, 1], [2.6688, 130, 1], [2.7812, 90, -1], [2.7812, 103, -1], [2.7812, 117, -1], [2.7812, 130, -1], [2.3188, 230, 1], [2.3188, 243, 1], [2.3188, 257, 1], [2.3188, 270, 1], [2.4312, 230, -1], [2.4312, 243, -1], [2.4312, 257, -1], [2.4312, 270, -1], [3.3687, 130, 1], [3.3687, 143, 1], [3.3687, 157, 1], [3.3687, 170, 1], [3.4812, 130, -1], [3.4812, 143, -1], [3.4812, 157, -1], [3.4812, 170, -1], [3.7188, 240, 1], [3.7188, 253, 1], [3.7188, 267, 1], [3.7188, 280, 1], [3.8312, 240, -1], [3.8312, 253, -1], [3.8312, 267, -1], [3.8312, 280, -1], [5.1187, 180, 1], [5.1187, 193, 1], [5.1187, 207, 1], [5.1187, 220, 1], [5.2313, 180, -1], [5.2313, 193, -1], [5.2313, 207, -1], [5.2313, 220, -1], [5.4688, 180, 1], [5.4688, 193, 1], [5.4688, 207, 1], [5.4688, 220, 1], [5.5813, 180, -1], [5.5813, 193, -1], [5.5813, 207, -1], [5.5813, 220, -1]]) fillHouse(ha, hz, face);
+  [[0.55, 122, 1], [0.55, 178, -1], [0.625, 222, 1], [0.625, 278, -1], [2.725, 82, 1], [2.725, 138, -1], [2.375, 222, 1], [2.375, 278, -1], [3.425, 122, 1], [3.425, 178, -1], [3.775, 232, 1], [3.775, 288, -1], [5.175, 172, 1], [5.175, 228, -1], [5.525, 172, 1], [5.525, 228, -1]].forEach(([sa, sz, faceZ], si) => fillShop(sa, sz, faceZ, fillStallMats[si % fillStallMats.length]));
+  for (const [ga, gz] of [[0.4438, 150], [0.6562, 150], [0.5188, 250], [0.7312, 250], [2.6187, 110], [2.8313, 110], [2.2687, 250], [2.4813, 250], [3.3187, 150], [3.5312, 150], [3.6687, 260], [3.8813, 260], [5.0687, 200], [5.2812, 200], [5.4188, 200], [5.6313, 200]]) fillGarden(ga, gz);
+  for (const [ta, tz] of [[0.4438, 130], [0.4438, 170], [0.6562, 130], [0.6562, 170], [0.5188, 230], [0.5188, 270], [0.7312, 230], [0.7312, 270], [2.6187, 90], [2.6187, 130], [2.8313, 90], [2.8313, 130], [2.2687, 230], [2.2687, 270], [2.4813, 230], [2.4813, 270], [3.3187, 130], [3.3187, 170], [3.5312, 130], [3.5312, 170], [3.6687, 240], [3.6687, 280], [3.8813, 240], [3.8813, 280], [5.0687, 180], [5.0687, 220], [5.2812, 180], [5.2812, 220], [5.4188, 180], [5.4188, 220], [5.6313, 180], [5.6313, 220]]) fillTree(ta, tz);
+  for (const [la, lz] of [[0.5125, 135], [0.5125, 165], [0.5875, 135], [0.5875, 165], [0.5875, 235], [0.5875, 265], [0.6625, 235], [0.6625, 265], [2.6875, 95], [2.6875, 125], [2.7625, 95], [2.7625, 125], [2.3375, 235], [2.3375, 265], [2.4125, 235], [2.4125, 265], [3.3875, 135], [3.3875, 165], [3.4625, 135], [3.4625, 165], [3.7375, 245], [3.7375, 275], [3.8125, 245], [3.8125, 275], [5.1375, 185], [5.1375, 215], [5.2125, 185], [5.2125, 215], [5.4875, 185], [5.4875, 215], [5.5625, 185], [5.5625, 215]]) fillLamp(la, lz);
+  // Center lanes for the eight neighborhoods.
+  for (const [ca, cz] of [[0.55, 150], [0.625, 250], [2.725, 110], [2.375, 250], [3.425, 150], [3.775, 260], [5.175, 200], [5.525, 200]]) {
+    const g = fillGroup(ca, cz, 0.12);
+    fillBox(g, 4, 0.15, 50, fillStreetMat, 0, 0, 0);
+  }
+}
+
 // ---------- Round 11: lived-in habitat dressing ----------
 // The bare floors are dressed as a place people live, not a warehouse:
 //   * crew quarters: two rows of housing units (technology z 55...155,
