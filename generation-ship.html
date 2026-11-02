@@ -977,6 +977,13 @@ function solidBlocked(a, z) {
   }
   return false;
 }
+function solidHit(a, z) {
+  for (let i = 0; i < SOLID.length; i++) {
+    const s = SOLID[i];
+    if (Math.abs(angDiff(a, s[0])) < s[1] && z >= s[2] && z <= s[3]) return s;
+  }
+  return null;
+}
 // Bulkhead entrance doorways (see the bulkhead section below): decorative
 // boxes must not block these either.
 const BULK_DOORS = [0, Math.PI / 2, Math.PI, 3 * Math.PI / 2];
@@ -4059,14 +4066,6 @@ function updateWalk(dt) {
     if (playerZ > 0) playerZ = Math.max(1.0, playerZ);
     else if (playerZ < 0) playerZ = Math.min(-1.0, playerZ);
   }
-  // Solid structures: houses, shops, stalls, walls and frames are real
-  // obstacles now, not walk-through dressing. Slide along a face: keep
-  // whichever component of the move stays clear, else stay put.
-  if (solidBlocked(playerAngle, playerZ)) {
-    if (!solidBlocked(oldAngle, playerZ)) playerAngle = oldAngle;
-    else if (!solidBlocked(playerAngle, oldZ)) playerZ = oldZ;
-    else { playerAngle = oldAngle; playerZ = oldZ; }
-  }
 
   // Jump: Mars ballistic arc (JUMP_G = 3.71), landing back on the inner surface.
   if (jumpH > 0 || jumpV > 0) {
@@ -4085,6 +4084,34 @@ function updateWalk(dt) {
     const groundR = playerEyeR + EYE; // deck radius underfoot (160, or 150 on the gallery)
     const rNow = playerEyeR - jumpH;
     playerAngle += OMEGA * (groundR / rNow - 1) * dt;
+  }
+
+  // Solid structures, resolved after every position change (input move +
+  // Coriolis drift) so a jump can never carry the player through a wall:
+  // buildings are solid columns from deck to roof, so there is no way to
+  // jump onto a roof and fall in. Slide along a face when approaching; if
+  // already inside (an old save, a drifted jump), push out through the
+  // nearest face instead of freezing — nobody ever gets stuck inside.
+  if (solidBlocked(playerAngle, playerZ)) {
+    if (!solidBlocked(oldAngle, playerZ)) playerAngle = oldAngle;
+    else if (!solidBlocked(playerAngle, oldZ)) playerZ = oldZ;
+    else {
+      for (let k = 0; k < 8; k++) {
+        const s = solidHit(playerAngle, playerZ);
+        if (!s) break;
+        const dAngM = Math.abs(angDiff(playerAngle, s[0])) * RADIUS;
+        const dTangM = s[1] * RADIUS - dAngM;
+        const dZM = Math.min(playerZ - s[2], s[3] - playerZ);
+        if (dTangM <= dZM) {
+          const sg = Math.sign(angDiff(playerAngle, s[0])) || 1;
+          playerAngle = s[0] + sg * (s[1] + 0.001);
+        } else if (playerZ - s[2] < s[3] - playerZ) {
+          playerZ = s[2] - 0.05;
+        } else {
+          playerZ = s[3] + 0.05;
+        }
+      }
+    }
   }
 
 
