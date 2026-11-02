@@ -23,6 +23,7 @@
     max-width: min(92vw, 440px, calc(100vw - 84px));
     font-size: clamp(12px, 2.6vw, 15px); line-height: 1.5;
     pointer-events: none;
+    display: none; /* shown only by the flight nav branch below; otherwise the box collapses to an empty pill */
   }
   #hud h1 { margin: 0 0 4px; font-size: clamp(16px, 4vw, 22px); font-weight: 800; letter-spacing: 0.10em; color: #ffffff; }
   #hud .flavor { color: #b9c9e2; font-style: italic; margin-bottom: 6px; }
@@ -2590,7 +2591,6 @@ function basisQuat(radial) {
       lowWallMat);
     wall.position.copy(radial).multiplyScalar(RADIUS - h / 2);
     wall.position.z = (z0 + z1) / 2;
-    addSolid(angle, 0.25, (z0 + z1) / 2, (z1 - z0) / 2);
     wall.quaternion.copy(basisQuat(radial));
     ship.add(wall);
   }
@@ -4372,7 +4372,7 @@ function updateFlight(dt) {
     beaconBeamMat.opacity = 0.4 * Math.max(0, Math.min(1, (dist - 500) / 2500));
     beaconBeam.visible = true;
     navLine.style.display = 'flex';
-    hudEl.style.display = '';
+    hudEl.style.display = 'block';
     // LOOK/STEER toggle: flight only — hidden docked / crashed / while any
     // prompt or panel is open (collect, station, review, menu).
     btnLookSteer.style.display = (mode === 'flight' && !crashed && !collectOpen && !toolOpen && !reviewOpen && !menuOn) ? '' : 'none';
