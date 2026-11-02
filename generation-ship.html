@@ -959,6 +959,24 @@ for (const qa of bodyPortAngles) {
 }
 
 function angDiff(a, b) { let d = a - b; return Math.atan2(Math.sin(d), Math.cos(d)); }
+// Solid-structure collision (walk mode): footprints of houses, shops,
+// stalls, walls, frames and furniture, in deck (angle, z) space. Builders
+// register their own footprint as they place each object, so collision
+// always matches what is drawn. Consoles, terminals, fields, trees, lamps
+// and water towers stay open: consoles need their approach, the rest is
+// thin or walk-between. A 0.5 m margin keeps the eye off the wall face.
+const SOLID = [];
+const SOLID_MARGIN = 0.5;
+function addSolid(angle, halfTangM, zCenter, halfAxM) {
+  SOLID.push([angle, (halfTangM + SOLID_MARGIN) / RADIUS, zCenter - halfAxM - SOLID_MARGIN, zCenter + halfAxM + SOLID_MARGIN]);
+}
+function solidBlocked(a, z) {
+  for (let i = 0; i < SOLID.length; i++) {
+    const s = SOLID[i];
+    if (Math.abs(angDiff(a, s[0])) < s[1] && z >= s[2] && z <= s[3]) return true;
+  }
+  return false;
+}
 // Bulkhead entrance doorways (see the bulkhead section below): decorative
 // boxes must not block these either.
 const BULK_DOORS = [0, Math.PI / 2, Math.PI, 3 * Math.PI / 2];
@@ -1003,6 +1021,7 @@ for (let i = 0; i < 14; i++) {
   m.position.z = z;
   m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), radial.clone().negate());
   ship.add(m);
+  addSolid(a, Math.hypot(w, d) / 2, z, Math.hypot(w, d) / 2);
 }
 
 
@@ -1659,6 +1678,7 @@ function basisQuat(radial) {
       const col = new THREE.Mesh(new THREE.BoxGeometry(1.2, 20, 1.2), colMat);
       col.position.copy(crad).multiplyScalar(150);
       col.position.z = cz;
+      addSolid(ca, 0.6, cz, 0.6);
       col.quaternion.copy(basisQuat(crad));
       ship.add(col);
     }
@@ -2020,11 +2040,13 @@ function basisQuat(radial) {
     cityBox(g, 3.6, 0.15, 3, cityPostMat, 0, 1.9, 0);
     cityBox(g, 3, 1, 0.6, cityBenchMat, 0, 0.1, 0.9);
     cityBox(g, 3.6, 0.1, 1.0, stallMats[si], 0, 1.6, 1.4);
+    addSolid(sa, 1.8, sz + 0.2, 1.7);
   });
   // Planters ringing the plaza.
   for (const [pa, pz] of [[1.45, 172], [1.65, 172], [1.45, 188], [1.65, 188]]) {
     const g = cityGroup(pa, pz, 0.4);
     cityBox(g, 1.6, 0.8, 4, cityBenchMat, 0, 0, 0);
+    addSolid(pa, 0.8, pz, 2);
     for (const pz2 of [-1.2, 0, 1.2]) {
       const plant = new THREE.Mesh(new THREE.ConeGeometry(0.45, 1.1, 8), cityLeafMat);
       plant.position.set(0, 0.9, pz2);
@@ -2047,6 +2069,7 @@ function basisQuat(radial) {
   for (const [ba, bz] of [[1.42, 80], [1.42, 200], [1.42, 240], [1.58, 168]]) {
     const g = cityGroup(ba, bz, 0.4);
     cityBox(g, 3.5, 0.15, 0.5, cityBenchMat, 0, 0.1, 0);
+    addSolid(ba, 1.75, bz, 0.25);
     cityBox(g, 0.2, 0.5, 0.4, cityPostMat, -1.4, -0.15, 0);
     cityBox(g, 0.2, 0.5, 0.4, cityPostMat, 1.4, -0.15, 0);
   }
@@ -2056,12 +2079,14 @@ function basisQuat(radial) {
     const crate = new THREE.Mesh(crateGeo, crateMat);
     crate.position.set(0, 0.2, 0);
     g.add(crate);
+    addSolid(ca, 0.6, cz, 0.6);
   }
   // Corner / street-end sign boards (plain geometry, no text).
   for (const [sa, sz] of [[1.35, 180], [1.95, 180], [1.5, 55], [1.5, 285]]) {
     const g = cityGroup(sa, sz, 0.4);
     cityBox(g, 0.3, 2.6, 0.3, cityPostMat, 0, 0.9, 0);
     cityBox(g, 2.2, 1.0, 0.15, cityBoardMat, 0, 2.0, 0);
+    addSolid(sa, 1.1, sz, 0.075);
   }
   // ---- Nov 1 expansion: houses, neighborhoods, trades, infrastructure ----
   // Four house rows flank the main street (1.5) and two side lanes
@@ -2085,6 +2110,7 @@ function basisQuat(radial) {
     cityBox(g, 0.15, 2.2, 1.2, houseDoorMat, face * 4.08, 0.7, 0);
     cityBox(g, 0.12, 1.0, 2.6, warmWinMat, face * 4.06, 2.6, 0);
     cityBox(g, 0.2, 0.2, 0.2, cityLampMat, face * 4.1, 2.2, 0);
+    addSolid(angle, 4, z, 4);
   }
   for (const z of [70, 90, 130, 150, 220, 240, 270]) {
     house(1.34, z, 1);
@@ -2120,6 +2146,7 @@ function basisQuat(radial) {
     cityBox(g, 1.8, 0.15, 4.5, awnMat, face * 3.9, 3.2, 0);
     cityBox(g, 0.15, 2.2, 1.2, houseDoorMat, face * 3.08, 0.7, 0);
     cityBox(g, 0.12, 1.0, 2.0, warmWinMat, face * 3.06, 2.4, 0);
+    addSolid(angle + face * 0.9 / RADIUS, 3.9, z, 3);
     prop(g, face);
   }
   function smithyProp(g, face) {
@@ -2147,6 +2174,7 @@ function basisQuat(radial) {
     const g = cityGroup(1.5, 200, 0.4);
     cityBox(g, 0.3, 2.6, 0.3, cityPostMat, 0, 0.9, 0);
     cityBox(g, 2.2, 1.0, 0.15, cityBoardMat, 0, 2.0, 0);
+    addSolid(1.5, 1.1, 200, 0.075);
   }
   // Schoolhouse closing the main street's north end (door faces the street).
   {
@@ -2160,6 +2188,7 @@ function basisQuat(radial) {
     cityBox(g, 1.4, 2.4, 0.15, houseDoorMat, 0, 0.8, -5.08);
     cityBox(g, 2.0, 1.0, 0.12, warmWinMat, -3, 3.1, -5.06);
     cityBox(g, 2.0, 1.0, 0.12, warmWinMat, 3, 3.1, -5.06);
+    addSolid(1.5, 6, 297, 5);
   }
   // Fenced garden plots behind the outer rows.
   const cropMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 });
@@ -2220,6 +2249,7 @@ function basisQuat(radial) {
     g.add(slide);
     cityBox(g, 0.2, 2.4, 0.2, cityPostMat, 2.7, 0.8, 2.0);
     cityBox(g, 0.2, 2.4, 0.2, cityPostMat, 3.7, 0.8, 2.0);
+    addSolid(1.727, 2.71, 285, 2.25);
   }
   // Fountain in the plaza medallion.
   {
@@ -2233,6 +2263,7 @@ function basisQuat(radial) {
     const fountWater = new THREE.Mesh(new THREE.CylinderGeometry(2.3, 2.3, 0.1, 16), fountWaterMat);
     fountWater.position.set(0, 0.45, 0);
     g.add(fountWater);
+    addSolid(1.55, 2.6, 180, 2.6);
     const fountPost = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 1.6, 10), fountStoneMat);
     fountPost.position.set(0, 1.3, 0);
     g.add(fountPost);
@@ -2387,6 +2418,7 @@ function basisQuat(radial) {
     fillBox(g, 3.6, 0.15, 3, fillStallPostMat, 0, 1.9, 0);
     fillBox(g, 3, 1, 0.6, fillBenchMat, 0, 0.1, 0.9);
     fillBox(g, 3.6, 0.1, 1.0, fillStallMats[si % fillStallMats.length], 0, 1.6, 1.4);
+    addSolid(sa, 1.8, sz + 0.2, 1.7);
   });
   // Neighborhoods: sixteen blocks, each a center lane with two house rows
   // facing it, a shop at each lane end (door toward the lane), gardens
@@ -2402,6 +2434,7 @@ function basisQuat(radial) {
     fillBox(g, 0.15, 2.2, 1.2, fillDoorMat, face * 4.08, 0.7, 0);
     fillBox(g, 0.12, 1.0, 2.6, fillWinMat, face * 4.06, 2.6, 0);
     fillBox(g, 0.2, 0.2, 0.2, fillLampMat, face * 4.1, 2.2, 0);
+    addSolid(angle, 4, z, 4);
   }
   function fillShop(angle, z, faceZ, awnMat) {
     const g = fillGroup(angle, z, 0.4);
@@ -2410,6 +2443,7 @@ function basisQuat(radial) {
     fillBox(g, 1.2, 2.2, 0.15, fillDoorMat, 0, 0.7, faceZ * 3.08);
     fillBox(g, 2.0, 1.0, 0.12, fillWinMat, 0, 2.4, faceZ * 3.06);
     fillBox(g, 3.5, 0.15, 0.5, fillBenchMat, 0, -0.325, faceZ * 4.2);
+    addSolid(angle, 3, z + faceZ * 0.9, 3.9);
   }
   function fillGarden(angle, z) {
     const g = fillGroup(angle, z, 0.4);
@@ -2419,6 +2453,7 @@ function basisQuat(radial) {
     fillBox(g, 0.15, 0.8, 6, fillBenchMat, 3, 0, 0);
     fillBox(g, 5, 0.5, 1.2, fillCropMat, 0, -0.15, -1.5);
     fillBox(g, 5, 0.5, 1.2, fillCropMat, 0, -0.15, 1.5);
+    addSolid(angle, 3, z, 3);
   }
   function fillTree(angle, z) {
     const g = fillGroup(angle, z, 0.4);
@@ -2517,6 +2552,7 @@ function basisQuat(radial) {
     const stoop = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.4, 2.5),
       new THREE.MeshStandardMaterial({ color: 0x5a5f66, roughness: 0.9 }));
     stoop.position.set(doorSide * 8.2, -2.3, 0);
+    addSolid(angle, 7, z, 6);
     grp.add(stoop);
     ship.add(grp);
   }
@@ -2536,6 +2572,7 @@ function basisQuat(radial) {
       const bench = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.15, 0.5),
         new THREE.MeshStandardMaterial({ color: 0x4a3b28, roughness: 0.9 }));
       bench.position.set(0, -0.55, bz);
+    addSolid(angle, 1.75, z, 1.65);
       grp.add(bench);
     }
     ship.add(grp);
@@ -2552,6 +2589,7 @@ function basisQuat(radial) {
       lowWallMat);
     wall.position.copy(radial).multiplyScalar(RADIUS - h / 2);
     wall.position.z = (z0 + z1) / 2;
+    addSolid(angle, 0.25, (z0 + z1) / 2, (z1 - z0) / 2);
     wall.quaternion.copy(basisQuat(radial));
     ship.add(wall);
   }
@@ -2568,6 +2606,7 @@ function basisQuat(radial) {
     grp.quaternion.copy(basisQuat(radial));
     const box = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.8, 4), planterMat);
     grp.add(box);
+    addSolid(angle, 0.8, z, 2);
     for (const pz of [-1.2, 0, 1.2]) {
       const plant = new THREE.Mesh(new THREE.ConeGeometry(0.45, 1.1, 8), leafMat);
       plant.position.set(0, 0.9, pz);
@@ -2646,6 +2685,8 @@ function basisQuat(radial) {
     lintel.quaternion.copy(basisQuat(arad));
     ship.add(lintel);
     mountAxialSign('EDUCATION ZONE', '#e8a33d', 5, 2.05, RADIUS - 4.2, 204.3, -1);
+    addSolid(2.05 - 6 / RADIUS, 0.4, 205, 0.4);
+    addSolid(2.05 + 6 / RADIUS, 0.4, 205, 0.4);
   }
   // Agriculture path: benches + sheds, fields untouched and open.
   for (const bz of [-240, -180, -120]) {
@@ -2656,6 +2697,7 @@ function basisQuat(radial) {
     bench.position.z = bz;
     bench.quaternion.copy(basisQuat(brad));
     ship.add(bench);
+    addSolid(1.2, 1.75, bz, 0.25);
   }
   for (const sz of [-200, -155]) {
     const srad = new THREE.Vector3(Math.cos(2.2), Math.sin(2.2), 0);
@@ -2665,6 +2707,7 @@ function basisQuat(radial) {
     shed.position.z = sz;
     shed.quaternion.copy(basisQuat(srad));
     ship.add(shed);
+    addSolid(2.2, 4.5, sz, 4.5);
   }
   // Warm point lights over the mess and the quarters row (living light;
   // work areas keep the existing cool strips). Emissive-only elsewhere.
@@ -2689,6 +2732,7 @@ function basisQuat(radial) {
     crate.position.z = cz;
     crate.quaternion.copy(basisQuat(crad));
     ship.add(crate);
+    addSolid(ca, 0.6, cz, 0.6);
   }
   for (const [ba, bz] of [[0.95, 170], [2.35, 170], [0.95, 190], [2.35, 190]]) {
     const brad = new THREE.Vector3(Math.cos(ba), Math.sin(ba), 0);
@@ -2697,6 +2741,7 @@ function basisQuat(radial) {
     bench.position.z = bz;
     bench.quaternion.copy(basisQuat(brad));
     ship.add(bench);
+    addSolid(ba, 1.75, bz, 0.25);
   }
   lowWall(0.85, 175, 195, 1.3);
   lowWall(2.45, 175, 195, 1.3);
@@ -3990,6 +4035,7 @@ function updateWalk(dt) {
   const right = new THREE.Vector3().crossVectors(fwdH, up);
   const move = fwdH.multiplyScalar(f).add(right.multiplyScalar(s));
 
+  const oldAngle = playerAngle, oldZ = playerZ;
   playerZ = Math.max(-(LENGTH / 2 - 20), Math.min(LENGTH / 2 - 20, playerZ + move.z * spd * dt));
   // Gallery side walls are solid: inside the gallery/stair footprint
   // (z 40 ... 160), a tangential move that would cross either gallery
@@ -4012,6 +4058,14 @@ function updateWalk(dt) {
   if (!inBulkDoor) {
     if (playerZ > 0) playerZ = Math.max(1.0, playerZ);
     else if (playerZ < 0) playerZ = Math.min(-1.0, playerZ);
+  }
+  // Solid structures: houses, shops, stalls, walls and frames are real
+  // obstacles now, not walk-through dressing. Slide along a face: keep
+  // whichever component of the move stays clear, else stay put.
+  if (solidBlocked(playerAngle, playerZ)) {
+    if (!solidBlocked(oldAngle, playerZ)) playerAngle = oldAngle;
+    else if (!solidBlocked(playerAngle, oldZ)) playerZ = oldZ;
+    else { playerAngle = oldAngle; playerZ = oldZ; }
   }
 
   // Jump: Mars ballistic arc (JUMP_G = 3.71), landing back on the inner surface.
