@@ -3388,6 +3388,7 @@ const wordLine = document.getElementById('wordLine');
 const wordArrow = document.getElementById('wordArrow');
 const wordDist = document.getElementById('wordDist');
 const beaconWarn = document.getElementById('beaconWarn');
+const hudEl = document.getElementById('hud');
 const menuPanel = document.getElementById('menuPanel');
 const menuBackdrop = document.getElementById('menuBackdrop');
 const btnMode = document.getElementById('btn-mode');
@@ -3435,6 +3436,7 @@ function hideNav() {
   navLine.style.display = 'none';
   wordLine.style.display = 'none';
   beaconWarn.style.display = 'none';
+  hudEl.style.display = 'none';
   beaconBeam.visible = false;
   btnLookSteer.style.display = 'none';
   btnBrake.style.display = 'none';
@@ -4370,6 +4372,7 @@ function updateFlight(dt) {
     beaconBeamMat.opacity = 0.4 * Math.max(0, Math.min(1, (dist - 500) / 2500));
     beaconBeam.visible = true;
     navLine.style.display = 'flex';
+    hudEl.style.display = '';
     // LOOK/STEER toggle: flight only — hidden docked / crashed / while any
     // prompt or panel is open (collect, station, review, menu).
     btnLookSteer.style.display = (mode === 'flight' && !crashed && !collectOpen && !toolOpen && !reviewOpen && !menuOn) ? '' : 'none';
@@ -4409,6 +4412,7 @@ function updateFlight(dt) {
     navLine.style.display = 'none';
     wordLine.style.display = 'none';
     beaconWarn.style.display = 'none';
+    hudEl.style.display = 'none'; // no nav content: hide the box, don't leave an empty pill
     beaconBeam.visible = false;
   }
 }
