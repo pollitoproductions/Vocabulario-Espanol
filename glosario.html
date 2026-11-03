@@ -4071,7 +4071,8 @@ function healPassStandard(transcript, fullForm){ return sayPass('standard', tran
 
 var glosAudio=null;
 function glosAudioEnsure(){try{if(!glosAudio){var AC=window.AudioContext||window.webkitAudioContext;if(!AC){return null;}glosAudio=new AC();}if(glosAudio.state==="suspended"){glosAudio.resume();}return glosAudio;}catch(err){return null;}}
-function glosDing(){var ac=glosAudioEnsure();if(!ac){return;}try{if(ac.resume){ac.resume();}var tm=ac.currentTime;var g=ac.createGain();g.gain.setValueAtTime(0.0001,tm);g.gain.linearRampToValueAtTime(0.5,tm+0.02);g.gain.setValueAtTime(0.5,tm+0.35);g.gain.exponentialRampToValueAtTime(0.0001,tm+1.05);g.connect(ac.destination);var o1=ac.createOscillator();o1.type="sine";o1.frequency.setValueAtTime(880,tm);var o2=ac.createOscillator();o2.type="sine";o2.frequency.setValueAtTime(1318.5,tm+0.15);o1.connect(g);o2.connect(g);o1.start(tm);o2.start(tm+0.15);o1.stop(tm+0.55);o2.stop(tm+1.1);}catch(err){}}
+// Single-tone correct-answer ding: the 1318.5 Hz second note was removed (harsh).
+function glosDing(){var ac=glosAudioEnsure();if(!ac){return;}try{if(ac.resume){ac.resume();}var tm=ac.currentTime;var g=ac.createGain();g.gain.setValueAtTime(0.0001,tm);g.gain.linearRampToValueAtTime(0.5,tm+0.02);g.gain.setValueAtTime(0.5,tm+0.35);g.gain.exponentialRampToValueAtTime(0.0001,tm+1.05);g.connect(ac.destination);var o1=ac.createOscillator();o1.type="sine";o1.frequency.setValueAtTime(880,tm);o1.connect(g);o1.start(tm);o1.stop(tm+0.55);}catch(err){}}
 const HEAL_SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 // Heal prompt: small, non-modal, Backrooms yellow. Never pauses the game,

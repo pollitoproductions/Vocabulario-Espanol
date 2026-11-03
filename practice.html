@@ -182,7 +182,7 @@ function flashShow(){
 
 var pracAudio=null;
 function pracAudioEnsure(){try{if(!pracAudio){var AC=window.AudioContext||window.webkitAudioContext;if(!AC){return null;}pracAudio=new AC();}if(pracAudio.state==="suspended"){pracAudio.resume();}return pracAudio;}catch(err){return null;}}
-function pracDing(){var ac=pracAudioEnsure();if(!ac){return;}try{if(ac.resume){ac.resume();}var tm=ac.currentTime;var g=ac.createGain();g.gain.setValueAtTime(0.0001,tm);g.gain.linearRampToValueAtTime(0.5,tm+0.02);g.gain.setValueAtTime(0.5,tm+0.35);g.gain.exponentialRampToValueAtTime(0.0001,tm+1.05);g.connect(ac.destination);var o1=ac.createOscillator();o1.type="sine";o1.frequency.setValueAtTime(880,tm);var o2=ac.createOscillator();o2.type="sine";o2.frequency.setValueAtTime(1318.5,tm+0.15);o1.connect(g);o2.connect(g);o1.start(tm);o2.start(tm+0.15);o1.stop(tm+0.55);o2.stop(tm+1.1);}catch(err){}}
+function pracDing(){var ac=pracAudioEnsure();if(!ac){return;}try{if(ac.resume){ac.resume();}var tm=ac.currentTime;var g=ac.createGain();g.gain.setValueAtTime(0.0001,tm);g.gain.linearRampToValueAtTime(0.5,tm+0.02);g.gain.setValueAtTime(0.5,tm+0.35);g.gain.exponentialRampToValueAtTime(0.0001,tm+1.05);g.connect(ac.destination);var o1=ac.createOscillator();o1.type="sine";o1.frequency.setValueAtTime(880,tm);o1.connect(g);o1.start(tm);o1.stop(tm+0.55);}catch(err){}}
 /* SAY-GATE-MATCH-START: pure pronunciation-matching helpers (no DOM) */
 function sayNorm(s){return (s||'').toLowerCase().trim().replace(/[áàä]/g,'a').replace(/[éèë]/g,'e').replace(/[íìï]/g,'i').replace(/[óòö]/g,'o').replace(/[úùü]/g,'u').replace(/[^a-zñ ]/g,' ').replace(/\s+/g,' ').trim()}
 const SAY_ARTICLES=['el','la','los','las','un','una'];
@@ -207,17 +207,17 @@ function sayGate(w,eligible){
   skip.onclick=e=>{e.preventDefault();stopping=true;clearTimeout(listenTimer);setListening(false);if(rec){try{rec.abort()}catch(err){}}advance()};
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){status.textContent='This browser can’t listen — use the skip link below to move on.';skip.style.fontWeight='bold';return}
-  let rec=null,attempt=0,stopping=false,listenTimer=null,listening=false,tried=false;
+  let rec=null,attempt=0,stopping=false,userStop=false,listenTimer=null,listening=false,tried=false;
   if(!document.getElementById('saylisten-style')){const st=document.createElement('style');st.id='saylisten-style';st.textContent='#saymic.listening{background:#c0392b!important;color:#fff!important;animation:saypulse 1s infinite}@keyframes saypulse{50%{opacity:.55}}';document.head.appendChild(st)}
   const setListening=on=>{listening=on;mic.classList.toggle('listening',on);if(on)mic.textContent='\u25cf Listening\u2026 \u2014 tap to stop';else mic.textContent=tried?'🎤 Try again':'🎤 Speak'};
   mic.onclick=()=>{
     /* tap while listening = stop, so the user is never stuck on Listening… */
-    if(listening){stopping=true;clearTimeout(listenTimer);try{rec.stop()}catch(e){}setListening(false);status.textContent='Stopped \u2014 try again.';return}
+    if(listening){stopping=true;userStop=true;clearTimeout(listenTimer);try{rec.stop()}catch(e){}setListening(false);return}
     pracAudioEnsure();
     /* iPhone fix: free the speech audio session first, or iOS may never engage the mic */
     if(window.speechSynthesis){try{speechSynthesis.cancel()}catch(e){}}
     if(rec){try{rec.abort()}catch(e){}}
-    attempt++;const my=attempt;stopping=false;tried=true;
+    attempt++;const my=attempt;stopping=false;userStop=false;tried=true;
     let done=false,heardAny=false,li=0;
     const langs=[];['es-MX','es-US',(navigator.language||'en-US')].forEach(l=>{if(l&&langs.indexOf(l)<0)langs.push(l)});
     status.textContent='Listening…';setListening(true);
@@ -249,7 +249,8 @@ function sayGate(w,eligible){
         else{status.textContent='Something went wrong listening — try again or skip this step.'}
       };
       rec.onend=()=>{
-        if(stopping||my!==attempt||done)return;
+        if(my!==attempt||done)return;
+        if(stopping){clearTimeout(listenTimer);setListening(false);if(userStop)status.textContent='Stopped \u2014 try again.';mic.disabled=false;return;}
         clearTimeout(listenTimer);
         /* iOS Safari often ends recognition silently with no result and no error: retry the next language */
         if(!heardAny&&li<langs.length-1){li++;startWith(langs[li]);return}
