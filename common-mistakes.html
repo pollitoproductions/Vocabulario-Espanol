@@ -45,6 +45,7 @@ ul.links span{display:block;font-size:.88rem;color:#333333}
 .tool .qbox{border:2px solid #000000;border-radius:14px;padding:26px 16px;text-align:center;min-height:110px;display:flex;flex-direction:column;justify-content:center}
 .tool .qbox b{font-size:1.55rem;color:#000000;line-height:1.3}
 .tool .qbox span{font-size:.85rem;color:#333333;margin-top:8px}
+.tool .qbox span.not{font-size:.9rem;color:#8a3b00;margin-top:6px;font-style:italic}
 .tool .count{font-size:.85rem;color:#333333;margin:12px 0 4px}
 .tool .ctl{display:flex;gap:10px;margin-top:14px}
 .tool .ctl button{flex:1;padding:12px 8px;text-align:center;margin:0}
@@ -60,8 +61,8 @@ ul.links span{display:block;font-size:.88rem;color:#333333}
 </style>
 <div class="tool">
 <h2>False friends practice</h2>
-<p>100 Spanish words that look like English words — but mean something else. One choice is the real meaning, the other is the English lookalike that fools everyone. Pick the real one.</p>
-<div class="qbox"><b id="q-sen"></b><span id="q-sub"></span></div>
+<p>100 Spanish words that look like English words — but mean something else. Each card shows what the word does NOT mean (the thing everyone assumes). Pick the real meaning.</p>
+<div class="qbox"><b id="q-sen"></b><span id="q-sub"></span><span id="q-not" class="not"></span></div>
 <div class="opts" id="opts"></div>
 <p class="feedback" id="feedback"></p>
 <div class="reveal" id="reveal"><b id="reveal-sen"></b><p id="reveal-en"></p><p id="reveal-note"></p><button class="btn alt" id="btn-hear" type="button" style="display:none">🔊 Hear it</button></div>
@@ -77,12 +78,16 @@ function shuffle2(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random(
 function $(id){return document.getElementById(id);}
 function show(){
 var q=deck[pos];
-// Two choices only: the real meaning and the English lookalike.
-// The student plainly accepts one and rejects the other.
-var opts=shuffle2([q[2],q[3]]);completed=q[1];
+// Two choices: the real meaning and one other real meaning from the
+// bank. The lookalike is NOT a choice — it is named on the card as
+// what the word does NOT mean.
+var pool=Q.map(function(x){return x[2];}).filter(function(m){return m!==q[2]&&m!==q[3];});
+var d1=pool[Math.floor(Math.random()*pool.length)];
+var opts=shuffle2([q[2],d1]);completed=q[1];
 cur={q:q,opts:opts,ans:opts.indexOf(q[2])};answered=false;
 $('q-sen').textContent=q[0];
 $('q-sub').textContent=q[1]+' — What does '+q[0]+' mean?';
+$('q-not').textContent='It does NOT mean "'+q[3]+'".';
 $('reveal').className='reveal';$('btn-hear').style.display='none';
 $('feedback').textContent='';$('feedback').className='feedback';
 var ob=$('opts');ob.innerHTML='';
