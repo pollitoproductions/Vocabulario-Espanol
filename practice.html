@@ -207,17 +207,17 @@ function sayGate(w,eligible){
   skip.onclick=e=>{e.preventDefault();stopping=true;clearTimeout(listenTimer);setListening(false);if(rec){try{rec.abort()}catch(err){}}advance()};
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){status.textContent='This browser can’t listen — use the skip link below to move on.';skip.style.fontWeight='bold';return}
-  let rec=null,attempt=0,stopping=false,userStop=false,listenTimer=null,listening=false,tried=false;
+  let rec=null,attempt=0,stopping=false,listenTimer=null,listening=false,tried=false;
   if(!document.getElementById('saylisten-style')){const st=document.createElement('style');st.id='saylisten-style';st.textContent='#saymic.listening{background:#c0392b!important;color:#fff!important;animation:saypulse 1s infinite}@keyframes saypulse{50%{opacity:.55}}';document.head.appendChild(st)}
   const setListening=on=>{listening=on;mic.classList.toggle('listening',on);if(on)mic.textContent='\u25cf Listening\u2026 \u2014 tap to stop';else mic.textContent=tried?'🎤 Try again':'🎤 Speak'};
   mic.onclick=()=>{
     /* tap while listening = stop, so the user is never stuck on Listening… */
-    if(listening){stopping=true;userStop=true;clearTimeout(listenTimer);try{rec.stop()}catch(e){}setListening(false);return}
+    if(listening){stopping=true;clearTimeout(listenTimer);try{rec.stop()}catch(e){}setListening(false);/* user stop: do not finalize here — onresult scores a final transcript if one arrives, onend shows try-again if none does */return}
     pracAudioEnsure();
     /* iPhone fix: free the speech audio session first, or iOS may never engage the mic */
     if(window.speechSynthesis){try{speechSynthesis.cancel()}catch(e){}}
     if(rec){try{rec.abort()}catch(e){}}
-    attempt++;const my=attempt;stopping=false;userStop=false;tried=true;
+    attempt++;const my=attempt;stopping=false;tried=true;
     let done=false,heardAny=false,li=0;
     const langs=[];['es-MX','es-US',(navigator.language||'en-US')].forEach(l=>{if(l&&langs.indexOf(l)<0)langs.push(l)});
     status.textContent='Listening…';setListening(true);
@@ -241,7 +241,7 @@ function sayGate(w,eligible){
       rec.onerror=ev=>{
         if(my!==attempt||done)return;
         const err=ev.error||'';
-        if(err==='language-not-supported'){nextLang();return}
+        if(err==='language-not-supported'){if(stopping){done=true;mic.disabled=false;clearTimeout(listenTimer);setListening(false);status.textContent='Didn\u2019t catch that \u2014 try again.';mic.textContent='🎤 Try again';return}nextLang();return}
         done=true;heardAny=true;mic.disabled=false;clearTimeout(listenTimer);setListening(false);
         if(err==='not-allowed'||err==='service-not-allowed'){status.textContent='Microphone access was denied — use the skip link below to move on.';skip.style.fontWeight='bold'}
         else if(err==='no-speech'){status.textContent='Didn’t hear anything — try again.';mic.textContent='🎤 Try again'}
@@ -250,8 +250,9 @@ function sayGate(w,eligible){
       };
       rec.onend=()=>{
         if(my!==attempt||done)return;
-        if(stopping){clearTimeout(listenTimer);setListening(false);if(userStop)status.textContent='Stopped \u2014 try again.';mic.disabled=false;return;}
         clearTimeout(listenTimer);
+        /* user stop with no result: end cleanly, never retry another language */
+        if(stopping){setListening(false);status.textContent='Didn\u2019t catch that \u2014 try again.';mic.textContent='🎤 Try again';mic.disabled=false;return}
         /* iOS Safari often ends recognition silently with no result and no error: retry the next language */
         if(!heardAny&&li<langs.length-1){li++;startWith(langs[li]);return}
         setListening(false);
