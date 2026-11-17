@@ -854,12 +854,6 @@ const skyboxMat = new THREE.ShaderMaterial({
 const skybox = new THREE.Mesh(new THREE.BoxGeometry(200000, 200000, 200000), skyboxMat);
 skybox.renderOrder = -1;
 exteriorCell.add(skybox);
-new THREE.TextureLoader().load(DEEPFIELD_SKY, function (tex) {
-  tex.colorSpace = THREE.SRGBColorSpace;
-  nebulaSkyMat.map = tex;
-  nebulaSkyMat.color.set(0xffffff);
-  nebulaSkyMat.needsUpdate = true;
-});
 
 
 // ---------- The ship: one rotating group, long axis along Z ----------
